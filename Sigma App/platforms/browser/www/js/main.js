@@ -38,7 +38,7 @@ function login() {
   var settings = {
     "async": true,
     "crossDomain": true,
-    "url": "http://localhost:16733/Account/Login",
+    "url": "http://204.48.19.107:5000/Account/Login",
     "method": "POST",
     "headers": {
       "Content-Type": "application/json",
