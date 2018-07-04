@@ -1,13 +1,14 @@
 // Objects
-var localStorage = function () {
-};
-
-localStorage.setToken = function (token) {
-  window.localStorage.setItem("sigma_token", token);
-};
-
-localStorage.getToken = function (token) {
-  return window.localStorage.getItem("sigma_token");
+SigmaLocalStorage = {
+  setToken: function (token) {
+    window.localStorage.setItem("sigma_token", token);
+  },
+  getToken: function (token) {
+    return window.localStorage.getItem("sigma_token");
+  },
+  removeToken: function(token) {
+    return window.localStorage.setItem("sigma_token", null);
+  }
 };
 
 // Initialize
@@ -34,6 +35,9 @@ if (!String.prototype.format) {
 function login() {
   var cedula = document.getElementById('cedula').value;
   var password = document.getElementById('password').value;
+  
+  var loading = document.getElementById('loading-modal');
+  loading.show();
 
   var settings = {
     "async": true,
@@ -47,27 +51,59 @@ function login() {
     "processData": false,
     "data": '{"CI": "{0}","Password": "{1}"}'.format(cedula, password),
     "success": function (response) {
-      document.querySelector('#nav').replacePage('home.html');
-      ons.notification.alert({
-        title: 'Atención!',
-        message: 'Logueado! Tu token es ' + response.token
-      })
+      for(var i = 0; i < response.roles.length; i++) {
+        switch(response.roles[i]) {
+          case "Docente":
+          SigmaLocalStorage.setToken(response.token);
+          document.querySelector('#nav').replacePage('docente-home.html');
+          loading.hide();
+          break;
+        }
+      }
     },
     "error": function (response) {
       ons.notification.alert({
         title: 'Atención!',
         message: 'Cédula o contraseña incorrecta.'
       });
+      loading.hide();
     }
   }
 
   $.ajax(settings);
 }
 
+function logout() {
+  ons.notification.confirm({
+    message: '¿Estás seguro de que querés cerrar sesión?',
+    callback: function(idx) {
+      if(idx === 1) {
+        SigmaLocalStorage.removeToken();
+        document.querySelector('#nav').replacePage('login.html'); 
+      }
+    },
+    buttonLabels: ["Cancelar", "Si"]
+  })
+}
+
+function deberes() {
+  document.querySelector('#nav').pushPage('docente-deberes.html');
+}
+
+function back() {
+  document.querySelector('#nav').popPage();  
+}
+
+function createDeber() {
+  document.querySelector('#nav').pushPage('docente-deberes-create.html', options = {
+    animation: 'lift'
+  })  
+}
+
 /////////// SEBA ////////////////////
 
 function mapa() {
-  document.querySelector('#nav').replacePage('mapa.html')
+  document.querySelector('#nav').pushPage('mapa.html')
 }
 
 function mapaControl() {
@@ -87,7 +123,4 @@ function scanOnsen() {
     });
    
   }
-
-
-
 }
