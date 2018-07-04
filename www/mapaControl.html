@@ -1,0 +1,50 @@
+<ons-page id="mapaControl">
+
+    <ons-toolbar>
+            <div class="left">
+                    <ons-button onclick="mapa()">Mapa</ons-button>
+                </div>
+        <div class="right">
+            <ons-button onclick="scanOnsen()">Escanear</ons-button>
+        </div>
+    </ons-toolbar>
+    <script>
+        document.addEventListener('init', function (event) {
+            if (event.target.matches('#mapaControl')) {
+                
+                scanSetup();
+
+            }
+        }, false);
+    </script>
+
+
+    <ons-card style="margin: 5px;">
+        <div style="text-align: center;">
+            
+            <h2>Panel de Control - Mapa</h2>
+            <input type="button" value="Iniciar Wifi" name="Wifi" id="wifi" />
+            
+            <input type="button" value="Escanear" name="Scan" id="scan" />
+            <input type="button" value="Crear Tabla" name="Crear" id="crear" />
+            <input type="button" value="PreCarga" name="PreCarga" id="preCarga" />
+            <input type="button" value="Mostrar datos" name="Data" id="data" />
+            <input type="button" value="Borrar Tabla" name="Borrar" id="borrar" />
+            <input type="button" value="Limpiar Mapa" name="LimpiarMapa" id="limpiarMapa" />
+            <br>
+            
+            <br>
+            <p id="pResultado"></p>
+            <hr>
+            <p id="pContador"></p>
+
+            <p id="aTableData"></p>
+            
+            <input type="button" value="Click Me!" name="counter" id="counter" />
+
+            <div id="result"></div>
+        </div>
+
+    </ons-card>
+
+</ons-page>

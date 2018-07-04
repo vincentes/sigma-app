@@ -1,0 +1,4 @@
+#Tue Jul 03 22:52:54 UYT 2018
+base.0=E\:\\Proyecto_FINAL_GIT\\OnsenUI\\PruebaWifi2\\platforms\\android\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0
+renamed.0=classes.dex
+file.0=E\:\\Proyecto_FINAL_GIT\\OnsenUI\\PruebaWifi2\\platforms\\android\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0\\classes.dex
