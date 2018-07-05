@@ -11,11 +11,6 @@ SigmaLocalStorage = {
   }
 };
 
-// Initialize
-document.addEventListener('init', function (event) {
-
-}, false);
-
 // Extension methods
 
 if (!String.prototype.format) {
