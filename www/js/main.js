@@ -3,7 +3,7 @@ SigmaLocalStorage = {
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
-  getToken: function (token) {
+  getToken: function () {
     return window.localStorage.getItem("sigma_token");
   },
   removeToken: function(token) {
@@ -11,8 +11,11 @@ SigmaLocalStorage = {
   }
 };
 
-// Extension methods
+ons.ready(function() {
+  checkLogin();
+});
 
+// Extension methods
 if (!String.prototype.format) {
   String.prototype.format = function () {
     var args = arguments;
@@ -79,6 +82,20 @@ function logout() {
     },
     buttonLabels: ["Cancelar", "Si"]
   })
+}
+
+function checkLogin() {
+  var page = document.querySelector('#nav').topPage.id;
+  var hasToken = SigmaLocalStorage.getToken() !== null;
+  if(page !== "login") {
+    if(!hasToken) {
+      document.querySelector('#nav').replacePage('login.html');    
+    }
+  } else {
+    if(hasToken) {
+      document.querySelector('#nav').replacePage('docente-home.html');    
+    }
+  }
 }
 
 function deberes() {
