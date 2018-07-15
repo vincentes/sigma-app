@@ -86,7 +86,7 @@ function logout() {
 
 function checkLogin() {
   var page = document.querySelector('#nav').topPage.id;
-  var hasToken = SigmaLocalStorage.getToken() !== null;
+  var hasToken = SigmaLocalStorage.getToken() !== 'null';
   if(page !== "login") {
     if(!hasToken) {
       document.querySelector('#nav').replacePage('login.html');    
