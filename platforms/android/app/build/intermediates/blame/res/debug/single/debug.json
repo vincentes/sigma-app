@@ -8,6 +8,10 @@
         "source": "E:\\Proyecto_FINAL_GIT\\OnsenUI\\PruebaWifi2\\platforms\\android\\app\\src\\main\\res\\drawable-port-mdpi\\screen.png"
     },
     {
+        "merged": "E:\\Proyecto_FINAL_GIT\\OnsenUI\\PruebaWifi2\\platforms\\android\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_photo.xml.flat",
+        "source": "E:\\Proyecto_FINAL_GIT\\OnsenUI\\PruebaWifi2\\platforms\\android\\app\\src\\main\\res\\layout\\activity_photo.xml"
+    },
+    {
         "merged": "E:\\Proyecto_FINAL_GIT\\OnsenUI\\PruebaWifi2\\platforms\\android\\app\\build\\intermediates\\res\\merged\\debug\\drawable-port-ldpi_screen.png.flat",
         "source": "E:\\Proyecto_FINAL_GIT\\OnsenUI\\PruebaWifi2\\platforms\\android\\app\\src\\main\\res\\drawable-port-ldpi\\screen.png"
     },

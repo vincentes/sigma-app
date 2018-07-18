@@ -15,6 +15,14 @@ module.exports = [
     "clobbers": [
       "SQLitePlugin"
     ]
+  },
+  {
+    "id": "com-sarriaroman-photoviewer.PhotoViewer",
+    "file": "plugins/com-sarriaroman-photoviewer/www/PhotoViewer.js",
+    "pluginId": "com-sarriaroman-photoviewer",
+    "clobbers": [
+      "PhotoViewer"
+    ]
   }
 ];
 module.exports.metadata = 
@@ -22,7 +30,8 @@ module.exports.metadata =
 {
   "cordova-plugin-whitelist": "1.3.3",
   "com.pylonproducts.wifiwizard": "0.2.11",
-  "cordova-sqlite-storage": "2.3.2"
+  "cordova-sqlite-storage": "2.3.2",
+  "com-sarriaroman-photoviewer": "1.1.18"
 };
 // BOTTOM OF METADATA
 });

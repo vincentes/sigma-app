@@ -15,6 +15,9 @@
     },
     "cordova-sqlite-storage": {
       "PACKAGE_NAME": "io.onsen.sampleapp"
+    },
+    "com-sarriaroman-photoviewer": {
+      "PACKAGE_NAME": "io.onsen.sampleapp"
     }
   },
   "dependent_plugins": {}

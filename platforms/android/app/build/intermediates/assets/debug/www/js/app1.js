@@ -110,6 +110,10 @@ function alertarOns(title, msg) {
     });
 }
 
+function redondeo(valor) {
+    return ((Math.round(valor * 100)) / 100);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////                              Base de Datos                                     ////////////////////
@@ -290,14 +294,15 @@ function calcularDistancia(freq, level) {
     if (num < 0) {
         num = 0;
     }
-    return Math.round(num * 100) / 100;
+    //return Math.round(num * 100) / 100;
+    return redondeo(num);
 
 }
 
 
 function win(e) {
     if (e) {
-        alertOns("Atención","Wifi enabled already");
+        alertOns("Atención", "Wifi enabled already");
     }
     else {
         WifiWizard.setWifiEnabled(true, winEnable, failEnable);
@@ -313,7 +318,7 @@ function scanOK(e) {
     }
 
     else {
-        alertOns("Atención","No se inició el scan");
+        alertOns("Atención", "No se inició el scan");
     }
 
 }
@@ -325,7 +330,7 @@ function funcExterna(e) {
         beaconsEncontrados.length = 0;
         //Limpiamos el mapa
         limpiarMapa();
-        //Dibujamos los beacons en la DB
+        //Dibujamos la posición de los beacons según la DB
         dibujarBeaconsEnDb();
 
         $("#pResultado").text('');
@@ -383,7 +388,8 @@ function funcExterna(e) {
                 bilateracion();
                 break;
             default:
-                alertarOns("Trilateración", "3 o más beacons");
+                //alertarOns("Trilateración", "3 o más beacons");
+                trilateracion();
         }
 
     });
@@ -396,15 +402,36 @@ function funcExterna(e) {
 function bilateracion() {
     var a = beaconsEncontrados[0];
     var b = beaconsEncontrados[1];
-    var disBeacons = dist2puntos(a.posX, a.posY, b.posX, b.posY);
-    if (a.radio > disBeacons) {
-        //refactorizarRadios(a,b, distancia);
-        alertOns("Atención", "los dos radios son mayores a la dist");
+
+    //Se dibujan los radios originales
+    //dibujarRadioPosicion(a.posX, a.posY, redondeo((a.radio) * escala),true);
+    //dibujarRadioPosicion(b.posX, b.posY, redondeo((b.radio) * escala),true);
+    dibujarRadioPosicion(a.posX, a.posY, (a.radio * escala),true);
+    dibujarRadioPosicion(b.posX, b.posY, (b.radio * escala),true);
+   
+
+
+
+    var disBeaconsAB = dist2puntos(a.posX, a.posY, b.posX, b.posY);
+    if (a.radio > disBeaconsAB) {
+        alertarOns("Atención", "los dos radios son mayores a la dist");
+        refactorizarRadios(a, b, disBeaconsAB, 1);
+
     } else {
-        if (b.radio > disBeacons) {
-            alertOns("Atención", "radio B mayor a la dist");
+        if (b.radio > disBeaconsAB) {
+            //radio B mayor a la dist
+            dibujarRadioPosicion(a.posX, a.posY, (a.radio) * escala, false);
         } else {
-            alertOns("Atención", "todo en orden");
+            if (a.radio + b.radio < disBeaconsAB) {
+                //los radios no se intersectan
+                refactorizarRadios(a, b, disBeaconsAB, 0);
+
+
+            } else {
+                //Radios correctos
+                intersect2beacons(a, b, disBeaconsAB);
+            }
+
         }
     }
 }
@@ -414,6 +441,146 @@ function dist2puntos(aX, aY, bX, bY) {
     dX = aX - bX;
     dY = aY - bY;
     return Math.round(Math.sqrt((dY * dY) + (dX * dX))) / escala;
+}
+
+//Re factorizar radios
+function refactorizarRadios(a, b, distancia, radioMayorADistancia) {
+    var dif = 0;
+    if (radioMayorADistancia == 0) {
+        dif = difRadiosDist(a, b, distancia);
+        //a.radio = a.radio + dif;
+        //Sumamos la diferencia al radio más grande
+        b.radio = b.radio + (dif * 2);
+
+
+    } else {
+        //Los radios ingresados son mayores a la distancia entre los dos puntos, se reducen proporcionalmente y se estima la posición
+
+        var div = (a.radio + b.radio) / distancia;
+        a.radio = Math.round(a.radio / div) + 1;
+        b.radio = Math.round(b.radio / div) + 1;
+
+    }
+
+
+    //dibujarRadioPosicion(a.posX, a.posY, (a.radio) * escala);
+    //dibujarRadioPosicion(b.posX, b.posY, (b.radio) * escala);
+    intersect2beacons(a, b, distancia);
+
+}
+
+//Diferencia entre los radios y la distancia entre los puntos
+function difRadiosDist(a, b, distancia) {
+    return Math.round(((distancia - (a.radio + b.radio)) + 1) / 2);
+}
+
+//Intersección de dos radios
+function intersect2beacons(a, b, dist) {
+
+    var p = ((a.radio * a.radio) - (b.radio * b.radio) + (dist * dist)) / (2.0 * dist);
+
+    var dx = b.posX - a.posX;
+
+    var dy = b.posY - a.posY;
+
+    var pX = a.posX + (dx * p / dist);
+    var pY = a.posY + (dy * p / dist);
+
+    var radio2 = (Math.sqrt((a.radio * a.radio) - (p * p)) * escala);
+    //var radio3 = redoneo(radio2);
+
+    dibujarRadioPosicion(pX, pY, radio2, false);
+
+}
+
+
+//Trilateración
+function trilateracion() {
+
+    var a = beaconsEncontrados[0];
+    var b = beaconsEncontrados[1];
+    var c = beaconsEncontrados[2];
+//Se dibujan los radios originales
+    dibujarRadioPosicion(a.posX, a.posY, (a.radio * escala), true);
+    dibujarRadioPosicion(b.posX, b.posY, (b.radio * escala), true);
+    dibujarRadioPosicion(c.posX, c.posY, (c.radio * escala), true);
+
+//No se utilazará el posicionamiento 3D se asignan las posiciones del eje Z como 0
+    a.posZ = 0;
+    b.posZ = 0;
+    c.posZ = 0;
+//Se respalda el valor original de los radios
+    var aRadioOriginal = a.radio + 0;
+    var bRadioOriginal = b.radio + 0;
+    var cRadioOriginal = c.radio + 0;
+
+
+
+    p4 = trilaterate(a, b, c);
+
+    if (p4 !== null) {
+        if (p4 instanceof Array) {
+            alertarOns("Atención:", "Sin Refact");
+            dibujarRadioPosicion(p4[0].posX, p4[0].posY, ((a.radio / 2) * escala), false);
+        } else {
+            alertarOns("Atención:", "Sin Refact único");
+            dibujarRadioPosicion(p4.posX, p4.posY, ((a.radio / 2) * escala), false);
+        }
+    } else {
+        //No se logró obtener la posición con los datos obtenidos, se intentará estimar los valores
+        var dif, dif2 = 0;
+        var disBeaconsAB = dist2puntos(a.posX, a.posY, b.posX, b.posY);
+        var disBeaconsAC = dist2puntos(a.posX, a.posY, c.posX, c.posY);
+        var disBeaconsBC = dist2puntos(b.posX, b.posY, c.posX, c.posY);
+
+        if (a.radio + b.radio < disBeaconsAB) {
+            dif = difRadiosDist(a, b, disBeaconsAB);
+            dif2 = difRadiosDist(a, c, disBeaconsAC);
+
+
+            a.radio = a.radio + dif;
+            b.radio = b.radio + dif;
+            c.radio = c.radio + dif2 * 2;
+
+        } else {
+            dif = a.radio / 2;
+        }
+
+
+        /*
+        if (a.radio + c.radio < disBeaconsAC) {
+            dif2 = difRadiosDist(a, c, disBeaconsAC);
+            //a.radio = a.radio + dif;
+            c.radio = c.radio + dif2;
+
+        }
+        */
+
+        //console.log("R1 Dif:"+dif + ", Dif2:"+dif2);
+
+
+        //Se lanza nuevamente la trilateración con los nuevos valores calculados
+        p4 = trilaterate(a, b, c);
+        if (p4 !== null) {
+            if (p4 instanceof Array) {
+                alertarOns("Atención:", "Refact array");
+                dibujarRadioPosicion(p4[0].posX, p4[0].posY, (((dif * 2 + dif2 * 2) / 2) * escala), false);
+                //console.log("R2 Dif:"+dif + ", Dif2:"+dif2);
+            } else {
+                alertarOns("Atención:", "Refact único");
+                dibujarRadioPosicion(p4.posX, p4.posY, (((dif * 2 + dif2 * 2) / 2) * escala), false);
+            }
+        } else {
+            a.radio = aRadioOriginal;
+            b.radio = bRadioOriginal;
+            alertarOns("Fallo en trilat:", "Llamando a Bilateración");
+            bilateracion();
+
+
+
+        }
+    }
+   
 }
 
 
@@ -460,7 +627,7 @@ function clickCounter() {
             alert(msg);
         } else {
             alertOns("Atención", "Aún no hay elementos para mostrar");
-           
+
         }
 
     } else {
