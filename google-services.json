@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "254819328445",
+    "firebase_url": "https://sigma-app-cf88c.firebaseio.com",
+    "project_id": "sigma-app-cf88c",
+    "storage_bucket": "sigma-app-cf88c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:254819328445:android:115d3409e3d1daf5",
+        "android_client_info": {
+          "package_name": "com.nerdish.sigma"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "254819328445-e9d7tq8u9rdcl4ao72m7vmnhg5skt621.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtsqFz8ua0VkrGjkAfo6AaDiD-MmmD-EE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
