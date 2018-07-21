@@ -1,5 +1,6 @@
 // Objects
 Sigma = {
+  baseUrl: "204.48.19.107:5000",
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -14,7 +15,7 @@ Sigma = {
       var settings = {
         "async": true,
         "crossDomain": true,
-        "url": "http://192.168.1.108:45455/Notification/SaveToken",
+        "url": "http://{0}/Notification/SaveToken".format(Sigma.baseUrl),
         "method": "POST",
         "headers": {
           "Content-Type": "application/json",
@@ -75,7 +76,7 @@ function login() {
   var settings = {
     "async": true,
     "crossDomain": true,
-    "url": "http://192.168.1.108:45455/Account/Login",
+    "url": "http://{0}/Account/Login".format(Sigma.baseUrl),
     "method": "POST",
     "headers": {
       "Content-Type": "application/json",
@@ -141,7 +142,9 @@ function checkLogin() {
   var hasToken = Sigma.getToken() !== 'null';
   if(page !== "login") {
     if(!hasToken) {
-      document.querySelector('#nav').replacePage('login.html');    
+      document.querySelector('#nav').replacePage('login.html', options = {
+        animation: "fade"
+      });
     }
   } else {
     if(hasToken) {
