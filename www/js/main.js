@@ -16,7 +16,7 @@ Deber = {
     var images = $(".deber-image");
     images.each(function(i, element) {
       ons.notification.toast('Uploading item..', { timeout: 500 });    
-      var uri = encodeURI('http://192.168.1.108:45455/Imagen/Upload');
+      var uri = encodeURI('http://{0}/Imagen/Upload'.format(Sigma.baseUrl));
       var fileUrl = element.src;
       var options = new FileUploadOptions();
       options.chunkedMode = false;
