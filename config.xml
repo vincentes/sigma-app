@@ -7,6 +7,7 @@
     <author email="dev@cordova.apache.org" href="http://cordova.io">
         Apache Cordova Team
     </author>
+    <preference name="orientation" value="portrait" />
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
@@ -27,5 +28,7 @@
     <plugin name="cordova-sqlite-storage" spec="^2.3.3" />
     <plugin name="com-sarriaroman-photoviewer" spec="^1.1.18" />
     <plugin name="cordova-plugin-fcm" spec="^2.1.2" />
+    <plugin name="cordova-plugin-camera" spec="^4.0.3" />
+    <plugin name="cordova-plugin-file-transfer" spec="^1.7.1" />
     <engine name="browser" spec="^5.0.3" />
 </widget>

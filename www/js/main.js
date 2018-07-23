@@ -1,4 +1,50 @@
 // Objects
+Deber = {
+  openImagePicker: function() {
+    Sigma.openFilePicker(Deber.appendThumbnail);
+  },
+  openCamera: function() {
+    Sigma.openCamera(Deber.appendThumbnail);
+  },
+  appendThumbnail: function(imageUri) {
+    $('#thumbnail-list').prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(imageUri));    
+    $(".thumbnail:eq(0) > img").click(function(targ) {
+      PhotoViewer.show($(this)[0].src, 'Imagen asociada');
+    });
+  },
+  save: function() {
+    var images = $(".deber-image");
+    images.each(function(i, element) {
+      ons.notification.toast('Uploading item..', { timeout: 500 });    
+      var uri = encodeURI('http://192.168.1.108:45455/Imagen/Upload');
+      var fileUrl = element.src;
+      var options = new FileUploadOptions();
+      options.chunkedMode = false;
+      options.headers = { 'Authorization': 'Bearer {0}'.format(Sigma.getToken()), 'Connection': 'close' };
+      options.fileKey = "file";
+      options.mimeType = "image/jpeg";
+      options.fileName = fileUrl.substr(fileUrl.lastIndexOf('/')+1);
+
+      var success = function(response) {
+        console.log(response);
+        ons.notification.toast('Image uploaded', { timeout: 1000 });
+      }; 
+
+      var error = function(response) {
+        console.log(response);
+        ons.notification.toast('Error uploading', { timeout: 1000 });
+      }
+
+      var ft = new FileTransfer();
+      ft.upload(fileUrl, uri, success, error, options);
+    });
+
+  },
+  reset: function() {
+    images = [];
+  }
+}
+
 Sigma = {
   baseUrl: "204.48.19.107:5000",
   setToken: function (token) {
@@ -9,6 +55,38 @@ Sigma = {
   },
   removeToken: function(token) {
     return window.localStorage.setItem("sigma_token", null);
+  },
+  setOptions: function(srcType) {
+      var options = {
+          quality: 50,
+          destinationType: Camera.DestinationType.FILE_URI,
+          sourceType: srcType,
+          encodingType: Camera.EncodingType.JPEG,
+          mediaType: Camera.MediaType.PICTURE,
+          allowEdit: false,
+          correctOrientation: true  //Corrects Android orientation quirks
+      }
+      return options;
+  },
+  openCamera: function openCamera(fn) {
+    var srcType = Camera.PictureSourceType.CAMERA;
+    var options = Sigma.setOptions(srcType);
+
+    navigator.camera.getPicture(function cameraSuccess(imageUri) {
+        fn(imageUri);
+    }, function cameraError(error) {
+      ons.notification.toast("Unable to obtain picture: " + error, { timeout: 1000 });
+    }, options);
+  },
+  openFilePicker: function(fn) {
+    var srcType = Camera.PictureSourceType.SAVEDPHOTOALBUM;
+    var options = Sigma.setOptions(srcType);
+
+    navigator.camera.getPicture(function cameraSuccess(imageUri) {
+      fn(imageUri);
+    }, function cameraError(error) {
+        ons.notification.toast("Unable to obtain picture: " + error, { timeout: 1000 });
+    }, options);
   },
   saveFCMToken: function(success, error) {
     FCMPlugin.getToken(function(token) {
@@ -46,6 +124,7 @@ Sigma = {
     });
   }
 };
+
 
 ons.ready(function() {
   checkLogin();
@@ -133,8 +212,11 @@ function logout() {
         document.querySelector('#nav').replacePage('login.html'); 
       }
     },
+    error: function(idx) {
+      ons.notification.toast('sdpokasdpokasdpokaspod fuck');
+    },
     buttonLabels: ["Cancelar", "Si"]
-  })
+  });
 }
 
 function checkLogin() {
