@@ -38,7 +38,6 @@ Deber = {
       var ft = new FileTransfer();
       ft.upload(fileUrl, uri, success, error, options);
     });
-
   },
   reset: function() {
     images = [];
@@ -64,7 +63,7 @@ Sigma = {
           encodingType: Camera.EncodingType.JPEG,
           mediaType: Camera.MediaType.PICTURE,
           allowEdit: false,
-          correctOrientation: true  //Corrects Android orientation quirks
+          correctOrientation: true
       }
       return options;
   },
