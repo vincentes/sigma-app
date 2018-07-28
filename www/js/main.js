@@ -1,43 +1,52 @@
 // Objects
 Deber = {
+  images: [],
+  imagesFull: [],
   openImagePicker: function() {
     Sigma.openFilePicker(Deber.appendThumbnail);
   },
   openCamera: function() {
     Sigma.openCamera(Deber.appendThumbnail);
   },
-  appendThumbnail: function(imageUri) {
-    $('#thumbnail-list').prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(imageUri));    
+  appendImage: function(jsImage, image) {
+    Deber.images.push(jsImage);
+    Deber.imagesFull.push(image);
+  },
+  appendThumbnail: function(imageEntry) {
+    $('#thumbnail-list').prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(imageEntry.nativeURL));    
     $(".thumbnail:eq(0) > img").click(function(targ) {
       PhotoViewer.show($(this)[0].src, 'Imagen asociada');
     });
   },
   save: function() {
-    var images = $(".deber-image");
-    images.each(function(i, element) {
-      ons.notification.toast('Uploading item..', { timeout: 500 });    
-      var uri = encodeURI('http://{0}/Imagen/Upload'.format(Sigma.baseUrl));
-      var fileUrl = element.src;
+    Deber.saveImages(function(data) {
+      var images = data;
+    });
+  },
+  saveImages: function(fn) {
+    ons.notification.toast('Subiendo imágenes...', { timeout: 1000 });
+    for(var i = 0; i < Deber.images.length; i++) {
+      var uri = encodeURI('http://192.168.1.108:45455/Imagen/Upload');
+      var fileUrl = imagesFull[i].nativeURL;
       var options = new FileUploadOptions();
       options.chunkedMode = false;
       options.headers = { 'Authorization': 'Bearer {0}'.format(Sigma.getToken()), 'Connection': 'close' };
       options.fileKey = "file";
       options.mimeType = "image/jpeg";
       options.fileName = fileUrl.substr(fileUrl.lastIndexOf('/')+1);
-
       var success = function(response) {
         console.log(response);
+        fd.append('file', file);
         ons.notification.toast('Image uploaded', { timeout: 1000 });
       }; 
-
       var error = function(response) {
         console.log(response);
         ons.notification.toast('Error uploading', { timeout: 1000 });
       }
-
-      var ft = new FileTransfer();
+        var ft = new FileTransfer();
       ft.upload(fileUrl, uri, success, error, options);
-    });
+    }
+
   },
   reset: function() {
     images = [];
@@ -45,7 +54,7 @@ Deber = {
 }
 
 Sigma = {
-  baseUrl: "204.48.19.107:5000",
+  baseUrl: "192.168.1.108:45455",
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -67,12 +76,19 @@ Sigma = {
       }
       return options;
   },
-  openCamera: function openCamera(fn) {
+  openCamera: function openCamera() {
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = Sigma.setOptions(srcType);
 
     navigator.camera.getPicture(function cameraSuccess(imageUri) {
-        fn(imageUri);
+      window.resolveLocalFileSystemURL(imageUri, function(fileEntry) {
+        fileEntry.file(function(jsFile) {
+          Deber.appendImage(jsFile, fileEntry);
+          Deber.appendThumbnail(fileEntry);
+        });
+      }, function() {
+        console.log("asdkaspodkaspodkpoasdko");
+      })
     }, function cameraError(error) {
       ons.notification.toast("Unable to obtain picture: " + error, { timeout: 1000 });
     }, options);
