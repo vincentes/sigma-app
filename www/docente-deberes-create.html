@@ -40,12 +40,15 @@
                         </div>
                     </ons-list-item>
                 </ons-list>
+            </div>
         </ons-row>
-        <ons-row>
-            <ons-button modifier="large" onclick="Deber.save()" id="create-tarea-button">Crear</ons-button>
-        </ons-row>
+        <ons-button style="width: 100% !important;" modifier="large" onclick="Deber.save()" id="create-tarea-button">Crear</ons-button>
     </ons-card>
-
+    
+    <ons-modal id="loading-modal-creando-tarea">
+            <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
+            <span style="line-height: 20px; font-size: 15px;">Creando tarea...</span>
+        </ons-modal>
     <!-- <ons-fab position="bottom right" ripple>
         <ons-icon icon="ion-checkmark" onclick="createTarea()"></ons-icon>
     </ons-fab> -->

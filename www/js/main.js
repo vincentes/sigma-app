@@ -1,52 +1,125 @@
 // Objects
+SigmaLS = {
+  myDeberes: [],
+  saveDeber: function(id, imagesIds, content, imagesURL) {
+    SigmaLS.myDeberes.push({
+      id: id,
+      imagesIds: imagesIds,
+      content: content,
+      imagesURL: imagesURL
+    });
+    window.localStorage.setItem("sigma_mydeberes", JSON.stringify(SigmaLS.myDeberes));
+  },
+  load: function() {
+    var lsMyDeberes = JSON.parse(window.localStorage.getItem("sigma_mydeberes"));
+    SigmaLS.myDeberes = (lsMyDeberes === null ? [] : lsMyDeberes);
+  }
+};
+
 Deber = {
-  images: [],
-  imagesFull: [],
+  imagesURL: [],
   openImagePicker: function() {
     Sigma.openFilePicker(Deber.appendThumbnail);
   },
   openCamera: function() {
     Sigma.openCamera(Deber.appendThumbnail);
   },
-  appendImage: function(jsImage, image) {
-    Deber.images.push(jsImage);
-    Deber.imagesFull.push(image);
-  },
-  appendThumbnail: function(imageEntry) {
-    $('#thumbnail-list').prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(imageEntry.nativeURL));    
+  appendThumbnail: function(imageUri) {
+    $('#thumbnail-list').prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(imageUri));    
     $(".thumbnail:eq(0) > img").click(function(targ) {
       PhotoViewer.show($(this)[0].src, 'Imagen asociada');
     });
   },
   save: function() {
     Deber.saveImages(function(data) {
-      var images = data;
+      var ids = data.ids;
+      var content = $("#contenido").val();
+      var request = new XMLHttpRequest();
+      request.open('POST', 'http://{0}/Tarea/'.format(Sigma.baseUrl));
+      request.setRequestHeader("Content-type", "application/json");
+      request.setRequestHeader("Authorization", "Bearer {0}".format(Sigma.getToken()));  
+      request.onload = function() {
+        SigmaLS.saveDeber(JSON.parse(request.response).tarea.id, ids, content, data.imagesURL);
+        var loading = document.getElementById('loading-modal-creando-tarea');
+        loading.hide();
+        document.querySelector('#nav').replacePage("docente-deberes-edit.html", {
+          data: SigmaLS.myDeberes[SigmaLS.myDeberes.length - 1]
+        });
+      };
+      request.onerror = function() {
+        ons.notification.toast('Error ' + request.response, { timeout: 1000 });  
+      };
+      request.send(JSON.stringify({ "ImageIds": ids,  "MateriaId": 10, "Contenido": content }));
     });
   },
   saveImages: function(fn) {
-    ons.notification.toast('Subiendo imágenes...', { timeout: 1000 });
-    for(var i = 0; i < Deber.images.length; i++) {
-      var uri = encodeURI('http://192.168.1.108:45455/Imagen/Upload');
-      var fileUrl = imagesFull[i].nativeURL;
-      var options = new FileUploadOptions();
-      options.chunkedMode = false;
-      options.headers = { 'Authorization': 'Bearer {0}'.format(Sigma.getToken()), 'Connection': 'close' };
-      options.fileKey = "file";
-      options.mimeType = "image/jpeg";
-      options.fileName = fileUrl.substr(fileUrl.lastIndexOf('/')+1);
-      var success = function(response) {
-        console.log(response);
-        fd.append('file', file);
-        ons.notification.toast('Image uploaded', { timeout: 1000 });
-      }; 
-      var error = function(response) {
-        console.log(response);
-        ons.notification.toast('Error uploading', { timeout: 1000 });
-      }
-        var ft = new FileTransfer();
-      ft.upload(fileUrl, uri, success, error, options);
-    }
+    var loading = document.getElementById('loading-modal-creando-tarea');
+    loading.show();
+    
+    console.log("Ok, going to upload "+ Deber.imagesURL.length + " images.");
+    var defs = [];
 
+    var fd = new FormData();
+    Deber.imagesURL.forEach(function(i) {
+      console.log('Processing ' + i);
+      var def = $.Deferred();
+      window.resolveLocalFileSystemURL(i, function(fileEntry) {
+        console.log('Got a file entry');
+        fileEntry.file(function(file) {
+          console.log('now i have a file ob');
+          console.dir(file);
+          var reader = new FileReader();
+          reader.onloadend = function(e) {
+            var imgBlob = new Blob([this.result], { type:file.type});
+            fd.append('file' + (Deber.imagesURL.indexOf(i) + 1), imgBlob);
+            fd.append('fileName' + (Deber.imagesURL.indexOf(i) + 1), file.name);
+            def.resolve();
+          };
+          reader.readAsArrayBuffer(file);
+        }, function(e) {
+          console.log('error getting file', e);
+        });			
+      }, function(e) {
+        console.log('Error resolving fs url', e);
+      });
+      defs.push(def.promise());
+    });
+
+    $.when.apply($, defs).then(function() {
+      console.log("all things done");
+      var request = new XMLHttpRequest();
+      request.open('POST', 'http://{0}/Imagen/Upload'.format(Sigma.baseUrl));
+      request.setRequestHeader("Authorization", "Bearer {0}".format(Sigma.getToken()));  
+      request.onload = function() {
+        var data = JSON.parse(request.response);
+        data.imagesURL = Deber.imagesURL;
+        fn(data);
+      };
+      request.onerror = function() {
+      };
+      request.send(fd);
+    });
+
+  },
+  display: function() {
+    $("#deberes-list").html("");
+    for(var i = 0; i < SigmaLS.myDeberes.length; i++) {
+      $("#deberes-list").prepend('<ons-list-item id="tarea-{1}" modifier="chevron" tappable>{0}</ons-list-item>'.format(SigmaLS.myDeberes[i].content, SigmaLS.myDeberes[i].id));
+      $("#tarea-" + SigmaLS.myDeberes[i].id).click(function(evt) {
+        var elementId = jQuery(this).attr("id");
+        var tokens = elementId.split("-");
+        var tareaId = tokens[1];
+        var tarea = null;
+        for(var j = 0; j < SigmaLS.myDeberes.length; j++) {
+          if(SigmaLS.myDeberes[j].id == tareaId) {
+            tarea = SigmaLS.myDeberes[j];
+          }
+        }
+        document.querySelector("#nav").pushPage("docente-deberes-edit.html", {
+          data: tarea
+        });
+      });
+    }
   },
   reset: function() {
     images = [];
@@ -54,7 +127,7 @@ Deber = {
 }
 
 Sigma = {
-  baseUrl: "192.168.1.108:45455",
+  baseUrl: "204.48.19.107:5000",
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -81,14 +154,8 @@ Sigma = {
     var options = Sigma.setOptions(srcType);
 
     navigator.camera.getPicture(function cameraSuccess(imageUri) {
-      window.resolveLocalFileSystemURL(imageUri, function(fileEntry) {
-        fileEntry.file(function(jsFile) {
-          Deber.appendImage(jsFile, fileEntry);
-          Deber.appendThumbnail(fileEntry);
-        });
-      }, function() {
-        console.log("asdkaspodkaspodkpoasdko");
-      })
+      Deber.imagesURL.push(imageUri);
+      Deber.appendThumbnail(imageUri);
     }, function cameraError(error) {
       ons.notification.toast("Unable to obtain picture: " + error, { timeout: 1000 });
     }, options);
@@ -98,7 +165,8 @@ Sigma = {
     var options = Sigma.setOptions(srcType);
 
     navigator.camera.getPicture(function cameraSuccess(imageUri) {
-      fn(imageUri);
+      Deber.imagesURL.push(imageUri);
+      Deber.appendThumbnail(imageUri);
     }, function cameraError(error) {
         ons.notification.toast("Unable to obtain picture: " + error, { timeout: 1000 });
     }, options);
@@ -141,7 +209,9 @@ Sigma = {
 };
 
 
+
 ons.ready(function() {
+  loadData();
   checkLogin();
 });
 
@@ -232,6 +302,11 @@ function logout() {
     },
     buttonLabels: ["Cancelar", "Si"]
   });
+}
+
+function loadData() {
+  console.log("loading sigmals");
+  SigmaLS.load();
 }
 
 function checkLogin() {

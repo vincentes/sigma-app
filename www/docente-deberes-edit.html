@@ -1,0 +1,51 @@
+<ons-page id="docente-deberes-edit">
+    <ons-toolbar>
+        <div class="left">
+            <ons-back-button>Atrás</ons-back-button>
+        </div>
+        <div class="center">Información de deber</div>
+    </ons-toolbar>
+
+    <ons-card class="card-fluid">
+        <ons-row>
+            <ons-col width="18px">
+                <ion-icon name="text"></ion-icon>
+            </ons-col>
+            <ons-col>
+                <label for="contenido">Consigna</label>
+            </ons-col>
+        </ons-row>
+        <ons-row>
+            <ons-col>
+                <p id="info-deber-consigna"></p>
+            </ons-col>
+        </ons-row>
+        <ons-row>
+            <div>
+                <br />
+                <ons-list>
+                    <ons-list-header>Imágenes asociadas</ons-list-header>
+                    <ons-list-item>
+                        <div id="thumbnail-list">
+
+                        </div>
+                    </ons-list-item>
+                </ons-list>
+            </div>
+        </ons-row>
+    </ons-card>
+    
+    <ons-modal id="loading-modal-creando-tarea">
+        <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
+        <span style="line-height: 20px; font-size: 15px;">Actualizando tarea...</span>
+    </ons-modal>
+
+
+    <ons-fab position="bottom right" ripple>
+        <ons-icon icon="ion-android-add" onclick="asignarTarea()" style="margin-right: 150px"></ons-icon>
+    </ons-fab>
+    
+    <ons-fab position="bottom right" ripple>
+        <ons-icon icon="ion-android-create" onclick="editTarea()"></ons-icon>
+    </ons-fab>
+</ons-page>
