@@ -1,6 +1,7 @@
 // Objects
 SigmaLS = {
   myDeberes: [],
+  userInfo: {},
   saveDeber: function(id, imagesIds, content, imagesURL) {
     SigmaLS.myDeberes.push({
       id: id,
@@ -13,6 +14,11 @@ SigmaLS = {
   load: function() {
     var lsMyDeberes = JSON.parse(window.localStorage.getItem("sigma_mydeberes"));
     SigmaLS.myDeberes = (lsMyDeberes === null ? [] : lsMyDeberes);
+    SigmaLS.userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
+  },
+  setUserInfo: function(info) {
+    SigmaLS.userInfo = info;
+    window.localStorage.setItem("userInfo", JSON.stringify(info));
   }
 };
 
@@ -32,7 +38,7 @@ Deber = {
   },
   save: function() {
     Deber.saveImages(function(data) {
-      var ids = data.ids;
+      var ids = data.imagesIds;
       var content = $("#contenido").val();
       var request = new XMLHttpRequest();
       request.open('POST', 'http://{0}/Tarea/'.format(Sigma.baseUrl));
@@ -92,8 +98,12 @@ Deber = {
       request.setRequestHeader("Authorization", "Bearer {0}".format(Sigma.getToken()));  
       request.onload = function() {
         var data = JSON.parse(request.response);
-        data.imagesURL = Deber.imagesURL;
-        fn(data);
+        fn({
+          content: data.content,
+          id: data.id,
+          imagesIds: data.ids,
+          imagesURL: Deber.imagesURL
+        });
       };
       request.onerror = function() {
       };
@@ -103,8 +113,13 @@ Deber = {
   },
   display: function() {
     $("#deberes-list").html("");
+    var deberes = "";
+    for(var i = SigmaLS.myDeberes.length - 1; i >= 0; i--) {
+      deberes += ('<ons-list-item id="tarea-{1}" modifier="chevron" tappable>{0}</ons-list-item>'.format(SigmaLS.myDeberes[i].content, SigmaLS.myDeberes[i].id));
+    }
+
+    $("#deberes-list").append(deberes);
     for(var i = 0; i < SigmaLS.myDeberes.length; i++) {
-      $("#deberes-list").prepend('<ons-list-item id="tarea-{1}" modifier="chevron" tappable>{0}</ons-list-item>'.format(SigmaLS.myDeberes[i].content, SigmaLS.myDeberes[i].id));
       $("#tarea-" + SigmaLS.myDeberes[i].id).click(function(evt) {
         var elementId = jQuery(this).attr("id");
         var tokens = elementId.split("-");
@@ -127,7 +142,7 @@ Deber = {
 }
 
 Sigma = {
-  baseUrl: "204.48.19.107:5000",
+  baseUrl: "192.168.1.108:45455",
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -205,6 +220,139 @@ Sigma = {
         ons.notification.toast('Push notification received. ' + name, { timeout: 2000 });          
       });
     });
+  },
+  toGroupName: function(grado, numero) {
+    var dGrado;
+    switch(grado) {
+      case 1:
+        dGrado = 4;
+        break;
+      case 2:
+        dGrado = 5;
+        break;
+      case 3:
+        dGrado = 6;
+        break;
+    }
+    return "{0}º{1}".format(dGrado, numero);
+  },
+  login: function(args) {
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "http://{0}/Account/Login".format(Sigma.baseUrl),
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
+      },
+      "processData": false,
+      "data": '{"CI": "{0}","Password": "{1}"}'.format(args.cedula,  args.password),
+      "success": function (response) {
+        args.success(response);
+      },
+      "error": function (response) {
+        args.error(response);
+      }
+    }
+  
+    $.ajax(settings);
+  },
+  docenteInfo: function(args) {
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "http://{0}/Docente/GetInfo".format(Sigma.baseUrl),
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Authorization": "Bearer {0}".format(Sigma.getToken())
+      },
+      "processData": false,
+      "success": function (response) {
+        args.success(response);
+      },
+      "error": function (response) {
+        args.error(response);
+      }
+    }
+    $.ajax(settings);
+  },
+  assignDeberToGroups: function(args) {
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "http://{0}/Tarea/AssignGrupo".format(Sigma.baseUrl),
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {0}".format(Sigma.getToken()),
+        "Cache-Control": "no-cache",
+      },
+      "processData": false,
+      "data": '{"GrupoIds": {0}, "Deadline": "{1}", "TareaId": {2}}'.format(JSON.stringify(args.groupIds), args.deadline, args.deberId),
+      "success": function(response) {
+        args.success(response)
+      },
+      "error": function(response) {
+        args.error(response)
+      }
+    }
+
+    $.ajax(settings);
+  },
+  serverDateToLocal: function(date) {
+    var tokens = date.split('-');
+    var year = tokens[0];
+    var month = tokens[1];
+    var day = tokens[2].split('T')[0];
+    return "{0}/{1}/{2}".format(day, month, year);
+  },
+  toLocalized: function(date) {
+    var tokens = date.split('-');
+    var year = tokens[0];
+    var month = tokens[1];
+    var day = tokens[2];
+    return "{0}/{1}/{2}".format(month, day, year);
+  },
+  getAssignedGrupos: function(args) {   
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "http://{0}/Tarea/GetAssignedGrupos/{1}".format(Sigma.baseUrl, args.deberId),
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {0}".format(Sigma.getToken()),
+        "Cache-Control": "no-cache",
+      },
+      "success": function(response) {
+        args.success(response);
+      },
+      "error": function(response) {
+        args.error(response);
+      }
+    }
+    
+    $.ajax(settings);
+  },
+  downloadImages: function(args) {
+    jQuery.ajax({
+      url: "http://{0}/Tarea/GetAssignedGrupos/{1}".format(Sigma.baseUrl, args.deberId),
+      cache: false,
+      xhr:function(){
+          var xhr = new XMLHttpRequest();
+          xhr.responseType= 'blob'
+          return xhr;
+      },
+      success: function(data){
+          ags.success();
+      },
+      error:function(){
+          args.error();
+      }
+    });
   }
 };
 
@@ -237,48 +385,36 @@ function login() {
   var loading = document.getElementById('loading-modal');
   loading.show();
 
-  var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "http://{0}/Account/Login".format(Sigma.baseUrl),
-    "method": "POST",
-    "headers": {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache"
-    },
-    "processData": false,
-    "data": '{"CI": "{0}","Password": "{1}"}'.format(cedula, password),
-    "success": function (response) {
+  Sigma.login({
+    cedula: cedula,
+    password: password,
+    success: function(response) {
       Sigma.setToken(response.token);
       Sigma.saveFCMToken(function(fcmSaveResponse) {
         for(var i = 0; i < response.roles.length; i++) {
           switch(response.roles[i]) {
             case "Docente":
-            document.querySelector('#nav').replacePage('docente-home.html');
-            loading.hide();
-            break;
+              document.querySelector('#nav').replacePage('docente-home.html');
+              loading.hide();
+              break;
           }
         }
-      }, function(fcmSaveResponse) {
+      });
+      Sigma.docenteInfo({
+        success: function(response) {
+          SigmaLS.setUserInfo(response);
+        },
+        error: function(response) {
+          SigmaLS.setUserInfo(response);
+        }
+      });
+    },
+    error: function(response) {
         Sigma.removeToken();
         serverError();
         loading.hide();
-      });
-    },
-    "error": function (response) {
-      if(response.status === 401) {
-        ons.notification.alert({
-          title: 'Atención!',
-          message: 'Cédula o contraseña incorrecta.'
-        });
-      } else {
-        serverError();
-      }
-      loading.hide();
     }
-  }
-
-  $.ajax(settings);
+  });
 }
 
 function serverError() {
@@ -329,14 +465,27 @@ function deberes() {
   document.querySelector('#nav').pushPage('docente-deberes.html');
 }
 
-function back() {
-  document.querySelector('#nav').popPage();  
+function back(callback) {
+  var options = {};
+  if(callback !== null) {
+    options.callback = callback;
+  }
+  document.querySelector('#nav').popPage(options);  
 }
 
 function createDeber() {
   document.querySelector('#nav').pushPage('docente-deberes-create.html', options = {
     animation: 'lift'
   })  
+}
+
+function asignarTarea() {
+  document.querySelector('#nav').pushPage('docente-deberes-assign.html', options = {
+    animation: 'lift',
+    data: {
+      deberId: document.getElementById("nav").topPage.data.id
+    }
+  });
 }
 
 /////////// SEBA ////////////////////

@@ -33,19 +33,23 @@
                 </ons-list>
             </div>
         </ons-row>
+        <ons-row>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="grupos-asignados">
+                    <tr>
+                        <th>Grupo asignado</th>
+                        <th>Fecha de entrega</th>
+                    </tr>
+                </table>
+            </div>
+            </ons-row>
+        <ons-row>
+            <ons-button modifier="large" onclick="asignarTarea()">Asignar</ons-button>
+        </ons-row>
     </ons-card>
     
     <ons-modal id="loading-modal-creando-tarea">
         <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
-        <span style="line-height: 20px; font-size: 15px;">Actualizando tarea...</span>
+        <span style="line-height: 20px; font-size: 15px;">Asignando tarea...</span>
     </ons-modal>
-
-
-    <ons-fab position="bottom right" ripple>
-        <ons-icon icon="ion-android-add" onclick="asignarTarea()" style="margin-right: 150px"></ons-icon>
-    </ons-fab>
-    
-    <ons-fab position="bottom right" ripple>
-        <ons-icon icon="ion-android-create" onclick="editTarea()"></ons-icon>
-    </ons-fab>
 </ons-page>

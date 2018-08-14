@@ -1,0 +1,31 @@
+<ons-page id="docente-deberes-assign">
+    <ons-toolbar>
+        <div class="left">
+            <ons-button modifier="quiet" onclick="back()">
+                <ons-icon icon="ion-close" style="font-size: 22px"></ons-icon>
+            </ons-button>
+        </div>
+        <div class="center">Asignar deber</div>
+    </ons-toolbar>
+    <ons-card class="card-fluid">
+        <ons-row>
+            <ons-col>
+                Fecha de entrega
+            </ons-col>
+            <ons-col>
+                <ons-input type="date" id="docente-deberes-date" width="100px"></ons-input>
+            </ons-col>
+        </ons-row>
+        <p id="deberes-consigna"></p>
+        <ons-list-header>Mis grupos</ons-list-header>
+        <ons-list id="grupos-list">
+            
+        </ons-list>
+        <ons-button modifier="large" id="assign-deber">Confirmar</ons-button>
+    </ons-card>
+
+    <ons-modal id="loading-modal-asignando-tarea">
+        <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
+        <span style="line-height: 20px; font-size: 15px;">Asignando deber...</span>
+    </ons-modal>
+</ons-page>
