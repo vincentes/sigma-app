@@ -1,18 +1,118 @@
-document.addEventListener('init', function () {
-    $(".deber-thumbnail img").click(function(targ) {
-        PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
-    });
-}, false);
-
 document.addEventListener('init', function(event) {
     if (event.target.matches('#docente-deberes')) {
         Deber.display();
-    } else if (event.target.matches('#docente-deberes-edit')) {
+    } else if(event.target.matches('#docente-deberes-create')) {
+        $(".deber-thumbnail img").click(function(targ) {
+            PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
+        });
+    } else if(event.target.matches('#alumno-deberes')) {
+        Alumno.deberes = [];
+        Sigma.getAssignedDeberes({
+            success: function(data) {
+              Alumno.deberes = data.deberes;
+              data.deberes.forEach(function(deber) {
+                var deberes = "";
+                deberes += ('<ons-list-item id="tarea-{1}" modifier="chevron" tappable>{0}</ons-list-item>'.format(deber.contenido, deber.id));
+                
+                $("#deberes-list").append(deberes);
+                $("#tarea-" + deber.id).click(function(evt) {
+                  var elementId = jQuery(this).attr("id");
+                  var tokens = elementId.split("-");
+                  var tareaId = tokens[1];
+                  var tarea = null;
+                  for(var j = 0; j < Alumno.deberes.length; j++) {
+                    if(Alumno.deberes[j].id == tareaId) {
+                      tarea = Alumno.deberes[j];
+                    }
+                  }
+        
+                  document.querySelector("#nav").pushPage("alumno-view-deber.html", {
+                    data: tarea
+                  });
+                });
+              });
+            },
+            error: function(data) {
+  
+            }  
+        });
+    } else if(event.target.matches('#alumno-view-deber')) {
         var data = document.getElementById("nav").topPage.data;
+        var defs = [];
+        $("#info-deber-consigna").text(data.contenido);
+        data.imageIds.forEach(function(imageId) {
+            var def = $.Deferred();
+            Sigma.downloadImages({
+                imageId: imageId,
+                success: function(src) {
+                    var xhr = new XMLHttpRequest;
+                    xhr.responseType = 'blob';
+
+                    xhr.onload = function() {
+                        var recoveredBlob = xhr.response;
+
+                        var reader = new FileReader;
+
+                        reader.onload = function() {
+                            var blobAsDataUrl = reader.result;
+                            $("#thumbnail-list").prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(blobAsDataUrl));
+                            def.resolve();
+                        };
+
+                        reader.readAsDataURL(recoveredBlob);
+                    };
+
+                    xhr.open('GET', src);
+                    xhr.send();
+                }
+            });
+            defs.push(def.promise());
+        });
+
+        $.when.apply($, defs).then(function() {
+            $(".deber-thumbnail img").click(function() {
+                PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
+            });
+        });
+    } else if(event.target.matches('#docente-deberes-edit')) {
+        var data = document.getElementById("nav").topPage.data;
+        var defs = [];
         $("#info-deber-consigna").text(data.content);
-        for(var i = 0; i < data.imagesURL.length; i++) {
-            $("#thumbnail-list").prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(data.imagesURL[i]));
-        }
+        data.imagesIds.forEach(function(imageId) {
+            var def = $.Deferred();
+            Sigma.downloadImages({
+                imageId: imageId,
+                success: function(src) {
+                    var xhr = new XMLHttpRequest;
+                    xhr.responseType = 'blob';
+
+                    xhr.onload = function() {
+                        var recoveredBlob = xhr.response;
+
+                        var reader = new FileReader;
+
+                        reader.onload = function() {
+                            var blobAsDataUrl = reader.result;
+                            $("#thumbnail-list").prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(blobAsDataUrl));
+                            def.resolve();
+                        };
+
+                        reader.readAsDataURL(recoveredBlob);
+                    };
+
+                    xhr.open('GET', src);
+                    xhr.send();
+                }
+            });
+            defs.push(def.promise());
+        });
+
+        $.when.apply($, defs).then(function() {
+            $(".deber-thumbnail img").click(function() {
+                PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
+            });
+        });
+
         Sigma.getAssignedGrupos({
             deberId: data.id,
             success: function(response) {
@@ -66,6 +166,7 @@ document.addEventListener('init', function(event) {
                             deberId: nav.topPage.data.id,
                             success: function(response) {
                                 var assignments = response.assignments;
+                                $("#grupos-asignados").empty();
                                 for(var j = 0; j < SigmaLS.userInfo.grupos.length; j++) {
                                     for(var i = 0; i < assignments.length; i++) {
                                         var assignment = assignments[i];

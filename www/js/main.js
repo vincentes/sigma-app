@@ -1,7 +1,13 @@
+CurrentUser = {
+  role: null,
+  token: null
+};
+
 // Objects
 SigmaLS = {
   myDeberes: [],
   userInfo: {},
+  currentUser: {},
   saveDeber: function(id, imagesIds, content, imagesURL) {
     SigmaLS.myDeberes.push({
       id: id,
@@ -15,10 +21,18 @@ SigmaLS = {
     var lsMyDeberes = JSON.parse(window.localStorage.getItem("sigma_mydeberes"));
     SigmaLS.myDeberes = (lsMyDeberes === null ? [] : lsMyDeberes);
     SigmaLS.userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
+    SigmaLS.currentUser = JSON.parse(window.localStorage.getItem("currentUser"));  
+    if(SigmaLS.currentUser !== null) {
+      CurrentUser = SigmaLS.currentUser;  
+    }
   },
   setUserInfo: function(info) {
     SigmaLS.userInfo = info;
     window.localStorage.setItem("userInfo", JSON.stringify(info));
+  },
+  save: function() {
+    SigmaLS.currentUser = CurrentUser;
+    window.localStorage.setItem("currentUser", JSON.stringify(SigmaLS.currentUser));    
   }
 };
 
@@ -41,7 +55,7 @@ Deber = {
       var ids = data.imagesIds;
       var content = $("#contenido").val();
       var request = new XMLHttpRequest();
-      request.open('POST', 'http://{0}/Tarea/'.format(Sigma.baseUrl));
+      request.open('POST', 'http://{0}/Tarea/Post'.format(Sigma.baseUrl));
       request.setRequestHeader("Content-type", "application/json");
       request.setRequestHeader("Authorization", "Bearer {0}".format(Sigma.getToken()));  
       request.onload = function() {
@@ -337,17 +351,45 @@ Sigma = {
     
     $.ajax(settings);
   },
+  getAssignedDeberes: function(args) {
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "http://{0}/Tarea/GetAssignedDeberes".format(Sigma.baseUrl),
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {0}".format(Sigma.getToken()),
+        "Cache-Control": "no-cache",
+      },
+      "success": function(data) {
+        args.success(data);
+      },
+      "error": function(data) {
+        args.error(data)
+      }
+    }
+    
+    $.ajax(settings);
+  },
   downloadImages: function(args) {
     jQuery.ajax({
-      url: "http://{0}/Tarea/GetAssignedGrupos/{1}".format(Sigma.baseUrl, args.deberId),
-      cache: false,
+      url: "http://{0}/Imagen/Download/{1}".format(Sigma.baseUrl, args.imageId),
+      cache: true,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {0}".format(Sigma.getToken()),
+        "Cache-Control": "no-cache",
+      },
       xhr:function(){
           var xhr = new XMLHttpRequest();
           xhr.responseType= 'blob'
           return xhr;
       },
       success: function(data){
-          ags.success();
+          var url = window.URL || window.webkitURL;
+          var src = url.createObjectURL(data);
+          args.success(src);
       },
       error:function(){
           args.error();
@@ -389,17 +431,25 @@ function login() {
     cedula: cedula,
     password: password,
     success: function(response) {
+      CurrentUser.token = response.token;
+      CurrentUser.role = response.roles[0];
       Sigma.setToken(response.token);
       Sigma.saveFCMToken(function(fcmSaveResponse) {
         for(var i = 0; i < response.roles.length; i++) {
           switch(response.roles[i]) {
             case "Docente":
-              document.querySelector('#nav').replacePage('docente-home.html');
+            document.querySelector('#nav').replacePage('docente-home.html');
+              loading.hide();
+              break;
+            case "Alumno":
+              document.querySelector('#nav').replacePage('alumno-home.html');
               loading.hide();
               break;
           }
+          SigmaLS.save();
         }
       });
+
       Sigma.docenteInfo({
         success: function(response) {
           SigmaLS.setUserInfo(response);
@@ -448,15 +498,36 @@ function loadData() {
 function checkLogin() {
   var page = document.querySelector('#nav').topPage.id;
   var hasToken = Sigma.getToken() !== 'null';
+  console.log("a");  
   if(page !== "login") {
+    console.log("b");
     if(!hasToken) {
       document.querySelector('#nav').replacePage('login.html', options = {
         animation: "fade"
       });
-    }
+    } else {
+      console.log(CurrentUser.role);
+      switch(CurrentUser.role) {
+        case "Docente":
+          document.querySelector('#nav').replacePage('docente-home.html');    
+          break;
+        case "Alumno":
+          document.querySelector('#nav').replacePage('alumno-home.html');    
+          break;
+      }
+    } 
   } else {
+    console.log("c");
     if(hasToken) {
-      document.querySelector('#nav').replacePage('docente-home.html');    
+      console.log(CurrentUser.role);
+      switch(CurrentUser.role) {
+        case "Docente":
+          document.querySelector('#nav').replacePage('docente-home.html', options = {animation: 'none'});    
+          break;
+        case "Alumno":
+          document.querySelector('#nav').replacePage('alumno-home.html', options = {animation: 'none'});    
+          break;
+      }
     }
   }
 }
@@ -486,6 +557,15 @@ function asignarTarea() {
       deberId: document.getElementById("nav").topPage.data.id
     }
   });
+}
+
+Alumno = {
+  deberes: {},
+  misDeberes: function() {
+    $("#deberes-list").empty();
+    Alumno.deberes = {};
+    document.getElementById("nav").pushPage("alumno-deberes.html"); 
+  }
 }
 
 /////////// SEBA ////////////////////

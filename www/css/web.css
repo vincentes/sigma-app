@@ -21,6 +21,11 @@ ons-page {
     flex-grow: 1;
 }
 
+.sticky {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+}
+
 .thumbnail img {
     width: 100%;
     height: 100%;
