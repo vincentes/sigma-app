@@ -11,10 +11,10 @@
     <ons-card class="card-fluid">
         <ons-row>
             <ons-col>
-                Fecha de entrega
+                Fecha
             </ons-col>
             <ons-col>
-                <ons-input type="date" id="docente-parciales-create-date" width="100%"></ons-input>
+                <ons-input type="date" id="docente-parciales-create-fecha" width="100%"></ons-input>
             </ons-col>
         </ons-row>
         <ons-row>
@@ -27,17 +27,17 @@
         </ons-row>
         <ons-row>
             <ons-col>
-                <textarea id="contenido" class="textarea" rows="4" placeholder="¿Qué temas irán para el parcial?"></textarea>
+                <textarea id="docente-parciales-create-temas" class="textarea" rows="4" placeholder="¿Qué temas irán para el parcial?"></textarea>
             </ons-col>
         </ons-row>
         <ons-list-header>Mis grupos</ons-list-header>
         <ons-list id="docente-parciales-create-grupos-list">
             
         </ons-list>
-        <ons-button style="width: 100% !important;" modifier="large" onclick="" id="create-tarea-button">Crear</ons-button>
+        <ons-button style="width: 100% !important;" modifier="large" onclick="DocenteParcialesCreate.submit()" id="create-tarea-button">Crear</ons-button>
     </ons-card>
     
-    <ons-modal id="loading-modal-creando-tarea">
+    <ons-modal id="loading-modal-creando-parcial">
             <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
             <span style="line-height: 20px; font-size: 15px;">Creando parcial...</span>
         </ons-modal>
