@@ -36,11 +36,56 @@ API = {
 
         return $.ajax(settings)
     },
-    createParcial: function(args) {
+    getAlumnoParciales: function() {
         var settings = {
             "async": true,
             "crossDomain": true,
-            "url": "http://{0}/Parcial/Post".format(Sigma.baseUrl),
+            "url": "http://{0}/Parcial/GetAlumnoParciales".format(Sigma.baseUrl),
+            "method": "GET",
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer {0}".format(Sigma.getToken()),
+              "Cache-Control": "no-cache",
+            }
+        }
+
+        return $.ajax(settings)
+    },
+    getDocenteEscritos: function() {
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://{0}/Escrito/GetDocenteEscritos".format(Sigma.baseUrl),
+            "method": "GET",
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer {0}".format(Sigma.getToken()),
+              "Cache-Control": "no-cache",
+            }
+        }
+
+        return $.ajax(settings)
+    },
+    getAlumnoEscritos: function() {
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://{0}/Escrito/GetAlumnoEscritos".format(Sigma.baseUrl),
+            "method": "GET",
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer {0}".format(Sigma.getToken()),
+              "Cache-Control": "no-cache",
+            }
+        }
+
+        return $.ajax(settings)
+    },
+    createEscrito: function(args) {
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://{0}/Escrito/Post".format(Sigma.baseUrl),
             "method": "POST",
             "headers": {
                 "Content-Type": "application/json",
@@ -51,6 +96,21 @@ API = {
         };
         
         return $.ajax(settings);
+    },
+    getEscrito: function(args) {
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://{0}/Escrito/Get/{1}".format(Sigma.baseUrl, args.id),
+            "method": "GET",
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer {0}".format(Sigma.getToken()),
+              "Cache-Control": "no-cache",
+            }
+        }
+
+        return $.ajax(settings)
     },
     getParcial: function(args) {
         var settings = {
@@ -149,6 +209,53 @@ Parcial.prototype.set = function(object) {
     }
 };
 
+Escrito = function() {
+
+}
+
+Escrito.prototype.id = null;
+Escrito.prototype.fecha = null;
+Escrito.prototype.docenteId = null;
+Escrito.prototype.materiaId = null;
+Escrito.prototype.temas = null;
+Escrito.prototype.gruposAsignados = [];
+Escrito.prototype.valid = function() {
+    if(isNaN(this.id) || isNaN(this.materiaId) || this.docenteId == null || this.fecha == null || this.gruposAsignados == null || this.temas == null) {
+        return false;
+    }
+
+    for(var i = 0; i < this.gruposAsignados.length; i++) {
+        var grupo = this.gruposAsignados[i];
+        if(!grupo.valid()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+Escrito.prototype.set = function(object) {
+    if(object == null) {
+        return;
+    }
+    
+    this.id = object.id;
+    this.fecha = object.fecha;
+    this.docenteId = object.docenteId;
+    this.materiaId = object.materiaId;
+    this.temas = object.temas;
+    
+    if(object.gruposAsignados == null) {
+        return;
+    }
+    
+    for(var i = 0; i < object.gruposAsignados.length; i++) {
+        var g = object.gruposAsignados[i];
+        var grupo = new Grupo();
+        grupo.set(g);
+        this.gruposAsignados.push(grupo);
+    }
+};
+
 Grupo = function() {
 
 }
@@ -199,6 +306,7 @@ User.prototype.set = function(object) {
 Docente = function() {
 
 }
+
 Docente.prototype.grupos = [];
 Docente.prototype.parciales = [];
 Docente.prototype.deberes = [];
@@ -263,6 +371,7 @@ Alumno.prototype.valid = function() {
 
     return true;
 };
+
 Alumno.prototype.set = function(object) {
     this.grupo = object.grupo;
     this.parciales = object.parciales;
@@ -289,6 +398,28 @@ Parciales = {
             parcialesList.push(parcial);
         }
         return parcialesList;
+    }
+};
+
+Escritos = {
+    toList: function(escritos) {
+        if(escritos === null) {
+            throw "The escritos argument is null.";
+        }
+
+        var escritosList = [];
+        for(var i = 0; i < escritos.length; i++) {
+            var e = escritos[i];
+            var escrito = new Escrito();
+            escrito.set(e);
+
+            if(!escrito.valid()) {
+                throw "Argumented escritos list is invalid.";
+            } 
+            escritosList.push(escrito);
+        }
+
+        return escritosList;
     }
 };
 
@@ -345,8 +476,39 @@ DocenteParciales = {
     }
 };
 
-DocenteParcialesCreate = {
+DocenteEscritos = {
     Templates: {
+        EscritoListItem: function(escrito) {
+            return {
+                html: '<ons-list-item id="escrito-{0}" modifier="chevron" tappable>Escrito {1}</ons-list-item>'.format(escrito.id, Utils.serverDateToLocal(escrito.fecha)),
+                id: 'escrito-{0}'.format(escrito.id)
+            }
+        }
+    },
+    escritosList: [],
+    init: function() {
+        // Get the logged docente's escritos
+        API.getDocenteEscritos().done(function(response) {
+            DocenteEscritos.escritosList = Escritos.toList(response);
+            $("#escritos-list").empty();
+            DocenteEscritos.escritosList.forEach(function(escrito) {
+                var element = DocenteEscritos.Templates.EscritoListItem(escrito);
+                $("#escritos-list").prepend(element.html);
+                $("#" + element.id).click(function() {
+                    Page.pushPage('docente-view-escrito.html', {
+                        data: escrito,
+                        callback: function() {
+                            DocenteEscritoInfo.init();
+                        }
+                    });
+                });
+            });
+        });
+    }
+};
+    
+DocenteParcialesCreate = {
+        Templates: {
         GrupoListItem: function(grupo) {
             return {
                 html: '<ons-list-item id="grupo-{0}"><label class="left"><ons-checkbox class="grupo-checkbox" name="grupos[]" input-id="grupo-check-{0}"></ons-checkbox></label><label for="grupo-{0}">{1}</label></ons-list-item>'.format(grupo.id, Utils.toGroupName(grupo.grado, grupo.numero)),
@@ -380,7 +542,6 @@ DocenteParcialesCreate = {
             temas: temas,
             gruposAsignados: grupos
         }).done(function(response) {
-            General.parciales.push(response.parcial);
             Page.back({
                 callback: function() {
                     DocenteParciales.init();
@@ -394,6 +555,57 @@ DocenteParcialesCreate = {
             $("#loading-modal-creando-parcial").hide();
         });
     }
+};
+
+
+DocenteEscritosCreate = {
+    Templates: {
+    GrupoListItem: function(grupo) {
+        return {
+            html: '<ons-list-item id="grupo-{0}"><label class="left"><ons-checkbox class="grupo-checkbox" name="grupos[]" input-id="grupo-check-{0}"></ons-checkbox></label><label for="grupo-{0}">{1}</label></ons-list-item>'.format(grupo.id, Utils.toGroupName(grupo.grado, grupo.numero)),
+            id: 'grupo-{0}'.format(grupo.id),
+            checkboxId: 'grupo-check-{0}'.format(grupo.id)
+        }
+    }
+},
+init: function() {
+    var grupos = SigmaLS.userInfo.grupos;
+    if(grupos === null) {
+        ons.notification.toast("Ocurrio un error. ¡No tenés grupos!");
+    } else {
+        grupos.forEach(function(grupo) {
+            var element = DocenteEscritosCreate.Templates.GrupoListItem(grupo);
+            $("#docente-escritos-create-grupos-list").append(element.html);
+        });
+    }
+},
+submit: function() {
+    var date = $("#docente-escritos-create-fecha").val();
+    var temas = $("#docente-escritos-create-temas").val();
+    var grupos = $('input[type="checkbox"][name="grupos\\[\\]"]:checked').map(function() { 
+        return { "Id": parseInt(this.id.split('-')[2]) }; 
+    }).get();
+
+    $("#loading-modal-creando-escrito").show();
+    API.createEscrito({
+        materiaId: 10,
+        fecha: Utils.timeSelectorDateToServer(date),
+        temas: temas,
+        gruposAsignados: grupos
+    }).done(function(response) {
+        Page.back({
+            callback: function() {
+                DocenteEscritos.init();
+            }
+        });
+    }).fail(function(response) {
+        ons.notification.toast("El escrito no pudo ser creado.", {
+            timeout: 1000
+        }); 
+    }).always(function() {
+        $("#loading-modal-creando-escrito").hide();
+    });
+}
 };
 
 DocenteParcialInfo = {
@@ -421,6 +633,85 @@ DocenteParcialInfo = {
     }
 };
 
+DocenteEscritoInfo = {
+    Templates: {
+        GrupoListItem: function(grupo) {
+            return {
+                html: '<ons-list-item id="grupo-{0}">{1}</ons-list-item>'.format(grupo.id, Utils.toGroupName(grupo.grado, grupo.numero)),
+                id: 'grupo-{0}'.format(grupo.id)
+            }
+        }
+    },
+    init: function() {
+        var data = document.getElementById("nav").topPage.data;
+        API.getEscrito({
+            id: data.id
+        }).done(function(response) {
+            $("#docente-view-escrito-temas").text(response.temas);
+            $("#docente-view-escrito-grupos").empty();
+            var grupos = response.gruposAsignados;
+            grupos.forEach(function(grupo) {
+                var element = DocenteEscritoInfo.Templates.GrupoListItem(grupo);
+                $("#docente-view-escrito-grupos").append(element.html);
+            });
+        });;
+    }
+};
+
+AlumnoParciales = {
+    Templates: {
+        ParcialListItem: function(parcial) {
+            return {
+                html: '<ons-list-item id="parcial-{0}" modifier="chevron" tappable>Parcial {1}</ons-list-item>'.format(parcial.id, Utils.serverDateToLocal(parcial.fecha)),
+                id: 'parcial-{0}'.format(parcial.id)
+            }
+        }
+    },
+    parcialesList: [],
+    init: function() {
+        // Get the logged docente's parciales
+        API.getAlumnoParciales().done(function(response) {
+            AlumnoParciales.parcialesList = Parciales.toList(response);
+            $("#parciales-list").empty();
+            AlumnoParciales.parcialesList.forEach(function(parcial) {
+                var element = AlumnoParciales.Templates.ParcialListItem(parcial);
+                $("#parciales-list").prepend(element.html);
+                $("#" + element.id).click(function() {
+                    Pages.docenteViewParcial(parcial);
+                });
+            });
+        });
+    }
+};
+
+
+
+AlumnoEscritos = {
+    Templates: {
+        EscritoListItem: function(escrito) {
+            return {
+                html: '<ons-list-item id="escrito-{0}" modifier="chevron" tappable>Escrito {1}</ons-list-item>'.format(escrito.id, Utils.serverDateToLocal(escrito.fecha)),
+                id: 'escrito-{0}'.format(escrito.id)
+            }
+        }
+    },
+    escritosList: [],
+    init: function() {
+        // Get the logged alumno's escritos
+        API.getAlumnoEscritos().done(function(response) {
+            AlumnoEscritos.escritosList = Escritos.toList(response);
+            $("#escritos-list").empty();
+            AlumnoEscritos.escritosList.forEach(function(escrito) {
+                var element = AlumnoEscritos.Templates.EscritoListItem(escrito);
+                $("#escritos-list").prepend(element.html);
+                $("#" + element.id).click(function() {
+                    Pages.docenteViewEscrito(escrito);
+                });
+            });
+        });
+    }
+};
+
 Pages = {
     docenteParciales: function() {
         Page.pushPage("docente-parciales.html", {
@@ -429,10 +720,61 @@ Pages = {
             }
         });
     },
+    docenteParciales: function() {
+        Page.pushPage("docente-escritos.html", {
+            callback: function() {
+                DocenteEscritos.init();
+            }
+        });
+    },
+    docenteViewEscrito: function(escrito) {
+        Page.pushPage('docente-view-escrito.html', {
+            data: escrito,
+            callback: function() {
+                DocenteEscritoInfo.init();
+            }
+        });
+    },
+    docenteEscritosCreate: function() {
+        Page.pushPage("docente-escritos-create.html", {
+            callback: function() {
+                DocenteEscritosCreate.init();
+            }
+        });
+    },
+    docenteViewParcial: function(parcial) {
+        Page.pushPage('docente-view-parcial.html', {
+            data: parcial,
+            callback: function() {
+                DocenteParcialInfo.init();
+            }
+        });
+    },
     docenteParcialesCreate: function() {
         Page.pushPage("docente-parciales-create.html", {
             callback: function() {
                 DocenteParcialesCreate.init();
+            }
+        });
+    },
+    alumnoParciales: function() {
+        Page.pushPage("alumno-parciales.html", {
+            callback: function() {
+                AlumnoParciales.init();
+            }
+        });
+    },
+    docenteEscritos: function() {
+        Page.pushPage("docente-escritos.html", {
+            callback: function() {
+                DocenteEscritos.init();
+            }
+        });
+    },
+    alumnoEscritos: function() {
+        Page.pushPage("alumno-escritos.html", {
+            callback: function() {
+                AlumnoEscritos.init();
             }
         });
     }
