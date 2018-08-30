@@ -9,6 +9,15 @@
     </ons-list>
 
     <ons-fab position="bottom right" ripple>
-        <ons-icon icon="md-plus" onclick="createDeber()"></ons-icon>
+        <ons-icon icon="md-plus" onclick="Pages.docenteDeberesCreate()"></ons-icon>
     </ons-fab>
+
+    <ons-modal id="docente-deberes-modal-delete">
+        <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
+        <span style="line-height: 20px; font-size: 15px;">Eliminando tarea...</span>
+    </ons-modal>
+
+    
+    <ons-progress-circular indeterminate class="spinner" id="docente-deberes-modal">
+    </ons-progress-circular>
 </ons-page>

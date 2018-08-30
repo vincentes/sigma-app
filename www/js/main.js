@@ -55,21 +55,21 @@ Deber = {
       var ids = data.imagesIds;
       var content = $("#contenido").val();
       var request = new XMLHttpRequest();
-      request.open('POST', 'http://{0}/Tarea/Post'.format(Sigma.baseUrl));
+      request.open('POST', '{0}/Tarea/Post'.format(Sigma.baseUrl));
       request.setRequestHeader("Content-type", "application/json");
       request.setRequestHeader("Authorization", "Bearer {0}".format(Sigma.getToken()));  
       request.onload = function() {
         SigmaLS.saveDeber(JSON.parse(request.response).tarea.id, ids, content, data.imagesURL);
         var loading = document.getElementById('loading-modal-creando-tarea');
         loading.hide();
-        document.querySelector('#nav').replacePage("docente-deberes-edit.html", {
+        document.querySelector('#nav'). replacePage("docente-deberes-edit.html", {
           data: SigmaLS.myDeberes[SigmaLS.myDeberes.length - 1]
         });
       };
       request.onerror = function() {
         ons.notification.toast('Error ' + request.response, { timeout: 1000 });  
       };
-      request.send(JSON.stringify({ "ImageIds": ids,  "MateriaId": 10, "Contenido": content }));
+      request.send(JSON.stringify({ "ImageIds": ids,  "MateriaId": 1, "Contenido": content }));
     });
   },
   saveImages: function(fn) {
@@ -108,7 +108,7 @@ Deber = {
     $.when.apply($, defs).then(function() {
       console.log("all things done");
       var request = new XMLHttpRequest();
-      request.open('POST', 'http://{0}/Imagen/Upload'.format(Sigma.baseUrl));
+      request.open('POST', '{0}/Imagen/Upload'.format(Sigma.baseUrl));
       request.setRequestHeader("Authorization", "Bearer {0}".format(Sigma.getToken()));  
       request.onload = function() {
         var data = JSON.parse(request.response);
@@ -156,7 +156,7 @@ Deber = {
 }
 
 Sigma = {
-  baseUrl: "192.168.1.108:45455",
+  baseUrl: "http://192.168.1.108:45457",
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -178,26 +178,20 @@ Sigma = {
       }
       return options;
   },
-  openCamera: function openCamera() {
+  openCamera: function openCamera(fn) {
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = Sigma.setOptions(srcType);
 
-    navigator.camera.getPicture(function cameraSuccess(imageUri) {
-      Deber.imagesURL.push(imageUri);
-      Deber.appendThumbnail(imageUri);
-    }, function cameraError(error) {
-      ons.notification.toast("Unable to obtain picture: " + error, { timeout: 1000 });
+    navigator.camera.getPicture(fn, function cameraError(error) {
+      ons.notification.toast("La imagen no pudo ser registrada." + error, { timeout: 5000 });
     }, options);
   },
   openFilePicker: function(fn) {
     var srcType = Camera.PictureSourceType.SAVEDPHOTOALBUM;
     var options = Sigma.setOptions(srcType);
 
-    navigator.camera.getPicture(function cameraSuccess(imageUri) {
-      Deber.imagesURL.push(imageUri);
-      Deber.appendThumbnail(imageUri);
-    }, function cameraError(error) {
-        ons.notification.toast("Unable to obtain picture: " + error, { timeout: 1000 });
+    navigator.camera.getPicture(fn, function cameraError(error) {
+        ons.notification.toast("La imagen no pudo ser registrada.", { timeout: 5000 });
     }, options);
   },
   saveFCMToken: function(success, error) {
@@ -205,7 +199,7 @@ Sigma = {
       var settings = {
         "async": true,
         "crossDomain": true,
-        "url": "http://{0}/Notification/SaveToken".format(Sigma.baseUrl),
+        "url": "{0}/Notification/SaveToken".format(Sigma.baseUrl),
         "method": "POST",
         "headers": {
           "Content-Type": "application/json",
@@ -254,7 +248,7 @@ Sigma = {
     var settings = {
       "async": true,
       "crossDomain": true,
-      "url": "http://{0}/Account/Login".format(Sigma.baseUrl),
+      "url": "{0}/Account/Login".format(Sigma.baseUrl),
       "method": "POST",
       "headers": {
         "Content-Type": "application/json",
@@ -276,7 +270,7 @@ Sigma = {
     var settings = {
       "async": true,
       "crossDomain": true,
-      "url": "http://{0}/Docente/GetInfo".format(Sigma.baseUrl),
+      "url": "{0}/Docente/GetInfo".format(Sigma.baseUrl),
       "method": "GET",
       "headers": {
         "Content-Type": "application/json",
@@ -297,7 +291,7 @@ Sigma = {
     var settings = {
       "async": true,
       "crossDomain": true,
-      "url": "http://{0}/Tarea/AssignGrupo".format(Sigma.baseUrl),
+      "url": "{0}/Tarea/AssignGrupo".format(Sigma.baseUrl),
       "method": "PUT",
       "headers": {
         "Content-Type": "application/json",
@@ -334,7 +328,7 @@ Sigma = {
     var settings = {
       "async": true,
       "crossDomain": true,
-      "url": "http://{0}/Tarea/GetAssignedGrupos/{1}".format(Sigma.baseUrl, args.deberId),
+      "url": "{0}/Tarea/GetAssignedGrupos/{1}".format(Sigma.baseUrl, args.deberId),
       "method": "GET",
       "headers": {
         "Content-Type": "application/json",
@@ -355,7 +349,7 @@ Sigma = {
     var settings = {
       "async": true,
       "crossDomain": true,
-      "url": "http://{0}/Tarea/GetAssignedDeberes".format(Sigma.baseUrl),
+      "url": "{0}/Tarea/GetAssignedDeberes".format(Sigma.baseUrl),
       "method": "GET",
       "headers": {
         "Content-Type": "application/json",
@@ -374,7 +368,7 @@ Sigma = {
   },
   downloadImages: function(args) {
     jQuery.ajax({
-      url: "http://{0}/Imagen/Download/{1}".format(Sigma.baseUrl, args.imageId),
+      url: "{0}/Imagen/Download/{1}".format(Sigma.baseUrl, args.imageId),
       cache: true,
       headers: {
         "Content-Type": "application/json",
@@ -559,11 +553,11 @@ function asignarTarea() {
   });
 }
 
-Alumno = {
+AlumnoPage = {
   deberes: {},
   misDeberes: function() {
     $("#deberes-list").empty();
-    Alumno.deberes = {};
+    AlumnoPage.deberes = {};
     document.getElementById("nav").pushPage("alumno-deberes.html"); 
   }
 }

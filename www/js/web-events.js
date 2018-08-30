@@ -1,11 +1,5 @@
 document.addEventListener('init', function(event) {
-    if (event.target.matches('#docente-deberes')) {
-        Deber.display();
-    } else if(event.target.matches('#docente-deberes-create')) {
-        $(".deber-thumbnail img").click(function(targ) {
-            PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
-        });
-    } else if(event.target.matches('#alumno-deberes')) {
+    if(event.target.matches('#alumno-deberes')) {
         Alumno.deberes = [];
         Sigma.getAssignedDeberes({
             success: function(data) {
@@ -75,62 +69,7 @@ document.addEventListener('init', function(event) {
             });
         });
     } else if(event.target.matches('#docente-deberes-edit')) {
-        var data = document.getElementById("nav").topPage.data;
-        var defs = [];
-        $("#info-deber-consigna").text(data.content);
-        data.imagesIds.forEach(function(imageId) {
-            var def = $.Deferred();
-            Sigma.downloadImages({
-                imageId: imageId,
-                success: function(src) {
-                    var xhr = new XMLHttpRequest;
-                    xhr.responseType = 'blob';
-
-                    xhr.onload = function() {
-                        var recoveredBlob = xhr.response;
-
-                        var reader = new FileReader;
-
-                        reader.onload = function() {
-                            var blobAsDataUrl = reader.result;
-                            $("#thumbnail-list").prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(blobAsDataUrl));
-                            def.resolve();
-                        };
-
-                        reader.readAsDataURL(recoveredBlob);
-                    };
-
-                    xhr.open('GET', src);
-                    xhr.send();
-                }
-            });
-            defs.push(def.promise());
-        });
-
-        $.when.apply($, defs).then(function() {
-            $(".deber-thumbnail img").click(function() {
-                PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
-            });
-        });
-
-        Sigma.getAssignedGrupos({
-            deberId: data.id,
-            success: function(response) {
-                var assignments = response.assignments;
-                for(var j = 0; j < SigmaLS.userInfo.grupos.length; j++) {
-                    for(var i = 0; i < assignments.length; i++) {
-                        var assignment = assignments[i];
-                        if(SigmaLS.userInfo.grupos[j].id === assignment.groupId) {
-                            var group = SigmaLS.userInfo.grupos[j];
-                            $("#grupos-asignados").append("<tr><td>{0}</td><td>{1}</td></tr>".format(Sigma.toGroupName(group.grado, group.numero), Sigma.serverDateToLocal(assignment.deadline)));
-                        }
-                    }
-                }
-            },
-            error: function(response) {
-
-            }
-        });
+        
     } else if(event.target.matches('#docente-deberes-assign')) {
         $("#docente-deberes-assign").css("background", "#ffffff");
         for(var i = 0; i < SigmaLS.userInfo.grupos.length; i++) {
@@ -178,7 +117,7 @@ document.addEventListener('init', function(event) {
                                 }
                             },
                             error: function(response) {
-                    
+                                
                             }
                         }); 
                     });
@@ -191,12 +130,6 @@ document.addEventListener('init', function(event) {
 
             
         });
-    }
-}, false);
-
-document.addEventListener('show', function(event) {
-    if (event.target.matches('#docente-deberes')) {
-        Deber.display();
     }
 }, false);
 

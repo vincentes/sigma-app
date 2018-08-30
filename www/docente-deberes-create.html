@@ -29,26 +29,26 @@
                     <ons-list-header>Imágenes asociadas</ons-list-header>
                     <ons-list-item>
                         <div id="thumbnail-list">
-                            <div class="thumbnail thumbnail-attach center-container" onclick="Deber.openImagePicker()">
+                            <div class="thumbnail thumbnail-attach center-container" onclick="DocenteDeberesCreate.onAddPhoto()">
                                 <ons-icon icon="ion-android-attach" class="thumbnail-baby" tappable style="font-size: 50px"></ons-icon>
                                 <ons-ripple><ons-ripple>
                             </div>
-                            <div class="thumbnail thumbnail-attach center-container" onclick="Deber.openCamera()">
-                                    <ons-icon icon="ion-android-camera" class="thumbnail-baby" tappable style="font-size: 50px"></ons-icon>
-                                    <ons-ripple><ons-ripple>                            
+                            <div class="thumbnail thumbnail-attach center-container" onclick="DocenteDeberesCreate.onTakePhoto()">
+                                <ons-icon icon="ion-android-camera" class="thumbnail-baby" tappable style="font-size: 50px"></ons-icon>
+                                <ons-ripple><ons-ripple>                            
                             </div>
                         </div>
                     </ons-list-item>
                 </ons-list>
             </div>
         </ons-row>
-        <ons-button style="width: 100% !important;" modifier="large" onclick="Deber.save()" id="create-tarea-button">Crear</ons-button>
+        <ons-button style="width: 100% !important;" modifier="large" onclick="DocenteDeberesCreate.submit()" id="create-tarea-button">Crear</ons-button>
     </ons-card>
     
     <ons-modal id="loading-modal-creando-tarea">
             <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
             <span style="line-height: 20px; font-size: 15px;">Creando tarea...</span>
-        </ons-modal>
+    </ons-modal>
     <!-- <ons-fab position="bottom right" ripple>
         <ons-icon icon="ion-checkmark" onclick="createTarea()"></ons-icon>
     </ons-fab> -->
