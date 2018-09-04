@@ -58,6 +58,12 @@ ons-page {
     border-width: 2px;
 }
 
+.deber-noimg-thumbnail {
+    border-style: dashed;
+    border-color: black;
+    border-width: 2px;
+}
+
 .center-container {
     display: flex;
     justify-content: center;

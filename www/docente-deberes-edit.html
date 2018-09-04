@@ -23,18 +23,21 @@
         <ons-row>
             <div>
                 <br />
-                <ons-list>
+                <ons-list id="ons-list-images" hidden>
                     <ons-list-header>Imágenes asociadas</ons-list-header>
-                    <ons-list-item id="img-real-list">
+                    <ons-list-item>
                         <div id="thumbnail-list">
 
                         </div>
                     </ons-list-item>
+                    <div id="img-real-list">
+
+                    </div>
                 </ons-list>
             </div>
         </ons-row>
         <ons-row>
-            <div class="table-responsive">
+            <div class="table-responsive" id="table-grupos-asignados" hidden>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -47,9 +50,9 @@
                     </tbody>
                 </table>
             </div>
-            </ons-row>
+        </ons-row>
         <ons-row>
-            <ons-button modifier="large" onclick="asignarTarea()">Asignar</ons-button>
+            <ons-button modifier="large" onclick="DocenteDeberesEdit.goToAssignDeber()">Asignar</ons-button>
         </ons-row>
     </ons-card>
     

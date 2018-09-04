@@ -2,13 +2,24 @@
     <ons-toolbar>
         <div class="center">Inicio</div>
     </ons-toolbar>
+    <ons-card>
+        <ons-list>
+            <ons-list-header>Menú</ons-list-header>        
+            <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteDeberes()">Deberes</ons-list-item>
+            <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteParciales()">Parciales</ons-list-item>
+            <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteEscritos()">Escritos</ons-list-item>
+            <ons-list-item tappable modifier="long-divider" onclick="mapa()">Mapa</ons-list-item>        
+            <ons-list-item tappable modifier="long-divider" onclick="logout()">Salir</ons-list-item>        
+        </ons-list>
+    </ons-card>
 
-    <ons-list>
-        <ons-list-header>Menú</ons-list-header>        
-        <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteDeberes()">Deberes</ons-list-item>
-        <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteParciales()">Parciales</ons-list-item>
-        <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteEscritos()">Escritos</ons-list-item>
-        <ons-list-item tappable modifier="long-divider" onclick="mapa()">Mapa</ons-list-item>        
-        <ons-list-item tappable modifier="long-divider" onclick="logout()">Salir</ons-list-item>        
-    </ons-list>
+    <ons-card id="modo-sin-internet" hidden>
+        <div class="title">
+            <ons-icon icon="wifi"></ons-icon>
+            Modo sin internet
+        </div>
+        <div class="content">
+            <p>¡Estás en modo offline! Los cambios que hagas se registrarán cuando tengas conexión a internet.</p>
+        </div>
+    </ons-card>
 </ons-page>

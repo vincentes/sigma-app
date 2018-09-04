@@ -288,27 +288,7 @@ Sigma = {
     $.ajax(settings);
   },
   assignDeberToGroups: function(args) {
-    var settings = {
-      "async": true,
-      "crossDomain": true,
-      "url": "{0}/Tarea/AssignGrupo".format(Sigma.baseUrl),
-      "method": "PUT",
-      "headers": {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer {0}".format(Sigma.getToken()),
-        "Cache-Control": "no-cache",
-      },
-      "processData": false,
-      "data": '{"GrupoIds": {0}, "Deadline": "{1}", "TareaId": {2}}'.format(JSON.stringify(args.groupIds), args.deadline, args.deberId),
-      "success": function(response) {
-        args.success(response)
-      },
-      "error": function(response) {
-        args.error(response)
-      }
-    }
-
-    $.ajax(settings);
+    return $.ajax(API.Configs.assignDeberToGroups(args));
   },
   serverDateToLocal: function(date) {
     var tokens = date.split('-');
@@ -318,6 +298,9 @@ Sigma = {
     return "{0}/{1}/{2}".format(day, month, year);
   },
   toLocalized: function(date) {
+    if(date == null || Utils.empty(date)) {
+      return undefined;
+    }
     var tokens = date.split('-');
     var year = tokens[0];
     var month = tokens[1];

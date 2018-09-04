@@ -68,8 +68,6 @@ document.addEventListener('init', function(event) {
                 PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
             });
         });
-    } else if(event.target.matches('#docente-deberes-edit')) {
-        
     } else if(event.target.matches('#docente-deberes-assign')) {
         $("#docente-deberes-assign").css("background", "#ffffff");
         for(var i = 0; i < SigmaLS.userInfo.grupos.length; i++) {
@@ -92,41 +90,7 @@ document.addEventListener('init', function(event) {
                 }
             });
             
-            $("#loading-modal-asignando-tarea").show();
-            Sigma.assignDeberToGroups({
-                groupIds: groups,
-                deadline: deadline,
-                deberId: deberId,
-                success: function(response) {
-                    $("#loading-modal-asignando-tarea").hide();  
-                    back(function() {
-                        var nav = document.getElementById("nav");
-                        Sigma.getAssignedGrupos({
-                            deberId: nav.topPage.data.id,
-                            success: function(response) {
-                                var assignments = response.assignments;
-                                $("#grupos-asignados").empty();
-                                for(var j = 0; j < SigmaLS.userInfo.grupos.length; j++) {
-                                    for(var i = 0; i < assignments.length; i++) {
-                                        var assignment = assignments[i];
-                                        if(SigmaLS.userInfo.grupos[j].id === assignment.groupId) {
-                                            var group = SigmaLS.userInfo.grupos[j];
-                                            $("#grupos-asignados").append("<tr><td>{0}</td><td>{1}</td></tr>".format(Sigma.toGroupName(group.grado, group.numero), Sigma.serverDateToLocal(assignment.deadline)));
-                                        }
-                                    }
-                                }
-                            },
-                            error: function(response) {
-                                
-                            }
-                        }); 
-                    });
-                },
-                error: function(response) {
-                    $("#loading-modal-asignando-tarea").hide();
-                    ons.notification.toast('Error ' + response, { timeout: 1000 });  
-                }
-            });
+
 
             
         });
