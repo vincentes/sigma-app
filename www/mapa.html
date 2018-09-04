@@ -1,44 +1,81 @@
 <ons-page id="mapa">
 
     <ons-toolbar>
-            <div class="left">
-                    <ons-button onclick="mapaControl()">Panel de Control</ons-button>
-                </div>
-            
-        <div class="right">
-            <ons-button onclick="scanOnsen()">Escanear</ons-button>
+        <div style="text-align: right;">
+            <ons-search-input placeholder="Buscar Destino" onchange="buscarLugar(this.value)"></ons-search-input>
+
         </div>
+
+
     </ons-toolbar>
+
+    <ons-fab position="bottom left" onclick="mapaControl()">
+        <ons-icon icon="ion-navicon, material:md-menu"></ons-icon>
+
+    </ons-fab>
+    <ons-fab position="bottom center" onclick="showModal('beacons-config-modal')">
+        <ons-icon icon="fa-cog"></ons-icon>
+
+    </ons-fab>
+
+    <ons-fab position="bottom right" ons-button onclick="centrarMapaPos()">
+        <ons-icon icon="fa-location-arrow" id="fabCentrarMapa"></ons-icon>
+    </ons-fab>
     <script>
         document.addEventListener('init', function (event) {
             if (event.target.matches('#mapa')) {
-                mapSetup();
-                scanSetup();
 
+                // mapSetup();
+                scanSetup();
+                controlMapaSetup(false);
+                verOcultarBeacons(false);
+                if (centrarMapa) {
+                    actDesCentrarMapa(true);
+                } else {
+                    actDesCentrarMapa(false);
+                }
+                try {
+                    document.getElementById('swVerOcultarBeacons').addEventListener('change', function () { verOcultarBeacons(document.getElementById("swVerOcultarBeacons").checked); });
+                    document.getElementById('swMoverFijarBeacons').addEventListener('change', function () { moverBloquearBeacons(document.getElementById("swMoverFijarBeacons").checked); });
+                    //Igual al del main pero alreves sólo para cambiar el color del botoón
+
+                }
+                catch{
+                    alert("Error al obtener datos de switch's");
+                }
+                scanOnsen();
+            } else {
+                if (periodoScan !== null) {
+                    detenerScan();
+                }
             }
         }, false);
+
+        //document.addEventListener("beforeunload", function (event) { alert("Todo Joya"); },false);
+
+        document.addEventListener("backbutton", function (event) { hideModal('beacons-config-modal'); }, false);
+
     </script>
+
+
 
 
     <ons-card style="margin: 5px;">
         <div style="text-align: center;">
-            <!--
-            <h2>Mapa</h2>
-            <input type="button" value="Iniciar Wifi" name="Wifi" id="wifi" />
-            -->
+            <div id="map"></div>
+        </div>
 
+    </ons-card>
+
+    <ons-card style="margin: 5px;">
+
+        <div style="text-align: center;">
             <!--
-            <input type="button" value="Escanear" name="Scan" id="scan" />
-            <input type="button" value="Crear Tabla" name="Crear" id="crear" />
-            <input type="button" value="PreCarga" name="PreCarga" id="preCarga" />
-            <input type="button" value="Mostrar datos" name="Data" id="data" />
-            <input type="button" value="Borrar Tabla" name="Borrar" id="borrar" />
-            <input type="button" value="Limpiar Mapa" name="LimpiarMapa" id="limpiarMapa" />
-            <br>
-            -->
             <canvas id="a" width="250" height="250" style="border: 1px solid black;">
                 This text is displayed if your browser does not support HTML5 Canvas.
             </canvas>
+        -->
+
             <br>
             <p id="pResultado"></p>
             <hr>
@@ -52,5 +89,48 @@
         </div>
 
     </ons-card>
+    <ons-modal direction="up" id="beacons-config-modal">
+        <div style="text-align: center">
+            <ons-list>
+                <ons-list-header>Configuración de los Beacon's</ons-list-header>
+                <ons-list-item>
+                    <div class="center">
+                        Visualizar Beacons
+                    </div>
+                    <div class="right">
+                        <ons-switch id='swVerOcultarBeacons'></ons-switch>
+                    </div>
+                </ons-list-item>
+                <ons-list-item id="modPos">
+                    <div class="center">
+                        Modificar Posición
+                    </div>
+                    <div class="right">
+                        <ons-switch id='swMoverFijarBeacons'></ons-switch>
+                    </div>
+                </ons-list-item>
 
+                <ons-list-item>
+                    <div class="center">
+                        <ons-button onclick="detenerScan()">Detener Escaneo</ons-button>
+                    </div>
+                    <div class="right">
+                        <ons-button onclick="scanOnsen()">Iniciar Escaneo</ons-button>
+                    </div>
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        <ons-button onclick="grabarPosiciones()">Grabar posiciones</ons-button>
+                    </div>
+                    <div class="right">
+                        <ons-button onclick="hideModal('beacons-config-modal')">Cerrar</ons-button>
+                    </div>
+                </ons-list-item>
+
+            </ons-list>
+            <p style="margin-top: 30px;">
+
+            </p>
+        </div>
+    </ons-modal>
 </ons-page>

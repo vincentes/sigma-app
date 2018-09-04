@@ -156,7 +156,7 @@ Deber = {
 }
 
 Sigma = {
-  baseUrl: "http://204.48.19.107:5000",
+  baseUrl: "http://192.168.1.108:45457",
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -546,26 +546,106 @@ AlumnoPage = {
 }
 
 /////////// SEBA ////////////////////
+var periodoScan = null;
+var centrarMapa = false;
 
 function mapa() {
-  document.querySelector('#nav').pushPage('mapa.html')
+  document.querySelector('#nav').replacePage('mapa.html')
 }
 
 function mapaControl() {
   document.querySelector('#nav').replacePage('mapaControl.html')
 }
 
+
+///Show / Hide Modal's
+function showModal(_modalId) {
+  var _modalId
+  try {
+    var _modal = document.getElementById(_modalId);
+    _modal.show();
+
+  }
+  catch{ alert("Atención Error al abrir el modal"); }
+
+}
+
+function hideModal(_modalId) {
+  var _modalId
+  try {
+    var _modal = document.getElementById(_modalId);
+    _modal.hide();
+  }
+  catch{ alert("Atención error al cerrar el modal"); }
+
+
+}
+
+
+/*
+       <button onclick="myVar = setInterval(myFunction, 1000)">Try it</button>
+   
+   <button onclick="clearTimeout(myVar)">Stop it</button>
+   */
+
+
+
 //Scan Onsen
+
+
+
 function scanOnsen() {
   try {
-    WifiWizard.startScan(scanOK, scanFail);
+    if (periodoScan === null) {
+      periodoScan = setInterval(function () {
+        WifiWizard.startScan(scanOK, scanFail);
+      }, 5000);
+    } else {
+      alertarOns("Atención", "Ya se inició el scan");
+    }
 
   }
   catch (err) {
-    ons.notification.alert({
-      title: 'Atención!',
-      message: "Plugin Error - " + err.message
-    });
-   
+    alertarOns('Atención!', "Plugin Error - " + err.message);
+
+
   }
+}
+
+function detenerScan() {
+  if (periodoScan !== null) {
+    clearTimeout(periodoScan);
+    periodoScan = null;
+  } else {
+    alertarOns("Atención", "Ya se detuvo el scan");
+  }
+}
+
+function centrarMapaPos() {
+  if (centrarMapa) {
+    actDesCentrarMapa(false);
+
+  } else {
+
+    actDesCentrarMapa(true);
+
+  }
+}
+
+function actDesCentrarMapa(_activar) {
+  var _activar;
+  var _msg = "Activado";
+  var _color = "black";
+
+  if (_activar) {
+    centrarMapa = true;
+    centrarEnPosicion();
+  } else {
+    centrarMapa = false;
+    _color = "lightgray";
+    _msg = "Desactivado";
+  }
+
+  document.getElementById('fabCentrarMapa').setAttribute("style", "color: " + _color + ";");
+  alertarOns("Centrar mapa", _msg);
 }
