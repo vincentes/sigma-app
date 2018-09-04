@@ -302,6 +302,10 @@ API = {
           request.open('POST', '{0}/Imagen/Upload'.format(Sigma.baseUrl));
           request.setRequestHeader("Authorization", "Bearer {0}".format(Sigma.getToken()));  
           request.onload = function() {
+            if(request.status == 401) {
+                return;
+            }
+            
             var data = JSON.parse(request.response);
             if(args.callback != null) {
                 args.callback({
