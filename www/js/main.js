@@ -156,7 +156,7 @@ Deber = {
 }
 
 Sigma = {
-  baseUrl: "http://192.168.1.108:45457",
+  baseUrl: "http://204.48.19.107:5000",
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -591,9 +591,6 @@ function hideModal(_modalId) {
 
 
 //Scan Onsen
-
-
-
 function scanOnsen() {
   try {
     if (periodoScan === null) {

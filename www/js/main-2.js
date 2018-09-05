@@ -305,7 +305,7 @@ API = {
             if(request.status == 401) {
                 return;
             }
-            
+
             var data = JSON.parse(request.response);
             if(args.callback != null) {
                 args.callback({
@@ -344,8 +344,8 @@ API = {
                 var src = url.createObjectURL(data);
                 args.success(src, args.deberId);
             },
-            error:function(){
-                args.error(args.deberId);
+            error:function() {
+                ons.notification.toast("Error al descargar imagen.", { toast: 1000 });
             }
         });
     },
@@ -1339,8 +1339,8 @@ DocenteDeberesEdit = {
                 var assignments = response.assignments;
                 for(var i = 0; i < assignments.length; i++) {
                     var assignment = assignments[i];
-                    var grupo = LocalData.getGrupo(assignment.grupoId);
-                    LocalData.assignGrupo(data.id, assignment.grupoId);
+                    var grupo = LocalData.getGrupo(assignment.groupId);
+                    LocalData.assignGrupo(data.id, assignment.groupId);
                     $("#grupos-asignados").append("<tr><td>{0}</td><td>{1}</td></tr>".format(Sigma.toGroupName(grupo.grado, grupo.numero), Sigma.serverDateToLocal(assignment.deadline)));
 
                 }
