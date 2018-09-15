@@ -157,17 +157,6 @@ Deber = {
 
 Sigma = {
   baseUrl: "http://204.48.19.107:5000",
-  productionServerEnabled: false,
-  useProductionServer: function(enable) {
-    if(enable) {
-      this.baseUrl = "http://204.48.19.107:5000";
-      this.productionServerEnabled = true;
-    } else {
-      this.baseUrl = "http://192.168.1.110:45455";
-      this.productionServerEnabled = false;
-    }
-    LocalData.setProductionServerEnabled(enable);
-  },
   setToken: function (token) {
     window.localStorage.setItem("sigma_token", token);
   },
@@ -387,6 +376,13 @@ Sigma = {
 };
 
 
+
+ons.ready(function() {
+  loadData();
+  checkLogin();
+});
+
+
 // Extension methods
 if (!String.prototype.format) {
   String.prototype.format = function () {
@@ -517,14 +513,12 @@ function deberes() {
   document.querySelector('#nav').pushPage('docente-deberes.html');
 }
 
-function back(_callback) {
-  var deber = document.getElementById("nav").topPage.data.deber;
-  document.querySelector('#nav').popPage({
-    callback: function() {
-      _callback();
-    },
-    data: deber
-  });  
+function back(callback) {
+  var options = {};
+  if(callback !== null) {
+    options.callback = callback;
+  }
+  document.querySelector('#nav').popPage(options);  
 }
 
 function createDeber() {
@@ -610,6 +604,8 @@ function scanOnsen() {
   }
   catch (err) {
     alertarOns('Atención!', "Plugin Error - " + err.message);
+
+
   }
 }
 

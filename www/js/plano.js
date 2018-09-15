@@ -46,7 +46,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Salón 33",
-                "TIPO": "salon"
+                "TIPO": "salon",
+                "ALIAS": "ssSalon33"
             }
         },
         {
@@ -65,7 +66,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Salón 32",
-                "TIPO": "salon"
+                "TIPO": "salon",
+                "ALIAS": "ssSalon32"
             }
         },
         {
@@ -84,7 +86,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Salón 31",
-                "TIPO": "salon"
+                "TIPO": "salon",
+                "ALIAS": "ssSalon31"
             }
         },
         {
@@ -103,7 +106,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Salón 30",
-                "TIPO": "salon"
+                "TIPO": "salon",
+                "ALIAS": "ssSalon30"
             }
         },
         {
@@ -122,7 +126,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Salón 29",
-                "TIPO": "salon"
+                "TIPO": "salon",
+                "ALIAS": "ssSalon29"
             }
         },
         {
@@ -141,7 +146,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Salón 28",
-                "TIPO": "salon"
+                "TIPO": "salon",
+                "ALIAS": "ssSalon28"
             }
         },
         {
@@ -160,7 +166,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Salón Gremial",
-                "TIPO": "salon"
+                "TIPO": "salon",
+                "ALIAS": "ssSalonGremial"
             }
         },
         {
@@ -183,7 +190,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Gimnasio",
-                "TIPO": "gimnasio"
+                "TIPO": "gimnasio",
+                "ALIAS": "ssGimCan"
             }
         },
         {
@@ -202,7 +210,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Baño de Damas",
-                "TIPO": "banio"
+                "TIPO": "banio",
+                "ALIAS": "ssBanDam"
             }
         },
         {
@@ -221,7 +230,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Baño de Caballeros",
-                "TIPO": "banio"
+                "TIPO": "banio",
+                "ALIAS": "ssBanCab"
             }
         },
         {
@@ -240,7 +250,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Laboratorio de Física",
-                "TIPO": "lab"
+                "TIPO": "lab",
+                "ALIAS": "ssLabFis"
             }
         },
         {
@@ -259,7 +270,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Laboratorio de Física 2",
-                "TIPO": "lab"
+                "TIPO": "lab",
+                "ALIAS": "ssLabFis2"
             }
         },
         {
@@ -278,7 +290,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Adscripción",
-                "TIPO": "admin"
+                "TIPO": "admin",
+                "ALIAS": "ssAds"
             }
         },
         {
@@ -297,7 +310,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Cantina",
-                "TIPO": "cantina"
+                "TIPO": "cantina",
+                "ALIAS": "ssCantina"
             }
         },
         {
@@ -316,7 +330,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Comedor",
-                "TIPO": "comedor"
+                "TIPO": "comedor",
+                "ALIAS": "ssComedor"
             }
         },
         {
@@ -335,7 +350,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Comedor 2",
-                "TIPO": "comedor"
+                "TIPO": "comedor",
+                "ALIAS": "ssComedor2"
             }
         },
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -455,7 +471,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Escalera al depósito",
-                "TIPO": "libre"
+                "TIPO": "libre",
+                "ALIAS": "ssEscDep"
             }
         },
         {
@@ -503,7 +520,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Escalera al depósito",
-                "TIPO": "escalon"
+                "TIPO": "escalon",
+                "ALIAS": "ssEscDep"
             }
         },
         {
@@ -520,8 +538,9 @@ var plano = {
                 ]]
             },
             "properties": {
-                "NAME": "Escalera al Primer Piso",
-                "TIPO": "libre"
+                "NAME": "Escalera a Planta Baja",
+                "TIPO": "libre",
+                "ALIAS": "ssEscPB"
             }
         },
         {
@@ -568,8 +587,9 @@ var plano = {
                 ]]
             },
             "properties": {
-                "NAME": "Escalera al Primer Piso",
-                "TIPO": "escalon"
+                "NAME": "Escalera a Planta Baja",
+                "TIPO": "escalon",
+                "ALIAS": "ssEscPB"
             }
         },
         {
@@ -587,7 +607,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Escalera al gimnasio (Tribuna)",
-                "TIPO": "libre"
+                "TIPO": "libre",
+                "ALIAS": "ssGimTri"
             }
         },
         {
@@ -620,7 +641,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Escalera al gimnasio (Tribuna)",
-                "TIPO": "escalon"
+                "TIPO": "escalon",
+                "ALIAS": "ssGimTri"
             }
         },
         {
@@ -638,9 +660,11 @@ var plano = {
             },
             "properties": {
                 "NAME": "Escalera al gimnasio (Cancha)",
-                "TIPO": "libre"
+                "TIPO": "libre",
+                "ALIAS": "ssGimCan"
             }
-        }, {
+        },
+        {
             "type": "Feature",
             "properties": {},
             "geometry": {
@@ -670,7 +694,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Escalera al gimnasio (Cancha)",
-                "TIPO": "escalon"
+                "TIPO": "escalon",
+                "ALIAS": "ssGimCan"
             }
         }
 
@@ -679,3 +704,89 @@ var plano = {
 
     ]
 }
+
+var nodosMapa = {
+    ssAds: { marker: [2001, 1301], ss01: 16 },
+    ss01: { marker: [1986, 1301], ss02: 30, ssAds: 16, ssLabFis2: 12 },
+    ssLabFis2: { marker: [1986, 1313], ss01: 12 },
+    ss02: { marker: [1956, 1301], ss01: 30, ss03: 65, ssLabFis: 12 },
+    ssLabFis: { marker: [1956, 1313], ss02: 12 },
+    ss03: { marker: [1922, 1301], ss02: 34, ss04: 31 },
+    ss04: { marker: [1891, 1301], ss03: 31, ss05: 38, ssBanCab: 20 },
+    ss05: { marker: [1853, 1301], ss04: 38, ss06: 39 },
+
+    ssBanCab: { marker: [1891, 1281], ss04: 20 },
+    ss06: { marker: [1814, 1301], ss05: 39, ss07: 34, ssBanDam: 20 },
+    ssBanDam: { marker: [1814, 1281], ss06: 20 },
+    ss07: { marker: [1780, 1301], ss06: 34, ss08: 34 },
+    ss08: { marker: [1746, 1301], ss07: 34, ss09: 24 },
+    ss09: { marker: [1722, 1301], ss08: 24, ss10: 24 },
+    ss10: { marker: [1698, 1301], ss09: 24, ss11: 21, ssGimCan: 20 },
+    ssGimCan: { marker: [1698, 1281], ss10: 20 },
+    ss11: { marker: [1677, 1301], ss10: 21, ss12: 21 },
+    ss12: { marker: [1657, 1301], ss11: 21, ss13: 34, ssGimTri: 20 },
+    ssGimTri: { marker: [1657, 1281], ss12: 20 },
+    ss13: { marker: [1623, 1301], ss12: 34, ss14: 34 },
+    ss14: { marker: [1589, 1301], ss13: 34, ss15: 34 },
+    ss15: { marker: [1555, 1301], ss14: 34, ss16: 34 },
+    ss16: { marker: [1521, 1301], ss15: 34, ss17: 34 },
+    ss17: { marker: [1487, 1301], ss16: 34, ss18: 34 },
+    ss18: { marker: [1453, 1301], ss17: 34, ss19: 39 },
+    ss19: { marker: [1415, 1301], ss18: 39, ss20: 33, ss24: 33},
+    ss20: { marker: [1415, 1333], ss19: 33, ss21: 19, ssEscDep: 25},
+    ssEscDep: { marker: [1440, 1333], ss20: 25 },
+    ss21: { marker: [1415, 1352], ss20: 19, ss22: 19, ss23: 30},
+    ss22: { marker: [1415, 1371], ss21: 19, ssComedor2: 19, ssEscPB: 25},
+    ssEscPB: { marker: [1440, 1371], ss22: 25 },
+    ssComedor2: { marker: [1415, 1390], ss22: 19 },
+    ssComedor: { marker: [1355, 1352], ss23: 30, ss25: 52 },
+    ssCantina: { marker: [1385, 1390], ss23: 38 },
+    ss23: { marker: [1385, 1352], ss24: 52, ss21: 30, ssComedor: 30, ssCantina: 38},
+    ss24: { marker: [1385, 1300], ss23: 52, ss19: 30, ss25: 30},
+    ss25: { marker: [1355, 1300], ssComedor: 52, ss24: 30, ss26: 34},
+    ss26: { marker: [1321, 1300], ss25: 34, ss27: 34},
+    ss27: { marker: [1287, 1300], ss26: 34, ss28: 31},
+    ss28: { marker: [1256, 1300], ss27: 31, ss29: 34, ssSalonGremial: 12 },
+    ssSalonGremial: { marker: [1256, 1312], ss28: 12 },
+    ss29: { marker: [1222, 1300], ss28: 34, ss30: 34},
+    ss30: { marker: [1188, 1300], ss29: 34, ss31: 34},
+    ss31: { marker: [1154, 1300], ss30: 34, ss32: 34},
+    ss32: { marker: [1120, 1300], ss31: 34, ss33: 27},
+    ss33: { marker: [1093, 1300], ss32: 27, ss34: 34, ssSalon28: 12 },
+    ssSalon28: { marker: [1093, 1312], ss33: 12 },
+    ss34: { marker: [1059, 1300], ss33: 34, ss35: 34},
+    ss35: { marker: [1025, 1300], ss34: 34, ss36: 34},
+    ss36: { marker: [991, 1300], ss35: 34, ss37: 34},
+    ss37: { marker: [956, 1300], ss36: 34, ss38: 17},
+    ss38: { marker: [939, 1300], ss37: 17, ss39: 34, ssSalon29: 12},
+    ssSalon29: { marker: [939, 1312], ss38: 12 },
+    ss39: { marker: [905, 1300], ss38: 34, ss40: 34},
+    ss40: { marker: [871, 1300], ss39: 34, ss41: 34},
+    ss41: { marker: [837, 1300], ss40: 34, ss42: 34},
+    ss42: { marker: [803, 1300], ss41: 34, ss43: 27},
+    ss43: { marker: [776, 1300], ss42: 30, ss44: 34, ssSalon30: 12},
+    ssSalon30: { marker: [776, 1312], ss43: 12 },
+    ss44: { marker: [739, 1300], ss43: 34, ss45: 34},
+    ss45: { marker: [705, 1300], ss44: 34, ss46: 34},
+    ss46: { marker: [671, 1300], ss45: 34, ss47: 34},
+    ss47: { marker: [637, 1300], ss46: 34, ss48: 28},
+    ss48: { marker: [610, 1300], ss47: 28, ss49: 34, ssSalon31: 12},
+    ssSalon31: { marker: [610, 1312], ss48: 12 },
+    ss49: { marker: [576, 1300], ss48: 34, ss50: 34},
+    ss50: { marker: [552, 1300], ss49: 34, ss51: 34},
+    ss51: { marker: [518, 1300], ss50: 34, ss52: 34},
+    ss52: { marker: [484, 1300], ss51: 34, ss53: 28},
+    ss53: { marker: [446, 1300], ss52: 28, ss54: 34, ssSalon32: 12},
+    ssSalon32: { marker: [446, 1312], ss53: 12 },
+    ss54: { marker: [412, 1300], ss53: 34, ss55: 34},
+    ss55: { marker: [378, 1300], ss54: 34, ss56: 34},
+    ss56: { marker: [344, 1300], ss55: 34, ss57: 34},
+    ss57: { marker: [310, 1300], ss56: 34, ss58: 26},
+    ss58: { marker: [285, 1300], ss57: 26, ss59: 34, ssSalon33: 12},
+    ssSalon33: { marker: [285, 1312], ss58: 12 },
+    ss59: { marker: [251, 1300], ss58: 34, ss60: 34},
+    ss60: { marker: [217, 1300], ss59: 34, ss61: 34},
+    ss61: { marker: [183, 1300], ss60: 34, ss62: 34},
+    ss62: { marker: [149, 1300], ss61: 34},
+    ss63: { marker: [-1]}
+};

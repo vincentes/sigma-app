@@ -2,21 +2,30 @@
     <ons-toolbar>
         <div class="center">Sigma</div>
     </ons-toolbar>
-    <ons-card style="margin: 20px;">
-        <div style="text-align: center;">
+    <ons-card class="card-fluid">
+        <div style="text-align: center; margin: 0 auto;">
             <h2>Iniciar sesión</h2>
             <p>
-                <ons-input id="cedula" modifier="underbar" placeholder="Cédula" value="1234" float></ons-input>
+                <ons-input id="cedula" modifier="underbar" placeholder="Cédula" value="2123" float></ons-input>
             </p>
             <p>
                 <ons-input id="password" modifier="underbar" type="password" value="S526!pp" placeholder="Contraseña" float></ons-input>
             </p>
             <p style="margin-top: 30px;">
-                <ons-button onclick="Login.submit()">Iniciar sesión</ons-button>
+                <ons-button onclick="Login.submit()" id="login-button">Iniciar sesión</ons-button>
             </p>
-            <p style="margin-top: 30px;">
-                <ons-button onclick="mapa()">Mapa</ons-button>
-            </p>
+            <ons-list>
+                <ons-list-header>Servidor</ons-list-header>
+                <ons-list-item>
+                  <div class="center">
+                    Testing
+                  </div>
+                  <div class="right">
+                    <ons-switch id="testing-enabled"></ons-switch>
+                  </div>
+                </ons-list-item>
+            </ons-list>
+            <p hidden style="color: darkred" id="login-info">No tenés internet. Cuando te conectes podrás loguearte a Sigma.</p>
         </div>
     </ons-card>
 

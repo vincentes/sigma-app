@@ -1,3 +1,34 @@
+ons.ready(function() {
+    loadData();
+    LocalData.loadEverything();
+    if(LocalData.user != null) {
+      switch(LocalData.user.roles[0]) {
+          case "Docente":
+          Pages.docenteHome();
+          break;
+          case "Alumno":
+          Pages.alumnoHome();
+          break;
+          case "Adscripto":
+          Pages.adscriptoHome();
+      }
+    }
+    ons.disableDeviceBackButtonHandler();
+});
+
+document.addEventListener("backbutton", function(e){
+    var nav = document.getElementById("nav");
+    if(nav.topPage.id === 'adscripto-encuestas-create') {
+        if(!AdscriptoEncuestaCreate.exiting) {
+            AdscriptoEncuestaCreate.confirmExit();
+        }
+        e.preventDefault();
+    }
+    else {
+        nav.popPage();
+    }
+ }, false);
+
 document.addEventListener('init', function(event) {
     if(event.target.matches('#alumno-deberes')) {
         Alumno.deberes = [];
@@ -30,6 +61,27 @@ document.addEventListener('init', function(event) {
   
             }  
         });
+    } else if(event.target.matches('#login')) {
+        if(LocalData.user != null) {
+            switch(LocalData.user.roles[0]) {
+                case "Docente":
+                Pages.docenteHome();
+                break;
+                case "Alumno":
+                Pages.alumnoHome();
+                break;
+                case "Adscripto":
+                Pages.adscriptoHome();
+            }
+
+            document.getElementById('testing-enabled').addEventListener('change', function(e) { 
+                var enabled = e.switch.checked;
+                Sigma.useProductionServer(!enabled);
+            });
+
+            var productionServerEnabled = LocalData.productionServerEnabled;
+            document.getElementById("testing-enabled").checked = !productionServerEnabled;
+        }
     } else if(event.target.matches('#alumno-view-deber')) {
         var data = document.getElementById("nav").topPage.data;
         var defs = [];
@@ -69,34 +121,11 @@ document.addEventListener('init', function(event) {
             });
         });
     } else if(event.target.matches('#docente-deberes-assign')) {
-        $("#docente-deberes-assign").css("background", "#ffffff");
-        for(var i = 0; i < SigmaLS.userInfo.grupos.length; i++) {
-            var grupo = SigmaLS.userInfo.grupos[i];
-            $("#grupos-list").prepend('<ons-list-item id="grupo-{0}" tappable><label class="left"><ons-checkbox name="grupos[]" input-id="grupo-{0}-assign"></ons-checkbox></label><label for="grupo-{0}-assign">{1}</label></ons-list-item>'.format(grupo.id, Sigma.toGroupName(grupo.grado, grupo.numero)));
-        }
 
-        $("#assign-deber").click(function() {
-            var deberId = document.getElementById("nav").topPage.data.deberId;
-            var deadline = Sigma.toLocalized($("#docente-deberes-date").val());
-            var groups = [];
-            $("ons-checkbox[name='grupos[]']").each(function ()
-            {
-                var element = $(this);
-                if(element[0].checked) {
-                    var elementID = element.attr('input-id');
-                    var tokens = elementID.split('-');
-                    var groupID = tokens[1];
-                    groups.push(parseInt(groupID));
-                }
-            });
-            
-
-
-            
-        });
     }
 }, false);
 
 $(".list-deber-item").click(function(evt) {
     
 });
+

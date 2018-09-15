@@ -1,0 +1,29 @@
+<ons-page id="alumno-encuesta-respond">
+    <ons-toolbar>
+            <div class="left"><ons-back-button>Volver</ons-back-button></div>
+            <div class="center" id="encuesta-titulo">Cargando...</div>
+    </ons-toolbar>
+
+    <div class="pregunta-box" id="box" hidden>
+        <ons-card style="width: 200px">
+            <ons-row style="margin-bottom:5px">
+                <ons-col>
+                    <ons-icon name="text" style="font-size: 21px"></ons-icon><span id="encuesta-p-texto">Cargando...</span>
+                </ons-col>
+            </ons-row>
+            <ons-row style="margin-bottom:5px">
+                <ons-input id="adscripto-encuestas-create-titulo" placeholder="..." modifier="underbar" width="100%"></ons-input>
+            </ons-row>
+            <ons-row>
+                <ons-button modifier="quiet" onclick="AlumnoEncuestaRespond.nextPregunta()" style="margin: 0 auto !important; width: 100%; text-align: center;">
+                    Siguiente
+                </ons-button>
+            </ons-row>
+        </ons-card>
+    </div>
+
+    <ons-modal id="loading-modal-respondiendo-encuesta">
+            <ons-icon icon="gear" spin="true" style="line-height: 20px; vertical-align: middle;"></ons-icon>
+            <span style="line-height: 20px; font-size: 15px;">Guardando respuestas...</span>
+    </ons-modal>
+</ons-page>

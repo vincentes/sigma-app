@@ -4,6 +4,10 @@
         <div class="center">Escritos</div>
     </ons-toolbar>
 
+    <div id="error">
+        
+    </div>
+
     <ons-list id="escritos-list">
         
     </ons-list>
@@ -11,4 +15,7 @@
     <ons-fab position="bottom right" ripple>
         <ons-icon icon="md-plus" onclick="Pages.docenteEscritosCreate()"></ons-icon>
     </ons-fab>
+
+    <ons-progress-circular indeterminate class="spinner" id="docente-escritos-spinner">
+    </ons-progress-circular>
 </ons-page>

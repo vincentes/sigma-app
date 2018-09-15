@@ -1,0 +1,53 @@
+<ons-page id="adscripto-encuestas-create-pregunta">
+    <ons-toolbar>
+        <div class="left">
+            <ons-back-button>Atrás</ons-back-button>
+        </div>
+        <div class="center">Pregunta</div>
+    </ons-toolbar>
+    <div style="margin: 10px">
+        <h1 id="p-titulo">Añadir pregunta</h1>
+        <ons-row style="margin-bottom:5px">
+            <ons-col style="width: 50px">
+                <label for="pregunta-texto-targ">Pregunta</label>
+            </ons-col>
+            <ons-col>
+                <ons-input class="pregunta" input-id="pregunta-texto-targ" id="pregunta-texto-i" placeholder="¿...?" width="100%"></ons-input>
+            </ons-col>
+        </ons-row>
+        <ons-row style="margin-bottom:5px">
+            <ons-col style="width:70px">
+                <label for="entrada">Tipo de respuesta</label>
+            </ons-col>
+            <ons-col>
+                <ons-select class="select">
+                    <select class="select-input" id="entrada">
+                        <option value="3">Multiple opción</option>
+                        <option value="1">Única opción</option>
+                        <option value="0">Escritura libre</option>
+                    </select>
+                </ons-select>
+            </ons-col>
+        </ons-row>
+
+        <ons-list>
+            <ons-list-header>Opciones de respuesta</ons-list-header>
+            <div id="respuestas-list">
+
+            </div>
+            <ons-list-item id="add-respuesta" tappable>             
+                <div class="left">
+                    <ons-button modifier="quiet" onclick="AdscriptoEncuestaPregunta.addRespuesta()"><ons-icon icon="plus"></ons-icon></ons-button>
+                </div>
+                <div class="center">
+                    <label>Añadir otra respuesta</label>
+                </div>
+            </ons-list-item>
+        </ons-list>
+        <ons-row>
+            <ons-button modifier="quiet" onclick="AdscriptoEncuestaPregunta.submit()" id="p-submit" style="margin: 0 auto !important; width: 100%; text-align: center;">
+                Añadir
+            </ons-button>
+        </ons-row>
+    </div>
+</ons-page>

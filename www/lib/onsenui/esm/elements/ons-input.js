@@ -123,8 +123,10 @@ var InputElement = function (_BaseInputElement) {
       _get(InputElement.prototype.__proto__ || _Object$getPrototypeOf(InputElement.prototype), 'connectedCallback', this).call(this);
 
       contentReady(this, function () {
-        _this2._input.addEventListener('input', _this2._boundOnInput);
-        _this2._input.addEventListener('focusin', _this2._boundOnFocusin);
+        if(_this3._input != null) {
+          _this2._input.addEventListener('input', _this2._boundOnInput);
+          _this2._input.addEventListener('focusin', _this2._boundOnFocusin);
+        }
       });
 
       var type = this.getAttribute('type');
@@ -140,8 +142,10 @@ var InputElement = function (_BaseInputElement) {
       _get(InputElement.prototype.__proto__ || _Object$getPrototypeOf(InputElement.prototype), 'disconnectedCallback', this).call(this);
 
       contentReady(this, function () {
-        _this3._input.removeEventListener('input', _this3._boundOnInput);
-        _this3._input.removeEventListener('focusin', _this3._boundOnFocusin);
+        if(_this3._input != null) {
+          _this3._input.removeEventListener('input', _this3._boundOnInput);
+          _this3._input.removeEventListener('focusin', _this3._boundOnFocusin);
+        }
       });
     }
   }, {

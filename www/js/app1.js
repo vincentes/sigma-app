@@ -408,6 +408,8 @@ function funcExterna(e) {
             //dibujarBeaconsEnDb(false);
 
             $("#pResultado").text('');
+            $("#pInfo").text('');
+
 
             for (i = 0; i < result.length; i++) {
                 //alert(result[i].SSID);
@@ -459,12 +461,15 @@ function funcExterna(e) {
 
             $("#pResultado").append(mostrarBeacons());
             $("#pResultado").append("Beacons encontrados: " + beaconsEncontrados.length + "<br>AP's encontrados: " + result.length + '<br>');
+            $("#pInfo").text('Posición obtenida');
 
+            
             switch (beaconsEncontrados.length) {
                 case 0:
-                    alertarOns("Atención", "No se puede determinar la posición");
+                    //alertarOns("Atención", "No se puede determinar la posición");
+                    $("#pInfo").text('No se pudo determinar la posición');
                 case 1:
-                    console.log("En funcExterna: Case 1: " + beaconsEncontrados[0].posX + " - " + beaconsEncontrados[0].posY + " - " + beaconsEncontrados[0].radio);
+                    //console.log("En funcExterna: Case 1: " + beaconsEncontrados[0].posX + " - " + beaconsEncontrados[0].posY + " - " + beaconsEncontrados[0].radio);
                     dibujarRadioPosicion2(beaconsEncontrados[0].posX, beaconsEncontrados[0].posY, beaconsEncontrados[0].radio * escala, false);
                     break;
                 case 2:

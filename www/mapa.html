@@ -1,12 +1,12 @@
 <ons-page id="mapa">
 
     <ons-toolbar>
-        <div style="text-align: right;">
-            <ons-search-input placeholder="Buscar Destino" onchange="buscarLugar(this.value)"></ons-search-input>
-
+        <div class="left">
+            <ons-back-button>Atrás</ons-back-button>
         </div>
-
-
+        <div class="center" style="text-align: right;">
+            <ons-search-input placeholder="Buscar Destino" onchange="buscarLugar(this.value)"></ons-search-input>
+        </div>
     </ons-toolbar>
 
     <ons-fab position="bottom left" onclick="mapaControl()">
@@ -63,6 +63,9 @@
     <ons-card style="margin: 5px;">
         <div style="text-align: center;">
             <div id="map"></div>
+            <br>
+            <p id="pInfo"></p>
+
         </div>
 
     </ons-card>
@@ -75,17 +78,18 @@
                 This text is displayed if your browser does not support HTML5 Canvas.
             </canvas>
         -->
-
-            <br>
             <p id="pResultado"></p>
+
+            <!--
+                
             <hr>
             <p id="pContador"></p>
 
             <p id="aTableData"></p>
-            <!--
             <input type="button" value="Click Me!" name="counter" id="counter" />
--->
             <div id="result"></div>
+-->
+
         </div>
 
     </ons-card>

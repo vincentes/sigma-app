@@ -241,9 +241,13 @@ function controlMapaSetup(edicion) {
     }
 
 
+
     function popup(feature, layer) {
         if (feature.properties && feature.properties.NAME) {
-            layer.bindPopup(feature.properties.NAME + "<br><ons-button onclick='alert('ok')'>Como llegar</ons-button>");
+            //layer.bindPopup(feature.properties.NAME + "<br><ons-button onclick='comoLlegar(" + '"ssAds","' + feature.properties.ALIAS + '"' + ")'>Como llegar</ons-button>");
+            layer.bindPopup(feature.properties.NAME + "<br><ons-button onclick='rutaMasCorta(" + '"' + feature.properties.ALIAS + '"' + ")'>Como llegar</ons-button>");
+
+            //.getLatLng().lng
         }
     }
     geojson = L.geoJson(plano, { style: style, onEachFeature: popup }).addTo(map);
@@ -294,6 +298,14 @@ function controlMapaSetup(edicion) {
 
 }
 
+function viajar(_Array, comienzaEnPosicion) {
+    var _Array;
+    if (comienzaEnPosicion) {
+        //travel1 = L.polyline([posicionamiento[1].getLatLng(),_Array[0]]).addTo(map);
+        _Array.push(posicionamiento[1].getLatLng());
+    }
+    travel2 = L.polyline(_Array).addTo(map);
+}
 
 function dibujarBeacon2(beacon, numero, editable) {
     //alert("dibujarBeacon2:");
@@ -329,8 +341,8 @@ function grabarPosiciones() {
                 dbUpdateBeacon("SG000001AAAA000" + (i + 1), Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
 
         }
-//Bermudez Wifi-ORT
-       
+        //Bermudez Wifi-ORT
+
     }
     actualizarPlano = true;
     dibujarBeaconsEnDb(false);
@@ -469,20 +481,209 @@ function moverBloquearBeacons(_permitir) {
 
 }
 
+
 function buscarLugar(_lugar) {
-    alertarOns("Estás buscando", _lugar);
+    var _name;
+    var _lugar;
+    var _msg = "No se encontró";
+    
+       
+ 
+ 
+     for (var i = 0; i < geojson.getLayers().length; i++) {
+         
+         if(geojson.getLayers()[i].feature.properties.NAME){
+                        
+             _name = geojson.getLayers()[i].feature.properties.NAME;
+             
+         if (_name.toLowerCase() === _lugar.toLowerCase()) {
+             geojson.getLayers()[i].openPopup();
+               _msg = "Encontrado";
+ 
+         }
+         }
+ 
+ 
+     }
+  alertarOns(_msg, _lugar);
+ 
+ }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DIJKSTRA - JS
+// Fuente del Original : https://gist.github.com/MoeweX/ab98efee9435b47529e3a6cb50c5b605
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    for (var i = 0; i < geojson.getLayers().length; i++) {
-        var _name = geojson.getLayers()[i].feature.properties.NAME;
-
-        if (_name == _lugar) {
-            geojson.getLayers()[i].openPopup();
+const lowestCostNode = (costs, processed) => {
+    return Object.keys(costs).reduce((lowest, node) => {
+        if (lowest === null || costs[node] < costs[lowest]) {
+            if (!processed.includes(node)) {
+                lowest = node;
+            }
         }
+        return lowest;
+    }, null);
+};
+
+// function that returns the minimum cost and path to reach Finish
+const dijkstra = (graph, startNodeName, endNodeName) => {
+    var nodosObtenidos = [];
+    // track the lowest cost to reach each node
+    let costs = {};
+    costs[endNodeName] = "Infinity";
+    costs = Object.assign(costs, graph[startNodeName]);
+
+    // track paths
+    const parents = { endNodeName: null };
+    for (let child in graph[startNodeName]) {
+        parents[child] = startNodeName;
+    }
+
+    // track nodes that have already been processed
+    const processed = [];
+
+    let node = lowestCostNode(costs, processed);
+
+    while (node) {
+        let cost = costs[node];
+        let children = graph[node];
+        for (let n in children) {
+            if (String(n) === String(startNodeName)) {
+                //log("WE DON'T GO BACK TO START");
+            } else {
+
+                let newCost = cost + children[n];
+
+                if (!costs[n] || costs[n] > newCost) {
+                    costs[n] = newCost;
+                    parents[n] = node;
+
+                } else {
+                    // log("A shorter path already exists");
+                }
+            }
+        }
+        processed.push(node);
+        node = lowestCostNode(costs, processed);
+    }
+
+    let optimalPath = [endNodeName];
+    let parent = parents[endNodeName];
+    nodosObtenidos.push(nodosMapa[endNodeName].marker);
+
+    while (parent) {
+        optimalPath.push(parent);
+        nodosObtenidos.push(nodosMapa[parent].marker);
+        parent = parents[parent];
+    }
+    optimalPath.reverse();
+
+    const results = {
+        distance: costs[endNodeName],
+        path: optimalPath,
+        nodos: nodosObtenidos
+    };
+
+    return results;
+};
 
 
+/// Queda acá para tener los valores
+function comoLlegar(origen, destino, comienzaEnPosicion) {
+    try {
+        map.removeLayer(travel2);
+        //map.removeLayer(travel1);
 
     }
+    catch{
+        console.log("Atención: Aún no hay rutas trazadas");
+        //alertarOns("Atención:", "Aún no hay rutas trazadas")
+    }
+
+    try {
+
+        var res = dijkstra(nodosMapa, origen, destino);
+        console.log(dijkstra(nodosMapa, origen, destino));
+        viajar(res.nodos, comienzaEnPosicion);
+
+        alertarOns("Su destino a", redondeo(res.distance / escala) + " metros")
+    }
+    catch{
+        alertarOns("Atención:", "No se pudo calcular la ruta al destino")
+    }
+}
+
+
+function nodoMasCercano(_lat, _lng) {
+    var _grafo = nodosMapa;
+    var _prefijo = "ss0";
+    var _counter = 1;
+    var _nodo = _grafo["ss01"];
+    var _menorDistancia = Number.POSITIVE_INFINITY;
+    var _nodoMasCercano = "";
+    var bandera = false;
+
+    while (!bandera) {
+
+
+
+
+
+        var _temp = dist2puntos(_lng, _lat, _nodo.marker[1], _nodo.marker[0]);
+
+
+        if (_temp < _menorDistancia) {
+
+            _menorDistancia = _temp;
+            _nodoMasCercano = _prefijo + _counter;
+            console.log("M dist:" + _menorDistancia + " Nodo: " + _nodoMasCercano);
+        } else {
+            console.log("NO - M dist:" + _temp + " Nodo: " + _prefijo + _counter);
+
+        }
+
+        //L.polyline([[_lat,_lng],_nodo.marker]).addTo(map);
+
+        _counter++;
+
+        if (_counter > 9 && _prefijo == "ss0") {
+            _prefijo = "ss";
+        }
+        _nodo = _grafo[_prefijo + _counter];
+
+        if (_nodo.marker[0] < 0) {
+            bandera = true;
+        }
+
+    }
+
+    return _nodoMasCercano;
+
+
+
+}
+
+
+function rutaMasCorta(_destino) {
+    var _origen;
+    var _destino;
+
+
+    if (posicionamiento[1].getLatLng().lat > 0) {
+        _origen = nodoMasCercano(posicionamiento[1].getLatLng().lat, posicionamiento[1].getLatLng().lng);
+        if (_origen != "") {
+            comoLlegar(_origen, _destino, true);
+        } else {
+            alertarOns("Atención", "No se puede determinar el punto de origen");
+
+        }
+
+    } else {
+        alertarOns("Aún no se determinó la posición", "Imposible generar la ruta");
+    }
+
+
 
 
 }
