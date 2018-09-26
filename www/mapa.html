@@ -1,12 +1,19 @@
 <ons-page id="mapa">
-
+    
     <ons-toolbar>
         <div class="left">
-            <ons-back-button>Atrás</ons-back-button>
+            <ons-button modifier="light" onclick="document.querySelector('#nav').popPage()">Volver</ons-button>
         </div>
-        <div class="center" style="text-align: right;">
+        <!--
+             <div class="center" style="text-align: right;">
             <ons-search-input placeholder="Buscar Destino" onchange="buscarLugar(this.value)"></ons-search-input>
+            
+            
         </div>
+             -->
+
+       
+
     </ons-toolbar>
 
     <ons-fab position="bottom left" onclick="mapaControl()">
@@ -26,8 +33,12 @@
             if (event.target.matches('#mapa')) {
 
                 // mapSetup();
+                //var physicalScreenHeight = window.screen.height * window.devicePixelRatio;
+                
                 scanSetup();
                 controlMapaSetup(false);
+                //comoLlegar("ssSalonGremial", "ssSalon33", true);
+                //rutaMasCorta("ssSalonGremial");
                 verOcultarBeacons(false);
                 if (centrarMapa) {
                     actDesCentrarMapa(true);
@@ -52,8 +63,8 @@
         }, false);
 
         //document.addEventListener("beforeunload", function (event) { alert("Todo Joya"); },false);
-
-        document.addEventListener("backbutton", function (event) { hideModal('beacons-config-modal'); }, false);
+        
+       // document.addEventListener("backbutton", function (event) { hideModal('beacons-config-modal'); }, false);
 
     </script>
 
@@ -61,26 +72,28 @@
 
 
     <ons-card style="margin: 5px;">
-        <div style="text-align: center;">
+        <div style="text-align: center;" >
             <div id="map"></div>
-            <br>
-            <p id="pInfo"></p>
-
+            
+            <p id="pInfo" style="margin-top: 5px;">Calculando posición</p>
+            
         </div>
 
     </ons-card>
+<!--
+
 
     <ons-card style="margin: 5px;">
 
         <div style="text-align: center;">
-            <!--
+            
             <canvas id="a" width="250" height="250" style="border: 1px solid black;">
                 This text is displayed if your browser does not support HTML5 Canvas.
             </canvas>
-        -->
+        
             <p id="pResultado"></p>
 
-            <!--
+            
                 
             <hr>
             <p id="pContador"></p>
@@ -91,7 +104,7 @@
 -->
 
         </div>
-
+    
     </ons-card>
     <ons-modal direction="up" id="beacons-config-modal">
         <div style="text-align: center">

@@ -1,9 +1,12 @@
 <ons-page id="docente-home">
     <ons-toolbar>
+        <div class="right">
+            <ons-button modifier="light" onclick="logout()"><ons-icon style="font-size: 22px" icon="ion-android-exit"></ons-icon></ons-button>
+        </div>
         <div class="center">Inicio</div>
     </ons-toolbar>
     <ons-card>
-        <ons-list>
+        <ons-list class="menu">
             <ons-list-header>Menú</ons-list-header>        
             <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteDeberes()">Deberes</ons-list-item>
             <ons-list-item tappable modifier="long-divider" onclick="Pages.docenteParciales()">Parciales</ons-list-item>

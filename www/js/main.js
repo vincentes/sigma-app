@@ -457,15 +457,19 @@ function serverError() {
 
 function logout() {
   ons.notification.confirm({
+    title: 'Confirmar',
     message: '¿Estás seguro de que querés cerrar sesión?',
     callback: function(idx) {
       if(idx === 1) {
+        API.deleteFCMToken().done(function() {
+          
+        });
         Sigma.removeToken();
-        document.querySelector('#nav').replacePage('login.html'); 
+        LocalData.emptyQueue();
+        Page.replacePage('login.html', {
+          animation: 'fade'
+        }); 
       }
-    },
-    error: function(idx) {
-      ons.notification.toast('sdpokasdpokasdpokaspod fuck');
     },
     buttonLabels: ["Cancelar", "Si"]
   });
@@ -521,7 +525,9 @@ function back(_callback) {
   var deber = document.getElementById("nav").topPage.data.deber;
   document.querySelector('#nav').popPage({
     callback: function() {
-      _callback();
+      if(!Utils.empty(_callback)) {
+        _callback();
+      }
     },
     data: deber
   });  
@@ -556,7 +562,7 @@ var periodoScan = null;
 var centrarMapa = false;
 
 function mapa() {
-  document.querySelector('#nav').replacePage('mapa.html')
+  document.querySelector('#nav').pushPage('mapa.html')
 }
 
 function mapaControl() {
@@ -625,11 +631,11 @@ function detenerScan() {
 function centrarMapaPos() {
   if (centrarMapa) {
     actDesCentrarMapa(false);
-    rutaMasCorta(false);
+    
   } else {
 
     actDesCentrarMapa(true);
-    rutaMasCorta(true);
+   
   }
 }
 

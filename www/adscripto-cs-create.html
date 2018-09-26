@@ -1,0 +1,94 @@
+<ons-page id="adscripto-cs-create" class="blue-background">
+    <ons-toolbar>
+        <div class="left">
+            <ons-button modifier="quiet" onclick="navBack()">
+                <ons-icon icon="ion-close" style="font-size: 22px"></ons-icon>
+            </ons-button>
+        </div>
+        <div class="center">Anunciar cambio de salón</div>
+    </ons-toolbar>
+
+    <ons-card>
+        <ons-list>
+            <ons-list-item modifier="nodivider" class="selected-input">
+                <div class="left" style="margin-bottom:5px">
+                    <label>Salón</label>
+                </div>
+                <div class="center">
+                    <ons-select select-id="salon" class="selected-input">
+                    <select class="selected-input">
+                        <option value="" selected disabled hidden>Seleccionar salón</option>
+                        <option value="Salón 32">Salón 32</option>
+                        <option value="Salón 33">Salón 33</option>
+                        <option value="Salón 34">Salón 34</option>
+                    </select>
+                    </ons-select>
+                </div>
+            </ons-list-item>
+        <ons-list-item modifier="nodivider">
+            <div class="left">
+                <label>Día</label>
+            </div>
+            <div class="center">
+                <ons-select select-id="dia" class="selected-input">
+                        <select class="selected-input">
+
+                    <option value="" selected disabled hidden>Seleccionar día</option>
+                    <option value="lunes">Lunes</option>
+                    <option value="martes">Martes</option>
+                    <option value="miercoles">Miércoles</option>
+                    <option value="jueves">Jueves</option>
+                    <option value="viernes">Viernes</option>
+                    </select>
+                </ons-select>
+            </div>
+        </ons-list-item>
+        <ons-list-item modifier="nodivider">
+            <div class="left">
+                <label>Turno</label>
+            </div>
+            <div class="center">
+                <ons-select select-id="turno" class="selected-input">
+                        <select class="selected-input">
+
+                    <option value="" selected disabled hidden>Seleccionar turno</option>
+                    <option value="Matutino">Matutino</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Vespertino">Vespertino</option>
+                    <option value="Nocturno">Nocturno</option>
+                    </select>
+                </ons-select>
+            </div>
+        </ons-list-item>
+        <ons-list-item modifier="nodivider">
+            <div class="left">
+                <label>Hora</label>
+            </div>
+            <div class="center">
+                <ons-select select-id="hora">
+                    <select class="selected-input">
+                        <option value="" selected disabled hidden>Seleccionar hora</option>
+                        <option value="1">º1</option>
+                        <option value="2">º2</option>
+                        <option value="3">º3</option>
+                        <option value="4">º4</option>
+                        <option value="5">º5</option>
+                        <option value="6">º6</option>
+                        <option value="7">º7</option>
+                    </select>
+                </ons-select>
+            </div>
+        </ons-list-item>
+        <ons-list-item id="c-reservado" style="display: none !important">
+            <div class="left">
+                <label>Reservado a</label>
+            </div>
+            <div class="center">
+                <span id="reservado"></span>
+            </div>
+        </ons-list-item>
+    </ons-list>
+    <ons-button style="width: 100% !important;" modifier="quiet" onclick="AdscriptoCSCreate.submit()" id="create-tarea-button">Asignar grupo al salón</ons-button>
+    </ons-card>
+</ons-page>
+

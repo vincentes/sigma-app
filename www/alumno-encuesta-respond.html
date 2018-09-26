@@ -11,9 +11,23 @@
                     <ons-icon name="text" style="font-size: 21px"></ons-icon><span id="encuesta-p-texto">Cargando...</span>
                 </ons-col>
             </ons-row>
-            <ons-row style="margin-bottom:5px">
-                <ons-input id="adscripto-encuestas-create-titulo" placeholder="..." modifier="underbar" width="100%"></ons-input>
-            </ons-row>
+            <div id="mo" hidden>
+                <ons-row>
+                    <ons-list id="mo-respuestas">
+
+                    </ons-list>
+                </ons-row>
+            </div>
+            <div id="uo" hidden>
+                <ons-list id="uo-respuestas">
+
+                </ons-list>
+            </div>
+            <div id="el" hidden>
+                <ons-row>
+                    <ons-input id="adscripto-encuestas-el" placeholder="..." modifier="underbar" width="100%"></ons-input>
+                </ons-row>
+            </div>
             <ons-row>
                 <ons-button modifier="quiet" onclick="AlumnoEncuestaRespond.nextPregunta()" style="margin: 0 auto !important; width: 100%; text-align: center;">
                     Siguiente

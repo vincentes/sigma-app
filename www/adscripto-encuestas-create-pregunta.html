@@ -5,14 +5,14 @@
         </div>
         <div class="center">Pregunta</div>
     </ons-toolbar>
-    <div style="margin: 10px">
-        <h1 id="p-titulo">Añadir pregunta</h1>
+    <ons-card>
+        <h2 id="p-titulo">Añadir pregunta</h2>
         <ons-row style="margin-bottom:5px">
-            <ons-col style="width: 50px">
+            <ons-col style="width: 70px">
                 <label for="pregunta-texto-targ">Pregunta</label>
             </ons-col>
             <ons-col>
-                <ons-input class="pregunta" input-id="pregunta-texto-targ" id="pregunta-texto-i" placeholder="¿...?" width="100%"></ons-input>
+                <ons-input class="pregunta" input-id="pregunta-texto-targ" id="pregunta-texto-i" placeholder="" width="80%"></ons-input>
             </ons-col>
         </ons-row>
         <ons-row style="margin-bottom:5px">
@@ -30,7 +30,7 @@
             </ons-col>
         </ons-row>
 
-        <ons-list>
+        <ons-list id="respuestas-list-container">
             <ons-list-header>Opciones de respuesta</ons-list-header>
             <div id="respuestas-list">
 
@@ -49,5 +49,5 @@
                 Añadir
             </ons-button>
         </ons-row>
-    </div>
+    </ons-card>
 </ons-page>

@@ -3,7 +3,7 @@ var marcadorActivo;
 var posicionamiento = [];
 var map;
 var verBeacons = false;
-
+var geojson;
 
 function controlMapaSetup(edicion) {
 
@@ -86,6 +86,8 @@ function controlMapaSetup(edicion) {
         mB3 = new mBeacon({ iconUrl: 'img/beacon3.png' }),
         mB4 = new mBeacon({ iconUrl: 'img/beacon4.png' }),
         mB5 = new mBeacon({ iconUrl: 'img/beacon5.png' });
+        mB6 = new mBeacon({ iconUrl: 'img/beacon6.png' });
+
 
 
     mR1 = new mBeaconR({ iconUrl: 'img/beacon1.png' });
@@ -93,6 +95,8 @@ function controlMapaSetup(edicion) {
     mR3 = new mBeaconR({ iconUrl: 'img/beacon3.png' });
     mR4 = new mBeaconR({ iconUrl: 'img/beacon4.png' });
     mR5 = new mBeaconR({ iconUrl: 'img/beacon5.png' });
+    mR6 = new mBeaconR({ iconUrl: 'img/beacon6.png' });
+
 
 
 
@@ -105,6 +109,7 @@ function controlMapaSetup(edicion) {
         var lat = -2000;
         var lng = -2000;
     */
+    var b6 = L.marker([lat, lng], { draggable: true, icon: mB6 }).addTo(map);
     var b5 = L.marker([lat, lng], { draggable: true, icon: mB5 }).addTo(map);
     var b4 = L.marker([lat, lng], { draggable: true, icon: mB4 }).addTo(map);
     var b3 = L.marker([lat, lng], { draggable: true, icon: mB3 }).addTo(map);
@@ -166,6 +171,17 @@ function controlMapaSetup(edicion) {
         }
     });
 
+    b6.on('dragend', function (e) {
+        try {
+            b6.bindPopup('Posición Modificada:<br>Lng/X:' + Math.round(b6.getLatLng().lng) + ' - Lat/Y:' + Math.round(b6.getLatLng().lat));
+            b6.setIcon(mR6);
+        }
+        catch{
+            alert("No se pudo fijar las propiedades al marcador");
+        }
+    });
+
+
 
     //b3.options.icon.options.shadowSize = [40, 40];
     //b3.options.icon.options.shadowAnchor = [20, 20];
@@ -188,6 +204,8 @@ function controlMapaSetup(edicion) {
     marcadoresDisponibles.push(b3);
     marcadoresDisponibles.push(b4);
     marcadoresDisponibles.push(b5);
+    marcadoresDisponibles.push(b6);
+
 
 
 
@@ -214,17 +232,18 @@ function controlMapaSetup(edicion) {
 
 
     function getColor(d) {
-        return d == "base" ? '#bebebe' :
-            d == "salon" ? '#ffffff' :
-                d == "gimnasio" ? '#ffffcc' :
-                    d == "banio" ? '#cfeef3' :
-                        d == "lab" ? '#d1f5d6' :
-                            d == "admin" ? '#f7dede' :
-                                d == "cantina" ? '#fbddbc' :
-                                    d == "comedor" ? '#cfcaeb' :
-                                        d == "libre" ? '#eeeeee' :
-                                            d == "escalon" ? '#d0d0d0' :
-                                                'red';
+        return d == "exterior" ? '#cadfc6' :
+            d == "base" ? '#bebebe' :
+                d == "salon" ? '#ffffff' :
+                    d == "gimnasio" ? '#ffffcc' :
+                        d == "banio" ? '#cfeef3' :
+                            d == "lab" ? '#d1f5d6' :
+                                d == "admin" ? '#f7dede' :
+                                    d == "cantina" ? '#fbddbc' :
+                                        d == "comedor" ? '#cfcaeb' :
+                                            d == "libre" ? '#eeeeee' :
+                                                d == "escalon" ? '#d0d0d0' :
+                                                    'red';
     }
     function style(feature) {
         return {
@@ -243,13 +262,14 @@ function controlMapaSetup(edicion) {
 
 
     function popup(feature, layer) {
+
         if (feature.properties && feature.properties.NAME) {
             //layer.bindPopup(feature.properties.NAME + "<br><ons-button onclick='comoLlegar(" + '"ssAds","' + feature.properties.ALIAS + '"' + ")'>Como llegar</ons-button>");
             layer.bindPopup(feature.properties.NAME + "<br><ons-button onclick='rutaMasCorta(" + '"' + feature.properties.ALIAS + '"' + ")'>Como llegar</ons-button>");
-
             //.getLatLng().lng
         }
     }
+
     geojson = L.geoJson(plano, { style: style, onEachFeature: popup }).addTo(map);
 
 
@@ -267,6 +287,44 @@ function controlMapaSetup(edicion) {
 
     var miPos = L.marker([-500, -500], { icon: mRojo }).addTo(map);
     posicionamiento.push(miPos);
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////////////// Búsqueda
+    ///////////////////////////////////////////////////////////////////////////////////////
+
+    var searchControl = new L.Control.Search({
+        layer: geojson,
+        propertyName: 'NAME',
+        marker: false,
+        moveToLocation: function (latlng, title, map) {
+            //map.fitBounds( latlng.layer.getBounds() );
+            var zoom = (map.getBoundsZoom(latlng.layer.getBounds())) - 1;
+
+            map.setView(latlng, zoom); // access the zoom
+        }
+    });
+
+    searchControl.on('search:locationfound', function (e) {
+
+        //console.log('search:locationfound', );
+
+        //map.removeLayer(this._markerSearch)
+
+        e.layer.setStyle({ fillColor: '#3f0', color: '#0f0' });
+        if (e.layer._popup)
+            e.layer.openPopup();
+
+    }).on('search:collapsed', function (e) {
+
+        geojson.eachLayer(function (layer) {	//restore feature color
+            geojson.resetStyle(layer);
+        });
+    });
+
+    map.addControl(searchControl);  //inizialize search control
+
+
 
     // }
 
@@ -299,10 +357,21 @@ function controlMapaSetup(edicion) {
 }
 
 function viajar(_Array, comienzaEnPosicion) {
+    var _miPos = posicionamiento[1].getLatLng();
+
+
+
+
     var _Array;
     if (comienzaEnPosicion) {
-        //travel1 = L.polyline([posicionamiento[1].getLatLng(),_Array[0]]).addTo(map);
-        _Array.push(posicionamiento[1].getLatLng());
+
+
+
+        //generamos el punto "nexo" entre la posición y el nodo inicio
+        var _lat = _Array[_Array.length - 1][0];
+        _Array.push([_lat, _miPos.lng]);
+
+        _Array.push(_miPos);
     }
     travel2 = L.polyline(_Array).addTo(map);
 }
@@ -336,6 +405,9 @@ function grabarPosiciones() {
                 break;
             case 4:
                 dbUpdateBeacon("Wifi-ORT", Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
+                break;
+            case 5:
+                dbUpdateBeacon("Ceibal", Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
                 break;
             default:
                 dbUpdateBeacon("SG000001AAAA000" + (i + 1), Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
@@ -481,7 +553,8 @@ function moverBloquearBeacons(_permitir) {
 
 }
 
-
+//Se cambió por Search Control
+/*
 function buscarLugar(_lugar) {
     var _name;
     var _lugar;
@@ -508,6 +581,8 @@ function buscarLugar(_lugar) {
   alertarOns(_msg, _lugar);
  
  }
+*/
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DIJKSTRA - JS
@@ -605,9 +680,14 @@ function comoLlegar(origen, destino, comienzaEnPosicion) {
 
         var res = dijkstra(nodosMapa, origen, destino);
         console.log(dijkstra(nodosMapa, origen, destino));
-        viajar(res.nodos, comienzaEnPosicion);
+        console.log("res.nodos");
 
+        console.log(res.nodos);
+        viajar(res.nodos, comienzaEnPosicion);
+        cerrarPopup(destino);
+        //$("#pInfo").text("Su destino a", redondeo(res.distance / escala) + " metros");
         alertarOns("Su destino a", redondeo(res.distance / escala) + " metros")
+
     }
     catch{
         alertarOns("Atención:", "No se pudo calcular la ruta al destino")
@@ -665,17 +745,99 @@ function nodoMasCercano(_lat, _lng) {
 }
 
 
+
+function cerrarPopup(_capa) {
+    var _capa;
+    //console.log(geojson);
+    for (var i = 0; i < geojson.getLayers().length; i++) {
+
+        if (geojson.getLayers()[i].feature.properties.ALIAS) {
+
+            _name = geojson.getLayers()[i].feature.properties.ALIAS;
+
+            if (_name === _capa) {
+                console.log("encontrado en " + geojson.getLayers()[i].feature.properties.ALIAS);
+
+                geojson.getLayers()[i].closePopup();
+            }
+        }
+
+
+    }
+}
+
+
+
 function rutaMasCorta(_destino) {
     var _origen;
     var _destino;
+    var _estaDentro = false;
+    var _estaEnPasillo = false;
+    var _capaObtenida;
+
+    //Sólo para pruebas
+    // posicionamiento[1].setLatLng( [866, 1352]) ;
+
+    var _miPos = posicionamiento[1].getLatLng();
+    var _aliasNodo;
 
 
-    if (posicionamiento[1].getLatLng().lat > 0) {
-        _origen = nodoMasCercano(posicionamiento[1].getLatLng().lat, posicionamiento[1].getLatLng().lng);
-        if (_origen != "") {
-            comoLlegar(_origen, _destino, true);
+
+    if (_miPos.lat > 0) {
+
+        //Si la ubicación está dentro de un lugar determinado por el plano se tomara como nodo más cercano a la entrada de dicho lugar
+        for (var i = 0; i < geojson.getLayers().length; i++) {
+            _capaObtenida = geojson.getLayers()[i];
+
+            //Preguntamos si las coordenadas están dentro de los límites de la capa
+            if (_capaObtenida.getBounds().contains(_miPos)) {
+
+                //con el if nos aseguramos que el lugar es un salón, lab, etc pues posee ALIAS
+                if (_capaObtenida.feature.properties.ALIAS || _capaObtenida.feature.properties.TIPO === "libre") {
+
+                    if (_capaObtenida.feature.properties.TIPO !== "libre") {
+                        //_counterAdentro++;
+                        //console.log(_capaObtenida.feature.properties.ALIAS);
+
+                        _estaDentro = true;
+                        //_origen = _capaObtenida.feature.properties.ALIAS;
+                        _aliasNodo = _capaObtenida.feature.properties.ALIAS;
+
+                        console.log("Dentro de: " + _capaObtenida.feature.properties.NAME);
+
+                    } else {
+                        _estaEnPasillo = true;
+                    }
+
+
+
+
+                }
+            }
+
+
+        }
+
+
+
+        if (_estaDentro) {
+
+            _origen = _aliasNodo;
+
+        } else if (_estaEnPasillo) {
+            _origen = nodoMasCercano(posicionamiento[1].getLatLng().lat, posicionamiento[1].getLatLng().lng);
+
         } else {
-            alertarOns("Atención", "No se puede determinar el punto de origen");
+            _origen = "";
+        }
+
+        if (_origen != "") {
+
+            comoLlegar(_origen, _destino, true);
+
+
+        } else {
+            alertarOns("Atención", "Punto de origen no válido");
 
         }
 

@@ -1,7 +1,7 @@
 ons.ready(function() {
     loadData();
     LocalData.loadEverything();
-    if(LocalData.user != null) {
+    if(!Utils.empty(LocalData.user)) {
       switch(LocalData.user.roles[0]) {
           case "Docente":
           Pages.docenteHome();
@@ -12,11 +12,13 @@ ons.ready(function() {
           case "Adscripto":
           Pages.adscriptoHome();
       }
+    } else {
+        Pages.login();
     }
     ons.disableDeviceBackButtonHandler();
 });
 
-document.addEventListener("backbutton", function(e){
+function navBack(e) {
     var nav = document.getElementById("nav");
     if(nav.topPage.id === 'adscripto-encuestas-create') {
         if(!AdscriptoEncuestaCreate.exiting) {
@@ -27,14 +29,24 @@ document.addEventListener("backbutton", function(e){
     else {
         nav.popPage();
     }
+}
+
+document.addEventListener("backbutton", function(e){
+    navBack(e);
  }, false);
 
 document.addEventListener('init', function(event) {
     if(event.target.matches('#alumno-deberes')) {
         Alumno.deberes = [];
+        $("#alumno-deberes-spinner").show();
         Sigma.getAssignedDeberes({
             success: function(data) {
+              $("#alumno-deberes-spinner").hide();
               Alumno.deberes = data.deberes;
+              if(Utils.empty(data.deberes)) {
+                  var deberes = '<ons-list-item>No tenés ningún deber asignado</ons-list-item>';
+                  $("#deberes-list").append(deberes);
+              }
               data.deberes.forEach(function(deber) {
                 var deberes = "";
                 deberes += ('<ons-list-item id="tarea-{1}" modifier="chevron" tappable>{0}</ons-list-item>'.format(deber.contenido, deber.id));

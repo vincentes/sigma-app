@@ -4,6 +4,7 @@
 //Inicializamos variables globales
 var myDB;
 sessionStorage.clickcount = 1;
+var baseDeDatos = [];
 var beaconsEncontrados = [];
 var beaconsEnDBLocal = [];
 var escala = 17;
@@ -39,6 +40,7 @@ function scanSetup() {
         dbInsertBeacon("SG000001AAAA0003", 1395, 1740, "SS", "Beacon 3");
         dbInsertBeacon("Bermudez", 1390, 1575, "SS", "Beacon 4");
         dbInsertBeacon("Wifi-ORT", 1280, 1835, "SS", "Beacon 5");
+        dbInsertBeacon("Ceibal", 1300, 1670, "SS", "Beacon 6");
 
 
 
@@ -187,8 +189,27 @@ function redondeo(valor) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////                              Base de Datos                                     ////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Evitando SQLite
+//creamos una variable para generar los nuevos beacons
+var beaconDeDB = {
+    init: function (idBeacon, posX, posY, piso, tipo) {
+        this.idBeacon = idBeacon;
+        this.posX = posX;
+        this.posY = posY;
+        this.piso = piso;
+        this.tipo = tipo;
+    }
+};
+
+
 //creamos la tabla si no existe
 function crearTabla() {
+
+    //Evitando SQLite
+    //No hacemos nada en este metodo, se usará un array en lugar de la base de datos
+
+
+    
     myDB.transaction(function (transaction) {
         transaction.executeSql('CREATE TABLE IF NOT EXISTS beacons (ID INTEGER PRIMARY KEY AUTOINCREMENT, idBeacon text UNIQUE, posX integer, posY integer, piso text, tipo text)', [],
             function (tx, result) {
@@ -198,27 +219,73 @@ function crearTabla() {
                 console.log("Error occurred while creating the table.");
             });
     });
+   
 }
 
 
 //Insertar Beacon
 
 function dbInsertBeacon(idBeacon, posX, posY, piso, tipo) {
-    myDB.transaction(function (transaction) {
-        var executeQuery = "INSERT INTO beacons (idBeacon, posX, posY, piso, tipo) VALUES (?,?,?,?,?)";
-        transaction.executeSql(executeQuery, [idBeacon, posX, posY, piso, tipo]
-            , function (tx, result) {
-                console.log('dbInsertBeacon: Inserted');
-            },
-            function (error) {
-                console.log('dbInsertBeacon: Error occurred');
-            });
-    });
+    //Evitando SQLite
+    /*
+    if (!buscarBeaconPorIdArray(idBeacon, baseDeDatos)) {
+
+        var beaconCreado = Object.create(beaconDeDB);
+        beaconCreado.init(idBeacon, posX, posY, piso, tipo);
+        baseDeDatos.push(beaconCreado);
+
+    } else {
+        console.log('dbInsertBeacon: Error occurred');
+    }
+
+*/
+    
+        myDB.transaction(function (transaction) {
+            var executeQuery = "INSERT INTO beacons (idBeacon, posX, posY, piso, tipo) VALUES (?,?,?,?,?)";
+            transaction.executeSql(executeQuery, [idBeacon, posX, posY, piso, tipo]
+                , function (tx, result) {
+                    console.log('dbInsertBeacon: Inserted');
+                },
+                function (error) {
+                    console.log('dbInsertBeacon: Error occurred');
+                });
+        });
+        
 }
 
 //Actualizar Beacon
 
 function dbUpdateBeacon(idBeacon, posX, posY, piso, tipo) {
+    /*
+    var bandera = false;
+    var _beacon;
+    var i = 0;
+
+    while (i < baseDeDatos.length && !bandera) {
+        _beacon = baseDeDatos[i].idBeacon;
+
+        if (baseDeDatos[i].idBeacon === idBeacon) {
+
+            baseDeDatos[i].idBeacon = idBeacon;
+            baseDeDatos[i].posX = posX;
+            baseDeDatos[i].posY = posY;
+            baseDeDatos[i].piso = piso;
+            baseDeDatos[i].tipo = tipo;
+
+
+            dibujarBeaconsEnDb(false);
+            alertarOns('dbUpdateBeacon: Updated:', idBeacon + " - " + posX + " - " + posY + " - " + piso + " - " + tipo);
+
+            bandera = true;
+        }
+        i++;
+    }
+
+*/
+
+
+
+    
     myDB.transaction(function (transaction) {
 
         transaction.executeSql("UPDATE beacons set posX =" + posX + ", posY =" + posY + ", piso = '" + piso + "', tipo = '" + tipo + "' where idBeacon = '" + idBeacon + "'", []
@@ -230,6 +297,7 @@ function dbUpdateBeacon(idBeacon, posX, posY, piso, tipo) {
                 alertarOns('dbUpdateBeacon:', 'Error occurred');
             });
     });
+    
 }
 
 
@@ -237,41 +305,61 @@ function dbUpdateBeacon(idBeacon, posX, posY, piso, tipo) {
 
 //Buscar Beacon en SQL Local por id
 function buscarBeaconPorIdSQL(idBeacon, radio) {
+/*
+    baseDeDatos.forEach(function (_beacon) {
+        var _beacon;
 
-    myDB.transaction(function (transaction) {
-        transaction.executeSql("SELECT * FROM beacons where idBeacon ='" + idBeacon + "'", [], function (tx, results) {
-
-            var len = results.rows.length;
-            if (len > 0) {
-                //El beacon es válido y está contrastado en la báse de datos local, lo llamamos "b"
-                b = results.rows.item(0);
+        try {
+            if (_beacon.idBeacon === idBeacon) {
                 //Añadimos el radio como atributo del objeto
-                b.radio = radio;
+                _beacon.radio = radio;
                 //Lo agregamos al array
 
-                beaconsEncontrados.push(b);
-
-
-
+                beaconsEncontrados.push(_beacon);
             }
 
-        }, null);
+        }
+        catch{
+            //nada 
+        }
     });
-
+*/
+    
+        myDB.transaction(function (transaction) {
+            transaction.executeSql("SELECT * FROM beacons where idBeacon ='" + idBeacon + "'", [], function (tx, results) {
+    
+                var len = results.rows.length;
+                if (len > 0) {
+                    //El beacon es válido y está contrastado en la báse de datos local, lo llamamos "b"
+                    b = results.rows.item(0);
+                    //Añadimos el radio como atributo del objeto
+                    b.radio = radio;
+                    //Lo agregamos al array
+    
+                    beaconsEncontrados.push(b);
+    
+    
+    
+                }
+    
+            }, null);
+        });
+    
 }
 
 
 
 //Buscar beacon en array local por Id
 
-function buscarBeaconPorIdArray(idBeacon) {
+function buscarBeaconPorIdArray(idBeacon, _array) {
+
     var bandera = false;
     var b = null;
     var i = 0;
-    while (i < beaconsEnDBLocal.length && !bandera) {
+    while (i < _array.length && !bandera) {
 
-        if (beaconsEnDBLocal[i].idBeacon == idBeacon) {
-            b = beaconsEnDBLocal[i];
+        if (_array[i].idBeacon == idBeacon) {
+            b = _array[i];
             bandera = true;
         }
         i++;
@@ -287,24 +375,43 @@ function pasarBeaconsSQLArray() {
     //Purgamos el Array
     beaconsEnDBLocal.length = 0;
 
-    myDB.transaction(function (transaction) {
-        transaction.executeSql("SELECT * FROM beacons", [], function (tx, results) {
+    //Evitando SQLite
+/*
+    baseDeDatos.forEach(function (_beacon) {
+        var _beacon;
 
-            var len = results.rows.length;
-            if (len > 0) {
-                for (var i = 0; i < len; i++) {
-                    //Pasamos cada beacon al Array
-                    var bE = results.rows.item(i);
-                    beaconsEnDBLocal.push(bE);
+        try {
+            //Pasamos cada beacon al Array
 
-                }
+            beaconsEnDBLocal.push(_beacon);
 
-
-            }
-
-        }, null);
+        }
+        catch{
+            //nada 
+        }
     });
+*/
 
+
+   
+        myDB.transaction(function (transaction) {
+            transaction.executeSql("SELECT * FROM beacons", [], function (tx, results) {
+    
+                var len = results.rows.length;
+                if (len > 0) {
+                    for (var i = 0; i < len; i++) {
+                        //Pasamos cada beacon al Array
+                        var bE = results.rows.item(i);
+                        beaconsEnDBLocal.push(bE);
+    
+                    }
+    
+    
+                }
+    
+            }, null);
+        });
+    
 }
 
 //Dibujamos la posición de cada beacon en la DB
@@ -326,34 +433,56 @@ function dibujarBeaconsEnDb(editable) {
 
 //Mostramos los datos
 function mostrarDatosSQL() {
+/*
+    $("#aTableData").text("");
+    baseDeDatos.forEach(function (_beacon) {
+        var _beacon;
 
+        try {
 
-    myDB.transaction(function (transaction) {
-
-
-        transaction.executeSql('SELECT * FROM beacons', [], function (tx, results) {
-            $("#aTableData").text("");
-            var len = results.rows.length, i;
-            // $("#rowCount").append(len);
-            for (i = 0; i < len; i++) {
-
-                var encontrado = results.rows.item(i);
-
-                $("#aTableData").append(encontrado.idBeacon + " - " + encontrado.posX + " - " + encontrado.posY + " - " + encontrado.piso + " - " + encontrado.tipo + "<br>");
-            }
-
-        }, null);
+            $("#aTableData").append(_beacon.idBeacon + " - " + _beacon.posX + " - " + _beacon.posY + " - " + _beacon.piso + " - " + _beacon.tipo + "<br>");
+        }
+        catch{
+            //nada 
+        }
     });
+*/
+   
+    
+        myDB.transaction(function (transaction) {
+    
+    
+            transaction.executeSql('SELECT * FROM beacons', [], function (tx, results) {
+                $("#aTableData").text("");
+                var len = results.rows.length, i;
+                // $("#rowCount").append(len);
+                for (i = 0; i < len; i++) {
+    
+                    var encontrado = results.rows.item(i);
+    
+                    $("#aTableData").append(encontrado.idBeacon + " - " + encontrado.posX + " - " + encontrado.posY + " - " + encontrado.piso + " - " + encontrado.tipo + "<br>");
+                }
+    
+            }, null);
+        });
+    
+       
 }
 
 function borrarTabla() {
-    myDB.transaction(function (transaction) {
-        var executeQuery = "DROP TABLE  IF EXISTS beacons";
-        transaction.executeSql(executeQuery, [],
-            function (tx, result) { console.log('Table deleted successfully.'); },
-            function (error) { console.log('Error occurred while droping the table.'); }
-        );
-    });
+
+    //baseDeDatos.length = 0;
+    
+    
+        myDB.transaction(function (transaction) {
+            var executeQuery = "DROP TABLE  IF EXISTS beacons";
+            transaction.executeSql(executeQuery, [],
+                function (tx, result) { console.log('Table deleted successfully.'); },
+                function (error) { console.log('Error occurred while droping the table.'); }
+            );
+        });
+    
+        
 }
 
 
@@ -431,12 +560,12 @@ function funcExterna(e) {
 
                 //Modificación para agregar un beacon "falso" para las demos
                 //if (SSID.length == 21) {
-                if (SSID.length == 21 || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido)) {
+                if (SSID.length == 21 || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido) || (SSID == "Ceibal" && !repetido)) {
 
-                    if ((SSID.charCodeAt(0) == 83 && SSID.charCodeAt(1) == 71 && SSID.charCodeAt(20) == 0) || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido)) {
+                    if ((SSID.charCodeAt(0) == 83 && SSID.charCodeAt(1) == 71 && SSID.charCodeAt(20) == 0) || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido) || (SSID == "Ceibal" && !repetido)) {
                         //Buscamos el beacon en el array local
-                        encontrado = buscarBeaconPorIdArray(SSID.substring(0, 16));
-                        
+                        encontrado = buscarBeaconPorIdArray(SSID.substring(0, 16), beaconsEnDBLocal);
+
                         if (encontrado != null) {
 
                             radio = calcularDistancia(frequency, level);
@@ -451,7 +580,7 @@ function funcExterna(e) {
 
 
                 }
-                if (SSID == "Wifi-ORT") repetido = true;
+                if (SSID == "Wifi-ORT" || SSID == "Ceibal") repetido = true;
 
             }
             //Ordenamos el array de beacons de acuerdo al radio (De menor a mayor)
@@ -463,7 +592,7 @@ function funcExterna(e) {
             $("#pResultado").append("Beacons encontrados: " + beaconsEncontrados.length + "<br>AP's encontrados: " + result.length + '<br>');
             $("#pInfo").text('Posición obtenida');
 
-            
+
             switch (beaconsEncontrados.length) {
                 case 0:
                     //alertarOns("Atención", "No se puede determinar la posición");

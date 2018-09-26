@@ -9,7 +9,7 @@ API.Configs.createEncuesta = function(args) {
             "Authorization": "Bearer {0}".format(Sigma.getToken()),
             "Cache-Control": "no-cache",
         },
-        "data": '{ "Id": 0, "Titulo": "{0}", "FechaCreacion": "12/05/2018", "Descripcion": "{1}", "Preguntas": {2} }'.format(args.titulo, args.descripcion, JSON.stringify(args.preguntas))
+        "data": '{ "Titulo": "{0}", "Descripcion": "{1}", "Preguntas": {2} }'.format(args.titulo, args.descripcion, JSON.stringify(args.preguntas))
     };
 };
 
@@ -40,6 +40,8 @@ document.addEventListener('init', function(event) {
         AdscriptoEncuestaCreate.init();
     } else if(event.target.matches('#adscripto-encuestas-create-pregunta')) {
         AdscriptoEncuestaPregunta.init();
+    } else if(event.target.matches("#adscripto-encuestas")) {
+        AdscriptoEncuestas.init();
     }
 });
 
@@ -49,6 +51,8 @@ document.addEventListener('show', function(event) {
         AdscriptoEncuestaCreate.init();
     } else if(event.target.matches('#adscripto-encuestas-create-pregunta')) {
         AdscriptoEncuestaPregunta.init();
+    } else if(event.target.matches("#adscripto-encuestas")) {
+        AdscriptoEncuestas.init();
     }
 });
 
@@ -68,6 +72,16 @@ AdscriptoEncuestaPregunta = {
     pregunta: {},
     editionModeOn: false,
     init: function() {
+        $('#entrada').on('change', function(e) {
+            var value = $("#entrada").val();
+            if(value == "0") {
+                $("#respuestas-list-container").hide();
+            } else {
+                $("#respuestas-list-container").show();
+            }
+            e.preventDefault();
+        });
+
         $("#add-respuesta").show();
         this.respuestasCounter = 1;
         if(this.editionModeOn) {
@@ -130,42 +144,58 @@ AdscriptoEncuestaPregunta = {
         }
     },
     submit: function() {
-        AdscriptoEncuestaPregunta.respuestas = [];
-        $(".respuesta").each(function(i, obj) {
-            var val = $(obj).val();
-            AdscriptoEncuestaPregunta.respuestas.push({
-                valor: val
-            });
-        });
-        
-        for(var j = 0; j < AdscriptoEncuestaPregunta.respuestas.length; j++) {
-            var respuesta = AdscriptoEncuestaPregunta.respuestas[j];
-            if($.trim(respuesta.valor) === "") {
-                ons.notification.alert("Dejaste una respuesta vacía. Podés llenarla o eliminarla.", {title:"Alerta", buttonLabels:["OK"]});
-                return;
-            }
-         }
-
         var texto = $("#pregunta-texto-i").val();
         var tipo = parseInt($("#entrada").val());
+        var libre = tipo === 0; 
+        AdscriptoEncuestaPregunta.respuestas = [];
+        if(!libre) {
+            $(".respuesta").each(function(i, obj) {
+                var val = $(obj).val();
+                AdscriptoEncuestaPregunta.respuestas.push({
+                    valor: val
+                });
+            });
+        }
 
-        var preguntas = AdscriptoEncuestaCreate.encuesta.preguntas;
-        for(var i =0; i<preguntas.length;i++) {
-            var pregunta = preguntas[i];
-            for(var j = 0; j < pregunta.respuestas.length; j++) {
-                var respuesta = pregunta.respuestas[j];
-                if(Utils.empty(respuesta)) {
+        if(Utils.empty(texto)) {
+            ons.notification.alert("Por favor, introducí el texto de la pregunta. No se puede dejar vacío.", {title:"Alerta", buttonLabels:["OK"]});
+            return;
+        }
+
+        if(!libre) {
+            for(var j = 0; j < AdscriptoEncuestaPregunta.respuestas.length; j++) {
+                var respuesta = AdscriptoEncuestaPregunta.respuestas[j];
+                if($.trim(respuesta.valor) === "") {
                     ons.notification.alert("Dejaste una respuesta vacía. Podés llenarla o eliminarla.", {title:"Alerta", buttonLabels:["OK"]});
                     return;
                 }
             }
 
+            if(AdscriptoEncuestaPregunta.respuestas.length < 2) {
+                ons.notification.alert("Tenés que introducir por lo menos dos opciones de respuesta.", {title:"Alerta", buttonLabels:["OK"]});
+                return;
+            }
+        }
+        
+        var preguntas = AdscriptoEncuestaCreate.encuesta.preguntas;
+        for(var i =0; i<preguntas.length;i++) {
+            var pregunta = preguntas[i];
+            if(!libre) {
+                for(var j = 0; j < pregunta.respuestas.length; j++) {
+                    var respuesta = pregunta.respuestas[j];
+                        if(Utils.empty(respuesta)) {
+                            ons.notification.alert("Dejaste una respuesta vacía. Podés llenarla o eliminarla.", {title:"Alerta", buttonLabels:["OK"]});
+                            return;
+                        }
+                }
+            }
+            
             if(pregunta.texto === texto && pregunta.id != this.pregunta.id) {
                 ons.notification.alert("Ya existe esa pregunta, cambiá el contenido.", { title: "Alerta", buttonLabels: ["OK"] });
                 return;
             }
         }
-
+        
         if(this.editionModeOn) {
             AdscriptoEncuestaCreate.editPregunta({
                 tempId: this.pregunta.id,
@@ -181,7 +211,6 @@ AdscriptoEncuestaPregunta = {
                 respuestas: AdscriptoEncuestaPregunta.respuestas
             });
         }
-
 
         AdscriptoEncuestaPregunta.respuestas = [];
         this.editionModeOn = false;
@@ -258,6 +287,7 @@ AdscriptoEncuestas = {
     init: function() {
         var spinner = $("#adscripto-encuestas-spinner");
         spinner.show();
+        $("#encuestas-list").empty();
         if(Network.isOnline()) {
             API.getEncuestas().done(function(response) {
                 if(!Utils.empty(response)) {
@@ -334,7 +364,7 @@ AdscriptoEncuestaCreate = {
         Pages.showConfigPregunta();
     },
     submit: function() {
-        var title = $("#adscripto-encuestas-create-titulo").text();
+        var title = $("#adscripto-encuestas-create-titulo").val();
         if(Utils.empty(title)) {
             ons.notification.toast("El titulo no puede quedar vacío.", {timeout:5000});
             return;
@@ -349,7 +379,7 @@ AdscriptoEncuestaCreate = {
         this.encuesta.descripcion = descripcion;
 
         var preguntas = this.encuesta.preguntas;
-        if(pregunta == null) {
+        if(Utils.empty(preguntas)) {
             ons.notification.alert("¡La encuesta debe tener por lo menos una pregunta!", {
                 title: "Alerta",
                 buttonLabels: ["OK"]
@@ -360,17 +390,45 @@ AdscriptoEncuestaCreate = {
         var modal = $("#loading-modal-creando-encuesta");
         modal.show();
         if(Network.isOnline()) {
-            API.createEncuesta(this.encuesta).done(function(encuesta) {
+            var xPreguntas = [];
+            for(var i=0;i<preguntas.length;i++) {
+                var pregunta = preguntas[i];
+                var xPregunta = {
+                    "texto": pregunta.texto,
+                    "tipo": pregunta.tipo,
+                    "respuestas": []
+                };
+
+                for(var j=0;j<pregunta.respuestas.length;j++) {
+                    xPregunta.respuestas.push(pregunta.respuestas[j].valor);
+                }
+
+                xPreguntas.push(xPregunta);
+            }
+
+            var data = {
+                "titulo": title,
+                "descripcion": descripcion,
+                "preguntas": xPreguntas
+            };
+
+            API.createEncuesta(data).done(function(encuesta) {
                 LocalData.pushEncuesta(encuesta);
                 Page.back()
-            }).fail(function() {
-                ons.notification.toast("La encuesta no pudo ser creada.", {timeout: 5000});
+            }).fail(function(res) {
+                if(res.status === 0) {
+                    console.log("AdscriptoEncuestaCreate: Ignoring status 0 in createEncuesta call.");
+                    LocalData.pushEncuesta(AdscriptoEncuestaCreate.encuesta);
+                    Page.back();
+                } else {
+                    ons.notification.toast("La encuesta no pudo ser creada.", {timeout: 5000});
+                }
             }).always(function() {
                 var modal = $("#loading-modal-creando-encuesta");
                 modal.hide();
             });
         } else {
-            LocalData.pushEncuesta(encuesta);
+            LocalData.pushEncuesta(this.encuesta);
             Page.back();
         }
 

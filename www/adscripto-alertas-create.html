@@ -1,0 +1,26 @@
+<ons-page id="adscripto-alertas-create" class="blue-background">
+    <ons-toolbar>
+        <div class="left"><ons-back-button>Volver</ons-back-button></div>
+        <div class="center">Modificar estado de alerta</div>
+    </ons-toolbar>
+
+    <ons-card>
+        <div class="title">
+            <h3>Estado de alerta</h3>
+        </div>
+        <div class="content">
+            <ons-select>
+                <select id="m-estado">
+                    <option value="na" default>No hay alerta</option>
+                    <option value="r">Alerta roja</option>
+                    <option value="n">Alerta naranja</option>
+                    <option value="a">Alerta amarilla</option>
+                </select>
+            </ons-select>
+            <br />
+            <ons-button modifier="quiet" onclick="AdscriptoAlertasCreate.submit()">Confirmar</ons-button>
+        </div>
+    </ons-card>
+    <ons-progress-circular indeterminate class="spinner" id="m-spinner">
+        </ons-progress-circular>
+</ons-page>

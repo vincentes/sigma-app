@@ -158,6 +158,14 @@ LocalData = {
             break;
         }
     },
+    saveQueue: function() {
+        window.localStorage.setItem("sigma_activities_queue", JSON.stringify(this.queue));
+        window.localStorage.setItem("sigma_activities_xhrQueue", JSON.stringify(this.xhrQueue));
+    },
+    emptyQueue: function() {
+        this.queue = [];
+        this.xhrQueue = [];
+    },
     addToQueue: function(method, args) {
         var _args = {
             method: method,
@@ -182,19 +190,28 @@ LocalData = {
     },
     respondEncuesta: function(respond) {
         this.responses.push(respond);
-        window.localStorage.setItem("sigma_user_responses", JSON.stringify(this.responses));
+        window.localStorage.setItem("sigma_activities_responses", JSON.stringify(this.responses));
         if(!Network.isOnline()) {
             this.addToQueue("respondEncuesta", respond);
         }
     },
     saveDeberes: function(deberes) {
-        window.localStorage.setItem("sigma_user_deberes", JSON.stringify(deberes));
-        LocalData.deberes = deberes;
-        for(var i =0; i < this.deberes.length; i++) {
-            if(this.deberes[i].assignments == null) {
-                this.deberes[i].assignments = [];
+        window.localStorage.setItem("sigma_activities_deberes", JSON.stringify(deberes));
+        if(!Utils.empty(deberes)) {
+            LocalData.deberes = deberes;
+            for(var i =0; i < this.deberes.length; i++) {
+                if(this.deberes[i].assignments == null) {
+                    this.deberes[i].assignments = [];
+                }
             }
         }
+    },
+    setAlerta: function(alerta) {
+        this.alerta = alerta;
+        this.saveAlerta(alerta);
+    },
+    saveAlerta: function() {
+        window.localStorage.setItem("sigma_activities_alerta", JSON.stringify(this.alerta));
     },
     deleteDeber: function(deberId) {
         for(var i = 0; i < LocalData.deberes.length; i++) {
@@ -223,7 +240,26 @@ LocalData = {
             this.addToQueue("xhrSaveImages", images);
         }
     },
-    assignGrupo: function(deberId, grupoId) {
+    isAssigned: function(deber, grupoId) {
+        for(var j= 0; deber.assignments.length; j++) {
+            var a = deber.assignments[j]
+            if(a.grupo.id == grupoId) {
+                return true;
+            }
+        }
+        return false;
+    },
+    emptyAssignments(deberId) {
+        for(var i = 0; i < this.deberes.length; i++) {
+            var deber = this.deberes[i];
+            if(deber.id === deberId) {
+                this.deberes[i].assignments = [];
+            }
+        }
+
+        this.saveDeberes();
+    },
+    assignGrupo: function(deberId, grupoId, fecha) {
         for(var i = 0; i < this.deberes.length; i++) {
             var deber = this.deberes[i];
             if(deber.id === deberId) {
@@ -231,11 +267,20 @@ LocalData = {
                     deber.assignments = [];
                 }
 
-                deber.assignments.push({
-                    grupo: this.getGrupo(grupoId)
-                });
+                var grupo =  this.getGrupo(grupoId);
+                if(!Utils.empty(grupo)) {
+                    if(!this.isAssigned(deber, grupoId)) {
+                        deber.assignments.push({
+                            deadline: fecha,
+                            grupo: grupo
+                        });
+                    }
+                }
+
             }
         }
+
+        this.saveDeberes();
     },
     getAssignments: function(deberId) {
         var deber = this.getDeber(deberId);
@@ -299,14 +344,14 @@ LocalData = {
             }
         }
 
-        window.localStorage.setItem("sigma_user_deberes", JSON.stringify(this.deberes));
+        window.localStorage.setItem("sigma_activities_deberes", JSON.stringify(this.deberes));
         if(!Network.isOnline()) {
             this.addToQueue("createAsignacion", asignacion);
         }
     },
     pushEscrito: function(escrito) {
         this.escritos.push(escrito);
-        window.localStorage.setItem("sigma_user_escritos", JSON.stringify(this.escritos));
+        window.localStorage.setItem("sigma_activities_escritos", JSON.stringify(this.escritos));
         if(!Network.isOnline()) {
             escrito.lsId = this.escritos.length;
             this.addToQueue("createEscrito", escrito);
@@ -315,7 +360,7 @@ LocalData = {
     },
     pushEncuesta: function(encuesta) {
         this.encuestas.push(encuesta);
-        window.localStorage.setItem("sigma_user_encuesta", JSON.stringify(this.encuestas));
+        window.localStorage.setItem("sigma_activities_encuesta", JSON.stringify(this.encuestas));
         if(!Network.isOnline()) {
             encuesta.lsId = this.encuestas.length;
             this.addToQueue("createEscrito", encuesta);
@@ -375,7 +420,11 @@ LocalData = {
             LocalData.responses = lsResponses; 
         }
 
-
+        var lsAlerta = JSON.parse(window.localStorage.getItem("sigma_activities_alerta"));
+        if(!Utils.empty(lsAlerta)) {
+            LocalData.alerta = lsAlerta;
+        }
+        
         var sp = window.localStorage.getItem("sigma_config_productionServerEnabled");
         if(sp != null) {
             var lsServerProduction = JSON.parse(sp.toLowerCase());

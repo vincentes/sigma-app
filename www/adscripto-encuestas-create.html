@@ -1,7 +1,7 @@
 <ons-page id="adscripto-encuestas-create">
         <ons-toolbar>
             <div class="left">
-                <ons-button modifier="quiet" onclick="back()">
+                <ons-button modifier="quiet" onclick="navBack()">
                     <ons-icon icon="ion-close" style="font-size: 22px"></ons-icon>
                 </ons-button>
             </div>
@@ -43,7 +43,7 @@
                     </ons-row>
                 </ons-list-item>
             </ons-list>
-            <ons-button style="width: 100% !important;" modifier="large" onclick="AdscriptoEncuestaPregunta.submit()" id="create-tarea-button">Crear</ons-button>
+            <ons-button style="width: 100% !important;" modifier="large" onclick="AdscriptoEncuestaCreate.submit()" id="create-tarea-button">Crear</ons-button>
         </ons-card>
         
         <ons-modal id="loading-modal-creando-encuesta">

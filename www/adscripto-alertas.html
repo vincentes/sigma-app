@@ -1,0 +1,16 @@
+<ons-page id="adscripto-alertas" class="blue-background">
+    <ons-toolbar>
+        <div class="left"><ons-back-button>Volver</ons-back-button></div>
+        <div class="center">Alerta metereológica</div>
+    </ons-toolbar>
+
+    <ons-card id="alerta" style="visibility: hidden;">
+        <div class="title">
+            <i id="estado-icon" style="margin-right: 5px;"></i>
+            <h3 id="estado"></h3>
+        </div>
+        <div class="content">
+            <ons-button modifier="quiet" onclick="AdscriptoAlertas.create()">Modificar alerta</ons-button>
+        </div>
+    </ons-card>
+</ons-page>

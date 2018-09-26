@@ -1,6 +1,47 @@
 var plano = {
     "type": "FeatureCollection", "features": [
+        {
 
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                    [0, 0],
+                    [1600, 0],
+                    [1600, 2380],
+                    //Empieza el recorte
+
+                    [563, 2380],
+
+                    [563, 1561],
+                    [1279, 1561],
+                    [1279, 135],
+                    [1391, 135],
+                    [1391, 1112],
+                    [1435, 1112],
+                    [1435, 1564],
+                    [1391, 1564],
+                    [1391, 2217],
+                    [1279, 2217],
+                    [1279, 1914],
+                    [563, 1914],
+                    [563, 1561],
+
+                    [563, 2380],
+                    //Termina el corte
+
+
+                    [0, 2380],
+                    [0, 0]
+
+                ]]
+            },
+            "properties": {
+                //"NAME": "perimetro exterior",
+                "TIPO": "exterior"
+            }
+        },/*
         {
 
             "type": "Feature",
@@ -29,7 +70,7 @@ var plano = {
                 //"NAME": "Base Subsuelo",
                 "TIPO": "base"
             }
-        },
+        },*/
         {
 
             "type": "Feature",
@@ -203,6 +244,13 @@ var plano = {
                 "coordinates": [[
                     [1249, 1757],
                     [1277, 1757],
+                    //Puerta Baño dam
+
+                    [1277, 1823],
+                    [1283, 1823],
+                    [1283, 1805],
+                    [1277, 1805],
+
                     [1277, 1827],
                     [1249, 1827],
                     [1249, 1757]
@@ -223,6 +271,13 @@ var plano = {
                 "coordinates": [[
                     [1249, 1833],
                     [1277, 1833],
+                    //Puerta Baño cab
+
+                    [1277, 1900],
+                    [1283, 1900],
+                    [1283, 1882],
+                    [1277, 1882],
+
                     [1277, 1910],
                     [1249, 1910],
                     [1249, 1833]
@@ -282,6 +337,13 @@ var plano = {
                 "type": "Polygon",
                 "coordinates": [[
                     [1283, 2004],
+                    //Puerta ads
+                    [1291, 2004],
+                    [1291, 1998],
+                    [1309, 1998],
+                    [1309, 2004],
+
+
                     [1311, 2004],
                     [1311, 2049],
                     [1283, 2049],
@@ -305,6 +367,11 @@ var plano = {
                     [1431, 1281],
                     [1431, 1396],
                     [1393, 1396],
+                    //Puerta Cantina
+                    [1393, 1390],
+                    [1386, 1390],
+                    [1386, 1365],
+                    [1393, 1365],
                     [1393, 1281]
                 ]]
             },
@@ -368,6 +435,41 @@ var plano = {
                     //Pasillo largo Salones
                     [1283, 139],
                     [1311, 139],
+                    //Puerta 33
+                    [1311, 272],
+                    [1317, 272],
+                    [1317, 297],
+                    [1311, 297],
+                    //Puerta 32
+                    [1311, 434],
+                    [1317, 434],
+                    [1317, 459],
+                    [1311, 459],
+                    //Puerta 31
+                    [1311, 597],
+                    [1317, 597],
+                    [1317, 621],
+                    [1311, 621],
+                    //Puerta 30
+                    [1311, 760],
+                    [1317, 760],
+                    [1317, 785],
+                    [1311, 785],
+                    //Puerta 29
+                    [1311, 922],
+                    [1317, 922],
+                    [1317, 949],
+                    [1311, 949],
+                    //Puerta 28
+                    [1311, 1071],
+                    [1317, 1071],
+                    [1317, 1109],
+                    [1311, 1109],
+                    //Puerta Gremial
+                    [1311, 1234],
+                    [1317, 1234],
+                    [1317, 1272],
+                    [1311, 1272],
                     //Fino al lado del comedor
                     [1311, 1281],
                     [1317, 1281],
@@ -402,9 +504,22 @@ var plano = {
                 "coordinates": [[
                     //Pasillo Baños
                     [1283, 1730],
+                    //Puerta sala de espera
+                    [1291, 1730],
+                    [1291, 1723],
+                    [1309, 1723],
+                    [1309, 1730],
+
                     [1311, 1730],
                     [1311, 1938],
+                    //Puerta sala labs
+                    [1291, 1938],
+                    [1291, 1944],
+                    [1309, 1944],
+                    [1309, 1938],
                     [1283, 1938],
+
+
                     [1283, 1730],
                 ]]
             },
@@ -453,7 +568,8 @@ var plano = {
             },
             "properties": {
                 "NAME": "Escalera - Descanso",
-                "TIPO": "libre"
+                "TIPO": "libre",
+                "ALIAS": "ssEscPBDescanso"
             }
         },
         {
@@ -702,13 +818,23 @@ var plano = {
 
 
 
+
     ]
 }
 
 var nodosMapa = {
     ssAds: { marker: [2001, 1301], ss01: 16 },
     ss01: { marker: [1986, 1301], ss02: 30, ssAds: 16, ssLabFis2: 12 },
-    ssLabFis2: { marker: [1986, 1313], ss01: 12 },
+    ssLabFis2: { marker: [1986, 1313], ss01: 12, ss63: 17 },
+    ss63: { marker: [1986, 1330], ss64: 17, ss67: 17, ssLabFis2: 17 },
+    ss64: { marker: [1986, 1347], ss63: 17, ss65: 17 },
+    ss65: { marker: [1986, 1364], ss64: 17, ss66: 17 },
+    ss66: { marker: [1986, 1381], ss65: 17 },
+    ss67: { marker: [2003, 1330], ss63: 17, ss68: 17 },
+    ss68: { marker: [2020, 1330], ss67: 17, ss69: 17 },
+    ss69: { marker: [2037, 1330], ss68: 17, ss70: 17 },
+    ss70: { marker: [2054, 1330], ss69: 17 },
+
     ss02: { marker: [1956, 1301], ss01: 30, ss03: 65, ssLabFis: 12 },
     ssLabFis: { marker: [1956, 1313], ss02: 12 },
     ss03: { marker: [1922, 1301], ss02: 34, ss04: 31 },
@@ -732,61 +858,67 @@ var nodosMapa = {
     ss16: { marker: [1521, 1301], ss15: 34, ss17: 34 },
     ss17: { marker: [1487, 1301], ss16: 34, ss18: 34 },
     ss18: { marker: [1453, 1301], ss17: 34, ss19: 39 },
-    ss19: { marker: [1415, 1301], ss18: 39, ss20: 33, ss24: 33},
-    ss20: { marker: [1415, 1333], ss19: 33, ss21: 19, ssEscDep: 25},
+    ss19: { marker: [1415, 1301], ss18: 39, ss20: 33, ss24: 33 },
+    ss20: { marker: [1415, 1333], ss19: 33, ss21: 19, ssEscDep: 25 },
     ssEscDep: { marker: [1440, 1333], ss20: 25 },
-    ss21: { marker: [1415, 1352], ss20: 19, ss22: 19, ss23: 30},
-    ss22: { marker: [1415, 1371], ss21: 19, ssComedor2: 19, ssEscPB: 25},
-    ssEscPB: { marker: [1440, 1371], ss22: 25 },
+    ss21: { marker: [1415, 1352], ss20: 19, ss22: 19, ss23: 30 },
+    ss22: { marker: [1415, 1371], ss21: 19, ssComedor2: 19, ssEscPB: 25 },
+    ssEscPB: { marker: [1440, 1371], ss22: 25, ssEscPBDescanso: 86 },
+    ssEscPBDescanso: { marker: [1542, 1371], ssEscPB: 86 },
+
     ssComedor2: { marker: [1415, 1390], ss22: 19 },
     ssComedor: { marker: [1355, 1352], ss23: 30, ss25: 52 },
     ssCantina: { marker: [1385, 1390], ss23: 38 },
-    ss23: { marker: [1385, 1352], ss24: 52, ss21: 30, ssComedor: 30, ssCantina: 38},
-    ss24: { marker: [1385, 1300], ss23: 52, ss19: 30, ss25: 30},
-    ss25: { marker: [1355, 1300], ssComedor: 52, ss24: 30, ss26: 34},
-    ss26: { marker: [1321, 1300], ss25: 34, ss27: 34},
-    ss27: { marker: [1287, 1300], ss26: 34, ss28: 31},
+    ss23: { marker: [1385, 1352], ss24: 52, ss21: 30, ssComedor: 30, ssCantina: 38 },
+    ss24: { marker: [1385, 1300], ss23: 52, ss19: 30, ss25: 30 },
+    ss25: { marker: [1355, 1300], ssComedor: 52, ss24: 30, ss26: 34 },
+    ss26: { marker: [1321, 1300], ss25: 34, ss27: 34 },
+    ss27: { marker: [1287, 1300], ss26: 34, ss28: 31 },
     ss28: { marker: [1256, 1300], ss27: 31, ss29: 34, ssSalonGremial: 12 },
     ssSalonGremial: { marker: [1256, 1312], ss28: 12 },
-    ss29: { marker: [1222, 1300], ss28: 34, ss30: 34},
-    ss30: { marker: [1188, 1300], ss29: 34, ss31: 34},
-    ss31: { marker: [1154, 1300], ss30: 34, ss32: 34},
-    ss32: { marker: [1120, 1300], ss31: 34, ss33: 27},
+    ss29: { marker: [1222, 1300], ss28: 34, ss30: 34 },
+    ss30: { marker: [1188, 1300], ss29: 34, ss31: 34 },
+    ss31: { marker: [1154, 1300], ss30: 34, ss32: 34 },
+    ss32: { marker: [1120, 1300], ss31: 34, ss33: 27 },
     ss33: { marker: [1093, 1300], ss32: 27, ss34: 34, ssSalon28: 12 },
     ssSalon28: { marker: [1093, 1312], ss33: 12 },
-    ss34: { marker: [1059, 1300], ss33: 34, ss35: 34},
-    ss35: { marker: [1025, 1300], ss34: 34, ss36: 34},
-    ss36: { marker: [991, 1300], ss35: 34, ss37: 34},
-    ss37: { marker: [956, 1300], ss36: 34, ss38: 17},
-    ss38: { marker: [939, 1300], ss37: 17, ss39: 34, ssSalon29: 12},
+    ss34: { marker: [1059, 1300], ss33: 34, ss35: 34 },
+    ss35: { marker: [1025, 1300], ss34: 34, ss36: 34 },
+    ss36: { marker: [991, 1300], ss35: 34, ss37: 34 },
+    ss37: { marker: [956, 1300], ss36: 34, ss38: 17 },
+    ss38: { marker: [939, 1300], ss37: 17, ss39: 34, ssSalon29: 12 },
     ssSalon29: { marker: [939, 1312], ss38: 12 },
-    ss39: { marker: [905, 1300], ss38: 34, ss40: 34},
-    ss40: { marker: [871, 1300], ss39: 34, ss41: 34},
-    ss41: { marker: [837, 1300], ss40: 34, ss42: 34},
-    ss42: { marker: [803, 1300], ss41: 34, ss43: 27},
-    ss43: { marker: [776, 1300], ss42: 30, ss44: 34, ssSalon30: 12},
+    ss39: { marker: [905, 1300], ss38: 34, ss40: 34 },
+    ss40: { marker: [871, 1300], ss39: 34, ss41: 34 },
+    ss41: { marker: [837, 1300], ss40: 34, ss42: 34 },
+    ss42: { marker: [803, 1300], ss41: 34, ss43: 27 },
+    ss43: { marker: [776, 1300], ss42: 30, ss44: 34, ssSalon30: 12 },
     ssSalon30: { marker: [776, 1312], ss43: 12 },
-    ss44: { marker: [739, 1300], ss43: 34, ss45: 34},
-    ss45: { marker: [705, 1300], ss44: 34, ss46: 34},
-    ss46: { marker: [671, 1300], ss45: 34, ss47: 34},
-    ss47: { marker: [637, 1300], ss46: 34, ss48: 28},
-    ss48: { marker: [610, 1300], ss47: 28, ss49: 34, ssSalon31: 12},
+    ss44: { marker: [739, 1300], ss43: 34, ss45: 34 },
+    ss45: { marker: [705, 1300], ss44: 34, ss46: 34 },
+    ss46: { marker: [671, 1300], ss45: 34, ss47: 34 },
+    ss47: { marker: [637, 1300], ss46: 34, ss48: 28 },
+    ss48: { marker: [610, 1300], ss47: 28, ss49: 34, ssSalon31: 12 },
     ssSalon31: { marker: [610, 1312], ss48: 12 },
-    ss49: { marker: [576, 1300], ss48: 34, ss50: 34},
-    ss50: { marker: [552, 1300], ss49: 34, ss51: 34},
-    ss51: { marker: [518, 1300], ss50: 34, ss52: 34},
-    ss52: { marker: [484, 1300], ss51: 34, ss53: 28},
-    ss53: { marker: [446, 1300], ss52: 28, ss54: 34, ssSalon32: 12},
+    ss49: { marker: [576, 1300], ss48: 34, ss50: 34 },
+    ss50: { marker: [552, 1300], ss49: 34, ss51: 34 },
+    ss51: { marker: [518, 1300], ss50: 34, ss52: 34 },
+    ss52: { marker: [484, 1300], ss51: 34, ss53: 28 },
+    ss53: { marker: [446, 1300], ss52: 28, ss54: 34, ssSalon32: 12 },
     ssSalon32: { marker: [446, 1312], ss53: 12 },
-    ss54: { marker: [412, 1300], ss53: 34, ss55: 34},
-    ss55: { marker: [378, 1300], ss54: 34, ss56: 34},
-    ss56: { marker: [344, 1300], ss55: 34, ss57: 34},
-    ss57: { marker: [310, 1300], ss56: 34, ss58: 26},
-    ss58: { marker: [285, 1300], ss57: 26, ss59: 34, ssSalon33: 12},
+    ss54: { marker: [412, 1300], ss53: 34, ss55: 34 },
+    ss55: { marker: [378, 1300], ss54: 34, ss56: 34 },
+    ss56: { marker: [344, 1300], ss55: 34, ss57: 34 },
+    ss57: { marker: [310, 1300], ss56: 34, ss58: 26 },
+    ss58: { marker: [285, 1300], ss57: 26, ss59: 34, ssSalon33: 12 },
     ssSalon33: { marker: [285, 1312], ss58: 12 },
-    ss59: { marker: [251, 1300], ss58: 34, ss60: 34},
-    ss60: { marker: [217, 1300], ss59: 34, ss61: 34},
-    ss61: { marker: [183, 1300], ss60: 34, ss62: 34},
-    ss62: { marker: [149, 1300], ss61: 34},
-    ss63: { marker: [-1]}
+    ss59: { marker: [251, 1300], ss58: 34, ss60: 34 },
+    ss60: { marker: [217, 1300], ss59: 34, ss61: 34 },
+    ss61: { marker: [183, 1300], ss60: 34, ss62: 34 },
+    ss62: { marker: [149, 1300], ss61: 34 },
+
+
+
+
+    ss71: { marker: [-1] }
 };

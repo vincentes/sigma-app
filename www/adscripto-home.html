@@ -1,14 +1,30 @@
 <ons-page id="adscripto-home">
         <ons-toolbar>
+            <div class="right">
+                <ons-button modifier="light" onclick="logout()"><ons-icon style="font-size: 22px" icon="ion-android-exit"></ons-icon></ons-button>
+            </div>
             <div class="center">Inicio</div>
         </ons-toolbar>
     
-        <ons-list>
+    <ons-card>
+
+        <ons-list class="menu">
             <ons-list-header>Menú</ons-list-header>        
             <ons-list-item tappable modifier="long-divider" onclick="Pages.adscriptoEncuestas()">Mis encuestas</ons-list-item>
-            <ons-list-item tappable modifier="long-divider">Mis alertas</ons-list-item>
-            <ons-list-item tappable modifier="long-divider">Mis avisos</ons-list-item>
+            <ons-list-item tappable modifier="long-divider" onclick="Pages.adscriptoCS()">Cambios de salones</ons-list-item>
+            <ons-list-item tappable modifier="long-divider" onclick="Pages.adscriptoAlertas()">Alerta metereológica</ons-list-item>
             <ons-list-item tappable modifier="long-divider" onclick="mapa()">Mapa</ons-list-item>        
             <ons-list-item tappable modifier="long-divider" onclick="logout()">Salir</ons-list-item>        
         </ons-list>
+    </ons-card>
+
+    <ons-card id="modo-sin-internet" style="visibility: hidden">
+            <div class="title">
+                <ons-icon icon="wifi"></ons-icon>
+                Modo sin internet
+            </div>
+            <div class="content">
+                <p>¡Estás en modo offline! Los cambios que hagas se registrarán cuando tengas conexión a internet.</p>
+            </div>
+        </ons-card>
 </ons-page>

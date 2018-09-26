@@ -38,7 +38,7 @@ API = {
                   "Authorization": "Bearer {0}".format(Sigma.getToken()),
                   "Cache-Control": "no-cache",
                 },
-                "data": '{ "MateriaId": 1, "Contenido": "{0}", "ImageIds": {1} }'.format(args.contenido, JSON.stringify(args.imageIds))
+                "data": '{ "MateriaId": 10, "Contenido": "{0}", "ImageIds": {1} }'.format(args.contenido, JSON.stringify(args.imageIds))
             };
         },
         saveImages: function(args) {
@@ -52,7 +52,7 @@ API = {
                   "Authorization": "Bearer {0}".format(Sigma.getToken()),
                   "Cache-Control": "no-cache",
                 },
-                "data": '{ "MateriaId": 1, "Contenido": "{0}", "ImageIds": {1} }'.format(args.contenido, JSON.stringify(args.imageIds))
+                "data": '{ "MateriaId": 10, "Contenido": "{0}", "ImageIds": {1} }'.format(args.contenido, JSON.stringify(args.imageIds))
             };
         },
         assignDeberToGroups: function(args) {
@@ -81,7 +81,7 @@ API = {
                     "Authorization": "Bearer {0}".format(Sigma.getToken())
                 },
                 "processData": false,
-                "data": '{"Id": 1, "MateriaId": {0}, "Temas": "{1}", "Date": "{2}", "GruposAsignados": {3}}'.format(args.materiaId, args.temas, args.fecha, JSON.stringify(args.gruposAsignados))
+                "data": '{"Id": 1, "MateriaId": 10, "Temas": "{1}", "Date": "{2}", "GruposAsignados": {3}}'.format(args.materiaId, args.temas, args.fecha, JSON.stringify(args.gruposAsignados))
             };
         },
         createParcial: function(args) {
@@ -95,8 +95,24 @@ API = {
                     "Authorization": "Bearer {0}".format(Sigma.getToken())
                 },
                 "processData": false,
-                "data": '{"Id": 1, "MateriaId": {0}, "Temas": "{1}", "Date": "{2}", "GruposAsignados": {3}}'.format(args.materiaId, args.temas, args.fecha, JSON.stringify(args.gruposAsignados))
+                "data": '{"Id": 1, "MateriaId": 10, "Temas": "{1}", "Date": "{2}", "GruposAsignados": {3}}'.format(args.materiaId, args.temas, args.fecha, JSON.stringify(args.gruposAsignados))
             };
+        },
+        deleteFCMToken: function() {
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "{0}/Notification/DeleteToken".format(Sigma.baseUrl),
+                "method": "POST",
+                "headers": {
+                  "Content-Type": "application/json",
+                  "Cache-Control": "no-cache",
+                  "Authorization": "Bearer {0}".format(Sigma.getToken())
+                },
+                "processData": false
+              };
+
+            return settings;
         }
     },
     createEscrito: function(args) {
@@ -118,6 +134,9 @@ API = {
                 });
             }
         });
+    },
+    deleteFCMToken: function() {
+        return $.ajax(API.Configs.deleteFCMToken());
     },
     login: function(args) {
         var settings = {
@@ -274,7 +293,7 @@ API = {
               "Authorization": "Bearer {0}".format(Sigma.getToken()),
               "Cache-Control": "no-cache",
             },
-            "data": '{ "MateriaId": 1, "Contenido": "{0}", "ImageIds": {1} }'.format(args.contenido, JSON.stringify(args.imageIds))
+            "data": '{ "MateriaId": 10, "Contenido": "{0}", "ImageIds": {1} }'.format(args.contenido, JSON.stringify(args.imageIds))
         }
 
         return $.ajax(settings)
@@ -319,18 +338,20 @@ API = {
                 return;
             }
 
-            var data = JSON.parse(request.response);
-            if(args.callback != null) {
-                args.callback({
-                  content: data.content,
-                  id: data.id,
-                  imageIds: data.ids,
-                  imagesURL: args.images
-                });
-            }
+            if(request.status == 200) {
+                var data = JSON.parse(request.response);
+                if(args.callback != null) {
+                    args.callback({
+                      content: data.content,
+                      id: data.id,
+                      imageIds: data.ids,
+                      imagesURL: args.images
+                    });
+                }
 
-            if(args.tmpActivityCallback != null) {
-                args.tmpActivityCallback(data.ids);
+                if(args.tmpActivityCallback != null) {
+                    args.tmpActivityCallback(data.ids);
+                }
             }
           };
           request.onerror = function() {
@@ -355,10 +376,10 @@ API = {
             success: function(data){
                 var url = window.URL || window.webkitURL;
                 var src = url.createObjectURL(data);
-                args.success(src, args.deberId);
+                args.success(src, args.deberId, args.imageId);
             },
             error:function() {
-                ons.notification.toast("Error al descargar imagen.", { toast: 1000 });
+                ons.notification.toast("Error al descargar imagen.", { timeout: 1000 });
             }
         });
     },
@@ -711,8 +732,15 @@ Page = {
         document.getElementById("nav").pushPage(htmlFile, options);
     },
     replacePage: function(htmlFile, options) {
+        if(!options) {
+            options = {};
+        }
+
+        if(!options.animation) {
+            options.animation = "fade";
+        }
         document.getElementById("nav").replacePage(htmlFile, {
-            animation: 'none' 
+            animation: options.animation
         });
     },
     back: function(options) {
@@ -739,6 +767,8 @@ DocenteParciales = {
         var spinner = $("#docente-parciales-spinner");
         spinner.show();
         if(Network.isOnline()) {
+        $("#escritos-list").empty();
+
             // Get the logged docente's parciales
             API.getDocenteParciales().done(function(response) {
                 DocenteParciales.parcialesList = Parciales.toList(response);
@@ -758,7 +788,7 @@ DocenteParciales = {
     display: function() {
         $("#parciales-list").empty();
         if(Utils.empty(this.parcialesList)) {
-            $("#parciales-list").prepend(DocenteEscritos.Templates.NoEscritoListItem().html);
+            $("#parciales-list").prepend(DocenteEscritos.Templates.NoParcialListItem().html);
         } else {
             this.parcialesList.forEach(function(parcial) {
                 var element = DocenteParciales.Templates.ParcialListItem(parcial);
@@ -795,6 +825,7 @@ DocenteEscritos = {
         var spinner = $("#docente-escritos-spinner");
         spinner.show();
         if(Network.isOnline()) {
+            $("#escritos-list").empty();
             // Get the logged docente's escritos
             API.getDocenteEscritos().done(function(response) {
                 DocenteEscritos.escritosList = Escritos.toList(response);
@@ -990,7 +1021,7 @@ DocenteEscritoInfo = {
             }).done(function(response) {
                 LocalData.pushEscrito(response);
                 DocenteEscritoInfo.escrito = response;
-                this.display();
+                DocenteEscritoInfo.display();
             }).fail(function() {
                 ons.notification.toast("No se pudo mostrar el deber.", { timeout: 5000 });
                 Page.back();
@@ -1021,28 +1052,55 @@ AlumnoParciales = {
                 html: '<ons-list-item id="parcial-{0}" modifier="chevron" tappable>Parcial {1}</ons-list-item>'.format(parcial.id, Utils.serverDateToLocal(parcial.fecha)),
                 id: 'parcial-{0}'.format(parcial.id)
             }
+        },
+        NoParcialListItem: function(parcial) {
+            return {
+                html: '<ons-list-item>No tenés parciales próximos.</ons-list-item>',
+            }
         }
     },
     parcialesList: [],
     init: function() {
         var spinner = $("#alumno-parciales-spinner");
         spinner.show();
-        // Get the logged docente's parciales
-        API.getAlumnoParciales().done(function(response) {
-            AlumnoParciales.parcialesList = Parciales.toList(response);
+        if(Network.isOnline()) {
             $("#parciales-list").empty();
-            AlumnoParciales.parcialesList.forEach(function(parcial) {
-                var element = AlumnoParciales.Templates.ParcialListItem(parcial);
-                $("#parciales-list").prepend(element.html);
-                $("#" + element.id).click(function() {
-                    Pages.docenteViewParcial(parcial);
+
+            // Get the logged docente's parciales
+            API.getAlumnoParciales().done(function(response) {
+                AlumnoParciales.parcialesList = Parciales.toList(response);
+                $("#parciales-list").empty();
+                if(Utils.empty(AlumnoParciales.parcialesList)) {
+                    $("#parciales-list").prepend(AlumnoParciales.Templates.NoParcialListItem().html);
+                } 
+                AlumnoParciales.parcialesList.forEach(function(parcial) {
+                    var element = AlumnoParciales.Templates.ParcialListItem(parcial);
+                    $("#parciales-list").prepend(element.html);
+                    $("#" + element.id).click(function() {
+                        Pages.docenteViewParcial(parcial);
+                    });
                 });
+                spinner.hide();
+            }).fail(function() {
+                ons.notification.toast("No se pudieron obtener los parciales.", {timeout:5000});
+            }).always(function() {
+                spinner.hide();  
             });
-        }).fail(function() {
-            ons.notification.toast("No se pudieron obtener los parciales.", {timeout:5000});
-        }).always(function() {
-            spinner.hide();  
-        });
+        } else {
+            AlumnoParciales.parcialesList = Parciales.toList(LocalData.getParciales());
+            $("#parciales-list").empty();
+            if(Utils.empty(AlumnoParciales.parcialesList)) {
+                $("#parciales-list").prepend(AlumnoParciales.Templates.NoParcialListItem(parcial).html);
+            } else {
+                AlumnoParciales.parcialesList.forEach(function(parcial) {
+                    var element = AlumnoParciales.Templates.ParcialListItem(parcial);
+                    $("#parciales-list").prepend(element.html);
+                    $("#" + element.id).click(function() {
+                        Pages.docenteViewParcial(parcial);
+                    });
+                });
+            }
+        }
     }
 };
 
@@ -1083,16 +1141,24 @@ Login = {
                 cedula: cedula,
                 password: password
             }).done(function(response) {
-                switch(response.roles[0]) {
-                    case "Docente":
-                    Pages.docenteHome();
-                    break;
-                    case "Alumno":
-                    Pages.alumnoHome();
-                    break;
-                    case "Adscripto":
-                    Pages.adscriptoHome();
-                }
+                Sigma.saveFCMToken(function(fcmSaveResponse) {
+                    for(var i = 0; i < response.roles.length; i++) {
+                        switch(response.roles[0]) {
+                            case "Docente":
+                            Pages.docenteHome();
+                            break;
+                            case "Alumno":
+                            Pages.alumnoHome();
+                            break;
+                            case "Adscripto":
+                            Pages.adscriptoHome();
+                            break;
+                        }
+                    }
+
+                    var loading = $('#loading-modal');
+                    loading.hide();
+                });
                 Sigma.setToken(response.token);
                 LocalData.saveUser(response);
             }).fail(function(response) {
@@ -1108,8 +1174,8 @@ Login = {
                     ons.notification.alert("Ocurrió un error inesperado.");
                     break;                    
                 }
-            }).always(function() {
                 loading.hide();                
+            }).always(function() {
             });
         }
     }
@@ -1122,14 +1188,40 @@ AlumnoEscritos = {
                 html: '<ons-list-item id="escrito-{0}" modifier="chevron" tappable>Escrito {1}</ons-list-item>'.format(escrito.id, Utils.serverDateToLocal(escrito.fecha)),
                 id: 'escrito-{0}'.format(escrito.id)
             }
+        },
+        NoEscritoListItem: function() {
+            return {
+                html: '<ons-list-item>No tenes escritos próximos.</ons-list-item>'
+            }
         }
     },
     escritosList: [],
     init: function() {
-        // Get the logged alumno's escritos
-        API.getAlumnoEscritos().done(function(response) {
-            AlumnoEscritos.escritosList = Escritos.toList(response);
+        $("#alumno-escritos-spinner").show();
+        $("#escritos-list").empty();
+        if(Network.isOnline()) {
+            API.getAlumnoEscritos().done(function(response) {
+                LocalData.setEscritos(Escritos.toList(response));
+                AlumnoEscritos.escritosList = Escritos.toList(response);
+                $("#escritos-list").empty();
+                if(Utils.empty(AlumnoEscritos.escritosList)) {
+                    $("#escritos-list").prepend(AlumnoEscritos.Templates.NoEscritoListItem().html);
+                }
+                AlumnoEscritos.escritosList.forEach(function(escrito) {
+                    var element = AlumnoEscritos.Templates.EscritoListItem(escrito);
+                    $("#escritos-list").prepend(element.html);
+                    $("#" + element.id).click(function() {
+                        Pages.docenteViewEscrito(escrito);
+                    });
+                });
+                $("#alumno-escritos-spinner").hide();
+            });
+        } else {
+            AlumnoEscritos.escritosList = LocalData.getEscritos();
             $("#escritos-list").empty();
+            if(Utils.empty(AlumnoEscritos.escritosList)) {
+                $("#escritos-list").prepend(AlumnoEscritos.Templates.NoEscritoListItem().html);
+            }
             AlumnoEscritos.escritosList.forEach(function(escrito) {
                 var element = AlumnoEscritos.Templates.EscritoListItem(escrito);
                 $("#escritos-list").prepend(element.html);
@@ -1137,9 +1229,9 @@ AlumnoEscritos = {
                     Pages.docenteViewEscrito(escrito);
                 });
             });
-        });
-    }
-};
+            $("#alumno-escritos-spinner").hide();
+        }
+}};
 
 DocenteDeberes = {
     Templates: {
@@ -1255,7 +1347,7 @@ DocenteDeberesCreate = {
     },
     images: [],
     init: function() {
-        
+        DocenteDeberesCreate.images = [];
     },
     onTakePhoto: function() {
         Sigma.openCamera(DocenteDeberesCreate.processNewImage);
@@ -1377,10 +1469,22 @@ DocenteDeberesEdit = {
     },
     deber: {},
     images: [],
+    downloadingImages: [],
+    showGrupos: [],
+    isDownloading: function(imageId) {
+        return this.downloadingImages.includes(imageId);
+    },
+    finishDownloading: function(imageId) {
+        this.downloadingImages.splice(this.downloadingImages.indexOf(imageId), 1);
+    },
     init: function() {
         var data = document.getElementById("nav").topPage.data;
+        if(data != null) {
+            DocenteDeberesEdit.deber = data;
+        } else {
+            data = DocenteDeberesEdit.deber;
+        }
         var defs = [];
-        DocenteDeberesEdit.deber = data;
         $("#img-real-list").empty();
         $("#info-deber-consigna").text(data.contenido);
         $("#ons-list-images").hide();
@@ -1390,15 +1494,23 @@ DocenteDeberesEdit = {
             if(Network.isOnline()) {
                 data.imageIds.forEach(function(imageId) {
                     var def = $.Deferred();
-                    API._downloadImage({
+                    if(!DocenteDeberesEdit.isDownloading(imageId)) {
+                        DocenteDeberesEdit.downloadingImages.push(imageId);
+                        API._downloadImage({
                         imageId: imageId,
                         deberId: DocenteDeberesEdit.deber.id,
-                        success: function(src, deberId) {
+                        success: function(src, deberId, imageId) {
                             // Prevent images showing up in other deberes when switching through them quickly.
                             if(DocenteDeberesEdit.deber.id != deberId) {
                                 return;
                             }
-    
+                            
+                            var imageAppendedCount = $("#thumbnail-list").children().length;
+                            if(imageAppendedCount >= DocenteDeberesEdit.deber.imageIds.length) {
+                                DocenteDeberesEdit.finishDownloading(imageId);
+                                return;
+                            }
+                            
                             var xhr = new XMLHttpRequest;
                             xhr.responseType = 'blob';
         
@@ -1410,57 +1522,38 @@ DocenteDeberesEdit = {
                                 reader.onload = function() {
                                     var blobAsDataUrl = reader.result;
                                     $("#thumbnail-list").prepend(DocenteDeberesEdit.Templates.ImageItem(blobAsDataUrl).html);
+                                    DocenteDeberesEdit.finishDownloading(imageId);
                                     def.resolve();
                                 };
-        
+                                
                                 reader.readAsDataURL(recoveredBlob);
                             };
-        
+                            
                             xhr.open('GET', src);
                             xhr.send();
                         }
-                    });
+                        });
+                     }
                     defs.push(def.promise());
                 });
             } else {
-                if(!Utils.empty(data.imagesUrl)) {
-                    data.imagesUrl.forEach(function(imageUrl) {
-                        var element = DocenteDeberesEdit.Templates.ImageItem(imageUrl);
-                        $("#thumbnail-list").prepend(element.html);
-                        $(".deber-thumbnail > div > img").click(function() {
-                            PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
-                        });
-                    });
-                    $("#ons-list-images").show();
-                } else {
-                    $("#thumbnail-list").empty();
-                    if(!Utils.empty(data.imageIds)) {
-                        for(var i = 0; i < data.imageIds.length; i++) {
-                            var element = DocenteDeberesEdit.Templates.NoImgImageItem();
-                            $("#thumbnail-list").prepend(element.html);
-                            $("#ons-list-images").show();
-                        }
-                        $(".deber-noimg-thumbnail").click(function() {
-                            ons.notification.alert({
-                                message: 'Esta imágen no pudo ser mostrada debido a que no la tenés descargada. Conectate a internet para poder verla.',
-                                title: "Alerta",
-                                buttonLabels: ["Ok"]
-                            });
-                        });
-                    }
-                }
+                this.showImagesOffline(data);
             }
         }
 
-        $.when.apply($, defs).then(function() {
-            $(".deber-thumbnail > div > img").click(function() {
-                PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
-            });
 
-            if(Network.isOnline()) {
-                $("#ons-list-images").show();
-            }
-        });
+        if(!Utils.empty(defs)) {
+            $.when.apply($, defs).then(function() {
+                $(".deber-thumbnail > div > img").click(function() {
+                    PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
+                });
+
+                if(Network.isOnline()) {
+                    $("#ons-list-images").show();
+                }
+            });
+        }
+
         $("#table-grupos-asignados").hide();        
         $("#grupos-asignados").empty();
         if(Network.isOnline()) {
@@ -1468,10 +1561,12 @@ DocenteDeberesEdit = {
                 deberId: data.id
             }).done(function(response) {
                 var assignments = response.assignments;
+                 $("#grupos-asignados").empty();
+                LocalData.emptyAssignments(data.id);
                 for(var i = 0; i < assignments.length; i++) {
                     var assignment = assignments[i];
                     var grupo = LocalData.getGrupo(assignment.groupId);
-                    LocalData.assignGrupo(data.id, assignment.groupId);
+                    LocalData.assignGrupo(data.id, assignment.groupId, assignment.deadline);
                     $("#grupos-asignados").append("<tr><td>{0}</td><td>{1}</td></tr>".format(Sigma.toGroupName(grupo.grado, grupo.numero), Sigma.serverDateToLocal(assignment.deadline)));
 
                 }
@@ -1486,21 +1581,53 @@ DocenteDeberesEdit = {
                 $("#table-grupos-asignados").show();  
             });
         } else {
-            var assignments = LocalData.getAssignments(data.id);
-        
-            if(!Utils.empty(assignments)) {
-                for(var i = 0; i < assignments.length; i++) {
-                    var assignment = assignments[i];
-                    for(var j = 0; j < assignment.groupIds.length; j++) {
-                        var grupo = LocalData.getGrupo(assignment.groupIds[j]);
-                        $("#grupos-asignados").append("<tr><td>{0}</td><td>{1}</td></tr>".format(Sigma.toGroupName(grupo.grado, grupo.numero), assignment.deadline));
-                    }
-                }
-            } else {
-                $("#grupos-asignados").append("<tr><td colspan='2'>No existen grupos asignados.</td></tr>");      
-            }
-            $("#table-grupos-asignados").show();  
+            this.showAssignmentsOffline(data);
         }
+    },
+    showImagesOffline: function(data) {
+        if(!Utils.empty(data.imagesUrl)) {
+            data.imagesUrl.forEach(function(imageUrl) {
+                var element = DocenteDeberesEdit.Templates.ImageItem(imageUrl);
+                $("#thumbnail-list").prepend(element.html);
+                $(".deber-thumbnail > div > img").click(function() {
+                    PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
+                });
+            });
+            $("#ons-list-images").show();
+        } else {
+            $("#thumbnail-list").empty();
+            if(!Utils.empty(data.imageIds)) {
+                for(var i = 0; i < data.imageIds.length; i++) {
+                    var element = DocenteDeberesEdit.Templates.NoImgImageItem();
+                    $("#thumbnail-list").prepend(element.html);
+                    $("#ons-list-images").show();
+                }
+                $(".deber-noimg-thumbnail").click(function() {
+                    ons.notification.alert({
+                        message: 'Esta imágen no pudo ser mostrada debido a que no la tenés descargada. Conectate a internet para poder verla.',
+                        title: "Alerta",
+                        buttonLabels: ["Ok"]
+                    });
+                });
+            }
+        }
+    },
+    showAssignmentsOffline: function(data) {
+        var assignments = LocalData.getAssignments(data.id);
+        $("#grupos-asignados").empty();
+        
+        if(!Utils.empty(assignments)) {
+            for(var i = 0; i < assignments.length; i++) {
+                var assignment = assignments[i];
+                for(var j = 0; j < assignment.groupIds.length; j++) {
+                    var grupo = LocalData.getGrupo(assignment.groupIds[j]);
+                    $("#grupos-asignados").append("<tr><td>{0}</td><td>{1}</td></tr>".format(Sigma.toGroupName(grupo.grado, grupo.numero), assignment.deadline));
+                }
+            }
+        } else {
+            $("#grupos-asignados").append("<tr><td colspan='2'>No existen grupos asignados.</td></tr>");      
+        }
+        $("#table-grupos-asignados").show();  
     },
     goToAssignDeber: function() {
         Pages.docenteDeberesAssign(document.getElementById("nav").topPage.data.id);
@@ -1509,6 +1636,21 @@ DocenteDeberesEdit = {
 
     }
 };
+
+var initialized = false;
+document.addEventListener("init", function(e) {
+    if(e.target.matches("#docente-deberes-edit")) {
+        DocenteDeberesEdit.init();
+        initialized = true;
+    } 
+});
+
+document.addEventListener("show", function(e) {
+    if(e.target.matches("#docente-deberes-edit") && !initialized) {
+        DocenteDeberesEdit.init();
+    } 
+});
+
 
 DocenteDeberesAssign = {
     Templates: {
@@ -1558,9 +1700,14 @@ DocenteDeberesAssign = {
         $("#loading-modal-asignando-tarea").show();
         if(Network.isOnline()) {
             API.assignDeberToGroups(asignacion).done(function() {
-                Pages.docenteDeberesEdit(DocenteDeberesAssign.deber, true);
+                DocenteDeberesEdit.deber = LocalData.getDeber(deberId);
+                for(var i =0; i < groupIds.length; i++) {
+                    LocalData.assignGrupo(deberId, groupIds[i], deadline);
+                }
+                initialized = false;
+                Page.back();
             }).fail(function() {
-                ons.notification.toast('No se pudo asignar el deber.');  
+                ons.notification.toast('No se pudo asignar el deber.', {timeout:5000});  
             }).always(function() {
                 $("#loading-modal-asignando-tarea").hide();            
             });
@@ -1603,18 +1750,12 @@ Pages = {
     },
     docenteDeberesEdit: function(deber) {
         document.querySelector("#nav").pushPage("docente-deberes-edit.html", {
-            data: deber,
-            callback: function() {
-                DocenteDeberesEdit.init();
-            }
+            data: deber
         });
     },
     docenteDeberesEditAfterCreate: function(deber) {
         document.querySelector("#nav").replacePage("docente-deberes-edit.html", {
-            data: deber,
-            callback: function() {
-                DocenteDeberesEdit.init();
-            }
+            data: deber
         });
     },
     docenteDeberesAssign: function(deberId) {
@@ -1713,7 +1854,6 @@ Pages = {
     adscriptoEncuestas: function() {
         Page.pushPage('adscripto-encuestas.html', {
             callback: function() {
-                AdscriptoEncuestas.init();
             }
         });
     },
