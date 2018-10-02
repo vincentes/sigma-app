@@ -51,7 +51,7 @@ API.Configs.respondEncuestaEL = function(args) {
     return {
         "async": true,
         "crossDomain": true,
-        "url": "{0}/EncuestaGlobal/RespondUOPregunta".format(Sigma.baseUrl),
+        "url": "{0}/EncuestaGlobal/RespondELPregunta".format(Sigma.baseUrl),
         "method": "POST",
         "headers": {
             "Content-Type": "application/json",
@@ -124,6 +124,7 @@ AlumnoEncuestaRespond = {
     init: function() {
         this.respuestas = [];
         this.encuesta = document.getElementById("nav").topPage.data;
+        this.preguntaCounter = 0;
         $("#encuesta-titulo").text(this.encuesta.titulo);
         $("#alumno-encuesta-respond .page__background").css("background","#75ABBC");
         $("#el").hide();
@@ -165,10 +166,10 @@ AlumnoEncuestaRespond = {
                     return;
                 }
             } else {
-                AdscriptoEncuestaPregunta.toSendPregunta.opciones = [];
-                $("input[name=mo-opcion]:checked").each(function(i, obj) {
+                AlumnoEncuestaRespond.toSendPregunta.opciones = [];
+                $('input[id^="mo-option"]:checked').each(function(i, obj) {
                     var id = $(obj).attr('id');
-                    AdscriptoEncuestaPregunta.toSendPregunta.opciones.push(id.split('-')[2]);
+                    AlumnoEncuestaRespond.toSendPregunta.opciones.push(id.split('-')[2]);
                 });
                 if(Utils.empty(this.toSendPregunta.opciones)) {
                     ons.notification.confirm("¡No has elegido ninguna respuesta!", {
@@ -199,7 +200,6 @@ AlumnoEncuestaRespond = {
         } else {
             this.preguntaCounter++;
             this.showPregunta();
-            modal.hide();
         }
 
     },
@@ -222,6 +222,7 @@ AlumnoEncuestaRespond = {
             break;
             case 2:
             $("#uo").show();
+            $("#mo-respuestas").empty();
             $("#uo-respuestas").empty();
             for(var i = 0; i < pregunta.opciones.length; i++) {
                 $("#uo-respuestas").append('<ons-list-item tappable><label class="center">{1}</label><label class="left"><ons-radio name="uo-option" input-id="uo-option-{0}" class="uo-option"></ons-radio></label></ons-list-item>'.format(pregunta.opciones[i].id, pregunta.opciones[i].texto));

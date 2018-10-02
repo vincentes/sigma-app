@@ -11,8 +11,10 @@
             <ons-col style="width: 70px">
                 <label for="pregunta-texto-targ">Pregunta</label>
             </ons-col>
+        </ons-row>
+        <ons-row>
             <ons-col>
-                <ons-input class="pregunta" input-id="pregunta-texto-targ" id="pregunta-texto-i" placeholder="" width="80%"></ons-input>
+                <textarea class="pregunta" rows="2" input-id="pregunta-texto-targ" id="pregunta-texto-i" width="50%"></textarea>
             </ons-col>
         </ons-row>
         <ons-row style="margin-bottom:5px">
@@ -50,4 +52,53 @@
             </ons-button>
         </ons-row>
     </ons-card>
+
+    <div style="text-align: center">
+        <ons-list>
+            <ons-list-header>Configuración de los Beacon's</ons-list-header>
+            <ons-list-item>
+                <div class="center">
+                    Visualizar Beacons
+                </div>
+                <div class="right">
+                    <ons-switch id='swVerOcultarBeacons'></ons-switch>
+                </div>
+            </ons-list-item>
+            <ons-list-item id="modPos">
+                <div class="center">
+                    Modificar Posición
+                </div>
+                <div class="right">
+                    <ons-switch id='swMoverFijarBeacons'></ons-switch>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item>
+                <div class="center">
+                    <ons-button onclick="detenerScan()">Detener Escaneo</ons-button>
+                </div>
+                <div class="right">
+                    <ons-button onclick="scanOnsen()">Iniciar Escaneo</ons-button>
+                </div>
+                
+            </ons-list-item>
+            <ons-list-item>
+                <div class="center">
+                    <ons-button onclick="mapaControl()">Panel de control</ons-button>
+                </div>
+            </ons-list-item>
+            <ons-list-item>
+                <div class="center">
+                    <ons-button onclick="grabarPosiciones()">Grabar posiciones</ons-button>
+                </div>
+                <div class="right">
+                    <ons-button onclick="hideModal('beacons-config-modal')">Cerrar</ons-button>
+                </div>
+            </ons-list-item>
+
+        </ons-list>
+        <p style="margin-top: 30px;">
+
+        </p>
+    </div>
 </ons-page>

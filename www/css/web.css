@@ -131,6 +131,10 @@ ons-page {
     background: #fff;
 }
 
+.fill-page .page__background {
+    background: #fff;
+}
+
 .blue-background .page__background {
     background: #75ABBC !important;
 }
@@ -157,4 +161,30 @@ ons-page {
     padding: 5%;
     font-size: 20px;
     border-bottom: 1px #fff;
+}
+
+.ct-slice.pie {
+
+}
+
+.ct-label {
+    font-size: 15px !important;
+}
+
+.adj-deber-item {
+    display: inline;
+    margin-right: 10px;
+    border-radius: 5px;
+    border-color: black;
+    border-width: 1px;
+    color: white !important;
+    background-color: black;
+    min-width: 20px !important;
+    vertical-align: middle;
+    padding: 5px 5px 5px 5px;
+    text-align: center;
+}
+
+.big-alerta {
+    font-size: 40px;
 }

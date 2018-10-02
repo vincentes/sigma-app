@@ -6,6 +6,9 @@ var Request = {
 
 var Network = {
     online: false,
+    callback: function() {
+
+    },
     setOnline: function() {
         Network.online = true;
     },
@@ -18,18 +21,29 @@ var Network = {
     isConnected: function() {
         return $.ajax({
             url:"http://www.google.com/blank.html",
-            timeout: 1000,
+            timeout: 5000,
             type: "GET",
             cache: false
         });
     },
     updateConnection: function(callback) {  
+        if(!Utils.empty(callback)) {
+            this.callback = callback;
+        } else {
+            return;
+        }
         Network.isConnected().done(function() {
             Network.setOnline();
             LocalData.sync();
         }).fail(function() {
             Network.setOffline();  
         }).always(function() {
+            if(!Utils.empty(Network.callback)) {
+                Network.callback();
+            } else {
+                return;
+            }
+            
             var online = Network.isOnline();
             if(online) {
                 $("#modo-sin-internet").css("visibility", "hidden");
@@ -56,7 +70,7 @@ document.addEventListener('deviceready', function() {
 
     setInterval(function(){ 
         Network.updateConnection(); 
-    }, 1000);
+    });
 }, false);
 
 // Local Storage
@@ -67,6 +81,7 @@ LocalData = {
     images: [],
     responses: [],
     escritos: [],
+    devEnabled: false,
     queueName: "sigma_sync",
     queue: [],
     xhrQueue: [],
@@ -100,6 +115,11 @@ LocalData = {
         }
         
         this.resetXhrQueue();
+    },
+    setDeberes: function(deberes) {
+        this.deberes = deberes;
+
+        window.localStorage.setItem("sigma_user_deberes", JSON.stringify(this.deberes));
     },
     setEncuestas: function(encuestas) {
         this.encuestas = encuestas;
@@ -165,6 +185,7 @@ LocalData = {
     emptyQueue: function() {
         this.queue = [];
         this.xhrQueue = [];
+        this.saveQueue();
     },
     addToQueue: function(method, args) {
         var _args = {
@@ -240,16 +261,44 @@ LocalData = {
             this.addToQueue("xhrSaveImages", images);
         }
     },
+    logout: function() {
+        this.user = null;
+        this.deberes = [];
+        this.encuestas = [];
+        this.images = [];
+        this.responses = [];
+        this.parciales = [];
+        window.localStorage.setItem("sigma_user", JSON.stringify(this.user));
+        window.localStorage.setItem("sigma_user_images", JSON.stringify(this.images));
+        window.localStorage.setItem("sigma_user_deberes", JSON.stringify(this.deberes));
+        window.localStorage.setItem("sigma_activities_encuestas", JSON.stringify(this.encuestas));
+        window.localStorage.setItem("sigma_activities_responses", JSON.stringify(this.responses));
+        window.localStorage.setItem("sigma_activities_parciales", JSON.stringify(this.parciales));
+    },
     isAssigned: function(deber, grupoId) {
-        for(var j= 0; deber.assignments.length; j++) {
-            var a = deber.assignments[j]
-            if(a.grupo.id == grupoId) {
-                return true;
+        for(var j= 0; j < deber.assignments.length; j++) {
+            var a = deber.assignments[j];
+            if(a == null) {
+                continue;
+            }
+            
+            if(a.groups != null) {
+                for(var x =0; x < a.groups.length; x++) {
+                    if(a.groups[x].id == grupoId) {
+                        return true;
+                    }
+                }
+            } else if(a.groupIds != null) {
+                for(var x = 0; x < a.groupIds.length; x++) {
+                    if(a.groupIds[x] == grupoId) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
     },
-    emptyAssignments(deberId) {
+    emptyAssignments: function(deberId) {
         for(var i = 0; i < this.deberes.length; i++) {
             var deber = this.deberes[i];
             if(deber.id === deberId) {
@@ -258,6 +307,20 @@ LocalData = {
         }
 
         this.saveDeberes();
+    },
+    saveItem: function(name, obj) {
+        window.localStorage.setItem(name, obj);
+    },
+    getItem: function(name) {
+        return window.localStorage.getItem(name);
+    },
+    enableDev: function() {
+        this.devEnabled = true;
+        this.saveItem("devEnabled", this.devEnabled);
+    },
+    disableDev: function() {
+        this.devEnabled = false;
+        this.saveItem("devEnabled", this.devEnabled);
     },
     assignGrupo: function(deberId, grupoId, fecha) {
         for(var i = 0; i < this.deberes.length; i++) {
@@ -297,9 +360,9 @@ LocalData = {
         return null;
     },   
     getEncuesta: function(encuestaId) {
-        for(var i = 0; i < LocalData.encuesta.length; i++) {
-            var encuesta = LocalData.encuesta[i];
-            if(encuesta.id == deberId) {
+        for(var i = 0; i < LocalData.encuestas.length; i++) {
+            var encuesta = LocalData.encuestas[i];
+            if(encuesta.id == encuestaId) {
                 return encuesta;
             }
         }
@@ -424,7 +487,7 @@ LocalData = {
         if(!Utils.empty(lsAlerta)) {
             LocalData.alerta = lsAlerta;
         }
-        
+
         var sp = window.localStorage.getItem("sigma_config_productionServerEnabled");
         if(sp != null) {
             var lsServerProduction = JSON.parse(sp.toLowerCase());
@@ -432,6 +495,11 @@ LocalData = {
                 LocalData.productionServerEnabled = lsServerProduction;
                 Sigma.useProductionServer(lsServerProduction); 
             }
+        }
+
+        var lsDevEnabled = this.getItem("devEnabled");
+        if(!Utils.empty(lsDevEnabled)) {
+            this.devEnabled = JSON.parse(lsDevEnabled);
         }
     }
 }

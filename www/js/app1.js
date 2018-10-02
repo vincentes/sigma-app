@@ -764,10 +764,10 @@ function trilateracion() {
 
         if (p4 !== null) {
             if (p4 instanceof Array) {
-                alertarOns("Atención:", "Sin Refact");
+                console.log("Atención: - Sin Refact");
                 dibujarRadioPosicion2(p4[0].posX, p4[0].posY, ((a.radio / 2) * escala), false);
             } else {
-                alertarOns("Atención:", "Sin Refact único");
+                console.log("Atención: - Sin Refact único");
                 dibujarRadioPosicion2(p4.posX, p4.posY, ((a.radio / 2) * escala), false);
             }
         } else {
@@ -807,17 +807,17 @@ function trilateracion() {
             p4 = trilaterate(a, b, c);
             if (p4 !== null) {
                 if (p4 instanceof Array) {
-                    alertarOns("Atención:", "Refact array");
+                    console.log("Atención: - Refact array");
                     dibujarRadioPosicion2(p4[0].posX, p4[0].posY, (((dif * 2 + dif2 * 2) / 2) * escala), false);
                     //console.log("R2 Dif:"+dif + ", Dif2:"+dif2);
                 } else {
-                    alertarOns("Atención:", "Refact único");
+                    console.log("Atención: - Refact único");
                     dibujarRadioPosicion2(p4.posX, p4.posY, (((dif * 2 + dif2 * 2) / 2) * escala), false);
                 }
             } else {
                 a.radio = aRadioOriginal;
                 b.radio = bRadioOriginal;
-                alertarOns("Fallo en trilat:", "Llamando a Bilateración");
+                console.log("Fallo en trilat: - Llamando a Bilateración");
                 bilateracion();
 
 

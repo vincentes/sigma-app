@@ -1,5 +1,5 @@
 <ons-page id="mapa">
-    
+
     <ons-toolbar>
         <div class="left">
             <ons-button modifier="light" onclick="document.querySelector('#nav').popPage()">Volver</ons-button>
@@ -12,15 +12,16 @@
         </div>
              -->
 
-       
+
 
     </ons-toolbar>
-
+    <!--
     <ons-fab position="bottom left" onclick="mapaControl()">
         <ons-icon icon="ion-navicon, material:md-menu"></ons-icon>
 
     </ons-fab>
-    <ons-fab position="bottom center" onclick="showModal('beacons-config-modal')">
+-->
+    <ons-fab position="bottom left" onclick="showModal('beacons-config-modal')" id="beaconConfigFab">
         <ons-icon icon="fa-cog"></ons-icon>
 
     </ons-fab>
@@ -34,11 +35,20 @@
 
                 // mapSetup();
                 //var physicalScreenHeight = window.screen.height * window.devicePixelRatio;
-                
+
                 scanSetup();
                 controlMapaSetup(false);
                 //comoLlegar("ssSalonGremial", "ssSalon33", true);
                 //rutaMasCorta("ssSalonGremial");
+                //Ocultamos el fab de configuración salvo que el rol sea Adscripto
+
+                $('#beaconConfigFab').hide();
+
+                if (LocalData.devEnabled) {
+                    $('#beaconConfigFab').show();
+                }
+
+
                 verOcultarBeacons(false);
                 if (centrarMapa) {
                     actDesCentrarMapa(true);
@@ -48,7 +58,7 @@
                 try {
                     document.getElementById('swVerOcultarBeacons').addEventListener('change', function () { verOcultarBeacons(document.getElementById("swVerOcultarBeacons").checked); });
                     document.getElementById('swMoverFijarBeacons').addEventListener('change', function () { moverBloquearBeacons(document.getElementById("swMoverFijarBeacons").checked); });
-                    //Igual al del main pero alreves sólo para cambiar el color del botoón
+                    //Igual al del main pero alreves sólo para cambiar el color del botón
 
                 }
                 catch{
@@ -63,7 +73,7 @@
         }, false);
 
         //document.addEventListener("beforeunload", function (event) { alert("Todo Joya"); },false);
-        
+
        // document.addEventListener("backbutton", function (event) { hideModal('beacons-config-modal'); }, false);
 
     </script>
@@ -72,15 +82,15 @@
 
 
     <ons-card style="margin: 5px;">
-        <div style="text-align: center;" >
+        <div style="text-align: center;">
             <div id="map"></div>
-            
+
             <p id="pInfo" style="margin-top: 5px;">Calculando posición</p>
-            
+
         </div>
 
     </ons-card>
-<!--
+    <!--
 
 
     <ons-card style="margin: 5px;">
@@ -103,8 +113,8 @@
             <div id="result"></div>
 -->
 
-        </div>
-    
+    </div>
+
     </ons-card>
     <ons-modal direction="up" id="beacons-config-modal">
         <div style="text-align: center">
@@ -133,6 +143,12 @@
                     </div>
                     <div class="right">
                         <ons-button onclick="scanOnsen()">Iniciar Escaneo</ons-button>
+                    </div>
+                   
+                </ons-list-item>
+                <ons-list-item>
+                    <div class="center">
+                        <ons-button onclick="mapaControl()">Panel de control</ons-button>
                     </div>
                 </ons-list-item>
                 <ons-list-item>

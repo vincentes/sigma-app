@@ -1,24 +1,26 @@
 <ons-page id="login">
     <ons-toolbar>
-        <div class="center">Sigma</div>
+        <div class="center" onclick="Login.devClick()">
+            Sigma
+        </div>
     </ons-toolbar>
     <ons-card class="card-fluid">
         <div style="text-align: center; margin: 0 auto; top: 50%">
             <h2 style="margin-bottom: 15px;">Iniciar sesión</h2>
             <p>
-                <ons-input id="cedula" modifier="underbar" placeholder="Cédula" value="2123" float style="margin-bottom: 15px;"></ons-input>
+                <ons-input id="cedula" modifier="underbar" placeholder="Cédula" float style="margin-bottom: 15px;"></ons-input>
             </p>
             <p>
-                <ons-input id="password" modifier="underbar" type="password" value="S526!pp" placeholder="Contraseña" float></ons-input>
+                <ons-input id="password" modifier="underbar" type="password" placeholder="Contraseña" float></ons-input>
             </p>
             <p style="margin-top: 15px;">
                 <ons-button onclick="Login.submit()" id="login-button">Iniciar sesión</ons-button>
             </p>
-            <ons-list>
-                <ons-list-header>Servidor</ons-list-header>
+            <ons-list id="dev-options" hidden>
+                <ons-list-header>Opciones de desarrollo</ons-list-header>
                 <ons-list-item>
                   <div class="center">
-                    Testing
+                    Usar servidor de testing
                   </div>
                   <div class="right">
                     <ons-switch id="testing-enabled"></ons-switch>

@@ -25,8 +25,10 @@ function navBack(e) {
             AdscriptoEncuestaCreate.confirmExit();
         }
         e.preventDefault();
-    }
-    else {
+    } else if(nav.topPage.id === 'docente-deberes-edit') {
+        DocenteDeberes.init();
+        nav.popPage();
+    } else {
         nav.popPage();
     }
 }
@@ -39,39 +41,75 @@ document.addEventListener('init', function(event) {
     if(event.target.matches('#alumno-deberes')) {
         Alumno.deberes = [];
         $("#alumno-deberes-spinner").show();
-        Sigma.getAssignedDeberes({
-            success: function(data) {
-              $("#alumno-deberes-spinner").hide();
-              Alumno.deberes = data.deberes;
-              if(Utils.empty(data.deberes)) {
-                  var deberes = '<ons-list-item>No tenés ningún deber asignado</ons-list-item>';
-                  $("#deberes-list").append(deberes);
-              }
-              data.deberes.forEach(function(deber) {
+        Network.updateConnection(function() {
+            if(Network.isOnline()) {
+                Sigma.getAssignedDeberes({
+                    success: function(data) {
+                      $("#alumno-deberes-spinner").hide();
+                      Alumno.deberes = data.deberes;
+                      LocalData.saveDeberes(data.deberes);
+                      $("#deberes-list").empty();
+                      if(Utils.empty(data.deberes)) {
+                          var deberes = '<ons-list-item>No tenés ningún deber asignado.</ons-list-item>';
+                          $("#deberes-list").append(deberes);
+                      }
+                      data.deberes.forEach(function(deber) {
+                        var deberes = "";
+                        deberes += ('<ons-list-item id="tarea-{1}" modifier="chevron" tappable>{0}</ons-list-item>'.format(deber.contenido, deber.id));
+                        
+                        $("#deberes-list").append(deberes);
+                        $("#tarea-" + deber.id).click(function(evt) {
+                          var elementId = jQuery(this).attr("id");
+                          var tokens = elementId.split("-");
+                          var tareaId = tokens[1];
+                          var tarea = null;
+                          for(var j = 0; j < Alumno.deberes.length; j++) {
+                            if(Alumno.deberes[j].id == tareaId) {
+                              tarea = Alumno.deberes[j];
+                            }
+                          }
+                
+                          document.querySelector("#nav").pushPage("alumno-view-deber.html", {
+                            data: tarea
+                          });
+                        });
+                      });
+                    },
+                    error: function(data) {
+          
+                    }  
+                });
+            } else {
+                $("#alumno-deberes-spinner").hide();
+                Alumno.deberes = LocalData.getDeberes();
+                $("#deberes-list").empty();
+                if(Utils.empty(Alumno.deberes)) {
+                    var deberes = '<ons-list-item>No tenés ningún deber asignado.</ons-list-item>';
+                    $("#deberes-list").append(deberes);
+                }
+                Alumno.deberes.forEach(function(deber) {
                 var deberes = "";
                 deberes += ('<ons-list-item id="tarea-{1}" modifier="chevron" tappable>{0}</ons-list-item>'.format(deber.contenido, deber.id));
                 
                 $("#deberes-list").append(deberes);
                 $("#tarea-" + deber.id).click(function(evt) {
-                  var elementId = jQuery(this).attr("id");
-                  var tokens = elementId.split("-");
-                  var tareaId = tokens[1];
-                  var tarea = null;
-                  for(var j = 0; j < Alumno.deberes.length; j++) {
+                    var elementId = jQuery(this).attr("id");
+                    var tokens = elementId.split("-");
+                    var tareaId = tokens[1];
+                    var tarea = null;
+                    for(var j = 0; j < Alumno.deberes.length; j++) {
                     if(Alumno.deberes[j].id == tareaId) {
-                      tarea = Alumno.deberes[j];
+                        tarea = Alumno.deberes[j];
                     }
-                  }
+                    }
         
-                  document.querySelector("#nav").pushPage("alumno-view-deber.html", {
+                    document.querySelector("#nav").pushPage("alumno-view-deber.html", {
                     data: tarea
-                  });
+                    });
                 });
-              });
-            },
-            error: function(data) {
-  
-            }  
+                });
+            }
+
         });
     } else if(event.target.matches('#login')) {
         if(LocalData.user != null) {
@@ -97,41 +135,46 @@ document.addEventListener('init', function(event) {
     } else if(event.target.matches('#alumno-view-deber')) {
         var data = document.getElementById("nav").topPage.data;
         var defs = [];
+        $("#thumbnail-list-c").show();
         $("#info-deber-consigna").text(data.contenido);
-        data.imageIds.forEach(function(imageId) {
-            var def = $.Deferred();
-            Sigma.downloadImages({
-                imageId: imageId,
-                success: function(src) {
-                    var xhr = new XMLHttpRequest;
-                    xhr.responseType = 'blob';
-
-                    xhr.onload = function() {
-                        var recoveredBlob = xhr.response;
-
-                        var reader = new FileReader;
-
-                        reader.onload = function() {
-                            var blobAsDataUrl = reader.result;
-                            $("#thumbnail-list").prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(blobAsDataUrl));
-                            def.resolve();
+        if(!Utils.empty(data.imageIds)) {
+            data.imageIds.forEach(function(imageId) {
+                var def = $.Deferred();
+                Sigma.downloadImages({
+                    imageId: imageId,
+                    success: function(src) {
+                        var xhr = new XMLHttpRequest;
+                        xhr.responseType = 'blob';
+    
+                        xhr.onload = function() {
+                            var recoveredBlob = xhr.response;
+    
+                            var reader = new FileReader;
+    
+                            reader.onload = function() {
+                                var blobAsDataUrl = reader.result;
+                                $("#thumbnail-list").prepend('<div class="thumbnail deber-thumbnail"><img class="deber-image" src="{0}"></img><ons-ripple><ons-ripple></div>'.format(blobAsDataUrl));
+                                def.resolve();
+                            };
+    
+                            reader.readAsDataURL(recoveredBlob);
                         };
-
-                        reader.readAsDataURL(recoveredBlob);
-                    };
-
-                    xhr.open('GET', src);
-                    xhr.send();
-                }
+    
+                        xhr.open('GET', src);
+                        xhr.send();
+                    }
+                });
+                defs.push(def.promise());
             });
-            defs.push(def.promise());
-        });
-
-        $.when.apply($, defs).then(function() {
-            $(".deber-thumbnail img").click(function() {
-                PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
+    
+            $.when.apply($, defs).then(function() {
+                $(".deber-thumbnail img").click(function() {
+                    PhotoViewer.show($(this).attr('src'), 'Imagen asociada');
+                });
             });
-        });
+        } else {
+            $("#thumbnail-list-c").hide();
+        }
     } else if(event.target.matches('#docente-deberes-assign')) {
 
     }

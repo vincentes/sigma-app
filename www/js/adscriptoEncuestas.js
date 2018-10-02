@@ -223,6 +223,12 @@ AdscriptoEncuestaPregunta = {
     }
 };
 
+document.addEventListener("init", function(e) {
+    if(e.target.matches("adscripto-encuesta-stats")) {
+        AdscriptoEncuestaStats.init();
+    }
+});
+
 AdscriptoEncuestaStats = {
     Templates: {
         PreguntaItem: function(args) {
@@ -231,25 +237,74 @@ AdscriptoEncuestaStats = {
                 id: id,
                 html: '<ons-list-item id="{0}">{1}</ons-list-item>'.format(id, args.texto)
             };
+        },
+        StatsEL: function(args) {
+            var id = 'pregunta-chart-' + args.id;
+            return {
+                id: id,
+                html: '<ons-card> <div class="title"> <h1 id="s-texto">{1}</h1> </div><div class="content">{2} respuestas<ons-list id="{0}"><ons-list-header>Respuestas</ons-list-header></ons-list></div> </ons-card>'.format(id, args.texto, args.respuestas)
+            };
+        },
+        Stats: function(args) {
+            var id = 'pregunta-chart-' + args.id;
+            return {
+                id: id,
+                html: '<ons-card> <div class="title"> <h1 id="s-texto">{1}</h1> </div><div class="content">{2} respuestas<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Opcion</th><th>Cantidad respuestas</th></tr></thead><tbody id="{0}"></tbody></div></div> </ons-card>'.format(id, args.texto, args.respuestas)
+            };
         }
     },
     encuesta: {
         preguntas: []
     },
     init: function() {
-        var encuesta = document.getElementById("nav").topPage.data;
-        this.encuesta = encuesta;
+        var encuesta = document.getElementById("nav").topPage.data.id;
+        this.encuesta = LocalData.getEncuesta(encuesta);
+        
+        $("#cont").empty();
+        for(var a = 0; a < this.encuesta.preguntas.length; a++) {
+            this.data = [
+                                    
+            ];
+        
+             if(this.encuesta.preguntas[a].tipo !== 0) {
+                for(var i = 0; i < this.encuesta.preguntas[a].opciones.length; i++) {
+                    this.data.push({
+                        label: this.encuesta.preguntas[a].opciones[i].texto,
+                        value: this.encuesta.preguntas[a].opciones[i].respuestas
+                    });
+                }
 
-        if(Network.isOnline()) {
-            API.getEncuesta({
-                id: encuesta.id
-            }).done(function(encuesta) {
-                AdscriptoEncuestaStats.encuesta = encuesta;
-            }).fail(function() {
-                ons.notification.toast("No se pudo actualizar los resultados de la encuesta.", { timeout: 5000 });
-            }).always(function() {
-                
-            });
+                var chartLabels = [];
+                var chartValues = [];
+                for(var i = 0; i < this.data.length; i++) {
+                    chartLabels.push(this.data[i].label);
+                    chartValues.push(this.data[i].value);
+                }
+    
+                var e = AdscriptoEncuestaStats.Templates.Stats({
+                    id: this.encuesta.preguntas[a].id,
+                    texto: this.encuesta.preguntas[a].texto
+                });
+    
+                $("#cont").append(e.html);
+                for(var i =0; i < chartLabels.length; i++) {
+                    $("#" + e.id).append("<tr><td>{0}</td><td>{1}</td></tr>".format(chartLabels[i], chartValues[i]));
+                }
+            } else {
+                var e = AdscriptoEncuestaStats.Templates.StatsEL({
+                    id: this.encuesta.preguntas[a].id,
+                    texto: this.encuesta.preguntas[a].texto
+                });
+
+                $("#cont").append(e.html);
+                for(var i =0; i < this.encuesta.preguntas[a].respuestas.length; i++) {
+                    var r = this.encuesta.preguntas[a].respuestas[i];
+                    $("#" + e.id).append("<ons-list-item>{0}</ons-list-item>".format(r.texto));
+                }
+            }
+ 
+
+            
         }
     },
     display: function() {
@@ -274,7 +329,7 @@ AdscriptoEncuestas = {
     Templates: {
         EncuestaCard: function(args) {
             return {
-                html: '<ons-card> <div class="title"> <div>{0}</div></div> <div class="content"> <p>{1}</p> <ons-button modifier="quiet" onclick="Pages.adscriptoEncuestaStats()">Ver respuestas</ons-button></div> </ons-card>'.format(args.titulo, args.descripcion)
+                html: '<ons-card> <div class="title"> <div>{0}</div></div> <div class="content"> <p>{1}</p> <ons-button modifier="quiet" onclick="AdscriptoEncuestas.adscriptoEncuestaStats({2})">Ver respuestas</ons-button></div> </ons-card>'.format(args.titulo, args.descripcion, args.id)
             };
         },
         NoneEncuestaCard: function() {
@@ -305,6 +360,9 @@ AdscriptoEncuestas = {
             this.display();
             spinner.hide();
         }
+    },
+    adscriptoEncuestaStats: function(id) {
+        Pages.adscriptoEncuestaStats(id);
     },
     display: function() {
         var encuestas = this.encuestas;

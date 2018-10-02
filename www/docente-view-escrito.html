@@ -1,4 +1,4 @@
-<ons-page id="docente-view-escrito">
+<ons-page id="docente-view-escrito" class="blue-background">
     <ons-toolbar>
         <div class="left">
             <ons-back-button>Atrás</ons-back-button>
@@ -6,15 +6,9 @@
         <div class="center">Información de escrito</div>
     </ons-toolbar>
     
-    <ons-card class="card-fluid">
-        <ons-row>
-            <ons-col width="18px">
-                <ion-icon name="text"></ion-icon>
-            </ons-col>
-            <ons-col>
-                <label for="docente-view-escrito-temas">Temas</label>
-            </ons-col>
-        </ons-row>
+    <ons-card>
+        <i class="fas fa-comment"></i>
+        <label for="docente-view-escrito-temas">Temas</label>
         <ons-row>
             <ons-col>
                 <p id="docente-view-escrito-temas"></p>
@@ -23,7 +17,7 @@
         <ons-row>
             <div>
                 <br />
-                <ons-list-header>Grupos asignados</ons-list-header>
+                <ons-list-header><i class="fas fa-users" style="margin-right: 4px"></i>Grupos asignados</ons-list-header>
                 <ons-list id="docente-view-escrito-grupos">
                 </ons-list>
             </div>

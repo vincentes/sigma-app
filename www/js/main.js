@@ -194,7 +194,6 @@ Sigma = {
     var options = Sigma.setOptions(srcType);
 
     navigator.camera.getPicture(fn, function cameraError(error) {
-      ons.notification.toast("La imagen no pudo ser registrada." + error, { timeout: 5000 });
     }, options);
   },
   openFilePicker: function(fn) {
@@ -202,7 +201,6 @@ Sigma = {
     var options = Sigma.setOptions(srcType);
 
     navigator.camera.getPicture(fn, function cameraError(error) {
-        ons.notification.toast("La imagen no pudo ser registrada.", { timeout: 5000 });
     }, options);
   },
   saveFCMToken: function(success, error) {
@@ -220,15 +218,12 @@ Sigma = {
         "processData": false,
         "data": '{"Token": "{0}"}'.format(token),
         "success": function (response) {
-          ons.notification.toast('FCM token saved.', { timeout: 2000 });
           success(response);
         },
         "error": function (response) {
           if(response.status) {
-            ons.notification.toast('FCM token save skipped.', { timeout: 2000 });
             success(response);
           } else {
-            ons.notification.toast('Error: FCM token not saved.', { timeout: 2000 });
             error(response);
           }
         }
@@ -465,6 +460,7 @@ function logout() {
           
         });
         Sigma.removeToken();
+        LocalData.logout();
         LocalData.emptyQueue();
         Page.replacePage('login.html', {
           animation: 'fade'
@@ -610,7 +606,7 @@ function scanOnsen() {
         WifiWizard.startScan(scanOK, scanFail);
       }, 5000);
     } else {
-      alertarOns("Atención", "Ya se inició el scan");
+      console.log("Atención - Ya se inició el scan");
     }
 
   }
@@ -624,7 +620,7 @@ function detenerScan() {
     clearTimeout(periodoScan);
     periodoScan = null;
   } else {
-    alertarOns("Atención", "Ya se detuvo el scan");
+    console.log("Atención - Ya se detuvo el scan");
   }
 }
 

@@ -1,4 +1,4 @@
-<ons-page id="docente-view-parcial">
+<ons-page id="docente-view-parcial" class="blue-background">
     <ons-toolbar>
         <div class="left">
             <ons-back-button>Atrás</ons-back-button>
@@ -6,24 +6,13 @@
         <div class="center">Información de parcial</div>
     </ons-toolbar>
     
-    <ons-card class="card-fluid">
-        <ons-row>
-            <ons-col width="18px">
-                <ion-icon name="text"></ion-icon>
-            </ons-col>
-            <ons-col>
-                <label for="docente-view-parcial-temas">Temas</label>
-            </ons-col>
-        </ons-row>
-        <ons-row>
-            <ons-col>
-                <p id="docente-view-parcial-temas"></p>
-            </ons-col>
-        </ons-row>
+    <ons-card>
+        <label for="docente-view-parcial-temas"><i class="fas fa-comment" style="margin-right: 4px"></i>Temas</label>
+        <p id="docente-view-parcial-temas" style="margin-right: 4px"></p>
         <ons-row>
             <div>
                 <br />
-                <ons-list-header>Grupos asignados</ons-list-header>
+                <ons-list-header><i class="fas fa-users" style="margin-right: 4px"></i>Grupos asignados</ons-list-header>
                 <ons-list id="docente-view-parcial-grupos">
                 </ons-list>
             </div>
