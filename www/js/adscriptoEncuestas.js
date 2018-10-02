@@ -249,7 +249,7 @@ AdscriptoEncuestaStats = {
             var id = 'pregunta-chart-' + args.id;
             return {
                 id: id,
-                html: '<ons-card> <div class="title"> <h1 id="s-texto">{1}</h1> </div><div class="content">{2} respuestas<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Opcion</th><th>Cantidad respuestas</th></tr></thead><tbody id="{0}"></tbody></div></div> </ons-card>'.format(id, args.texto, args.respuestas)
+                html: '<ons-card> <div class="title"> <h1 id="s-texto">{1}</h1> </div><div class="content"><div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Opcion</th><th>Cantidad respuestas</th></tr></thead><tbody id="{0}"></tbody></div></div> </ons-card>'.format(id, args.texto, args.respuestas)
             };
         }
     },
