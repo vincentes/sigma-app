@@ -88,7 +88,8 @@ var plano = {
             "properties": {
                 "NAME": "Salón 33",
                 "TIPO": "salon",
-                "ALIAS": "ssSalon33"
+                "ALIAS": "ssSalon33",
+                "LABEL": "S33"
             }
         },
         {
@@ -108,7 +109,8 @@ var plano = {
             "properties": {
                 "NAME": "Salón 32",
                 "TIPO": "salon",
-                "ALIAS": "ssSalon32"
+                "ALIAS": "ssSalon32",
+                "LABEL": "S32"
             }
         },
         {
@@ -128,7 +130,8 @@ var plano = {
             "properties": {
                 "NAME": "Salón 31",
                 "TIPO": "salon",
-                "ALIAS": "ssSalon31"
+                "ALIAS": "ssSalon31",
+                "LABEL": "S31"
             }
         },
         {
@@ -148,7 +151,8 @@ var plano = {
             "properties": {
                 "NAME": "Salón 30",
                 "TIPO": "salon",
-                "ALIAS": "ssSalon30"
+                "ALIAS": "ssSalon30",
+                "LABEL": "S30"
             }
         },
         {
@@ -168,7 +172,8 @@ var plano = {
             "properties": {
                 "NAME": "Salón 29",
                 "TIPO": "salon",
-                "ALIAS": "ssSalon29"
+                "ALIAS": "ssSalon29",
+                "LABEL": "S29"
             }
         },
         {
@@ -188,7 +193,8 @@ var plano = {
             "properties": {
                 "NAME": "Salón 28",
                 "TIPO": "salon",
-                "ALIAS": "ssSalon28"
+                "ALIAS": "ssSalon28",
+                "LABEL": "S28"
             }
         },
         {
@@ -208,7 +214,8 @@ var plano = {
             "properties": {
                 "NAME": "Salón Gremial",
                 "TIPO": "salon",
-                "ALIAS": "ssSalonGremial"
+                "ALIAS": "ssSalonGremial",
+                "LABEL": "SGr"
             }
         },
         {
@@ -232,7 +239,8 @@ var plano = {
             "properties": {
                 "NAME": "Gimnasio",
                 "TIPO": "gimnasio",
-                "ALIAS": "ssGimCan"
+                "ALIAS": "ssGimCan",
+                "LABEL": "Gimnasio"
             }
         },
         {
@@ -259,7 +267,8 @@ var plano = {
             "properties": {
                 "NAME": "Baño de Damas",
                 "TIPO": "banio",
-                "ALIAS": "ssBanDam"
+                "ALIAS": "ssBanDam",
+                "LABEL": "Ban.<br>Dam."
             }
         },
         {
@@ -286,7 +295,8 @@ var plano = {
             "properties": {
                 "NAME": "Baño de Caballeros",
                 "TIPO": "banio",
-                "ALIAS": "ssBanCab"
+                "ALIAS": "ssBanCab",
+                "LABEL": "Ban.<br>Cab."
             }
         },
         {
@@ -306,7 +316,8 @@ var plano = {
             "properties": {
                 "NAME": "Laboratorio de Física",
                 "TIPO": "lab",
-                "ALIAS": "ssLabFis"
+                "ALIAS": "ssLabFis",
+                "LABEL": "Lab.<br>Fis."
             }
         },
         {
@@ -326,7 +337,8 @@ var plano = {
             "properties": {
                 "NAME": "Laboratorio de Física 2",
                 "TIPO": "lab",
-                "ALIAS": "ssLabFis2"
+                "ALIAS": "ssLabFis2",
+                "LABEL": "Lab.<br>Fis2"
             }
         },
         {
@@ -353,7 +365,8 @@ var plano = {
             "properties": {
                 "NAME": "Adscripción",
                 "TIPO": "admin",
-                "ALIAS": "ssAds"
+                "ALIAS": "ssAds",
+                "LABEL": "Ads"
             }
         },
         {
@@ -378,7 +391,8 @@ var plano = {
             "properties": {
                 "NAME": "Cantina",
                 "TIPO": "cantina",
-                "ALIAS": "ssCantina"
+                "ALIAS": "ssCantina",
+                "LABEL": "Cant"
             }
         },
         {
@@ -398,7 +412,8 @@ var plano = {
             "properties": {
                 "NAME": "Comedor",
                 "TIPO": "comedor",
-                "ALIAS": "ssComedor"
+                "ALIAS": "ssComedor",
+                "LABEL": "Com."
             }
         },
         {
@@ -418,7 +433,8 @@ var plano = {
             "properties": {
                 "NAME": "Comedor 2",
                 "TIPO": "comedor",
-                "ALIAS": "ssComedor2"
+                "ALIAS": "ssComedor2",
+                "LABEL": "Com2"
             }
         },
         //////////////////////////////////////////////////////////////////////////////////////////

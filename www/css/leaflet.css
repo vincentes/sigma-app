@@ -9,6 +9,7 @@
 .leaflet-pane > canvas,
 .leaflet-zoom-box,
 .leaflet-image-layer,
+
 .leaflet-layer {
 	position: absolute;
 	left: 0;
@@ -245,7 +246,12 @@
 /* visual tweaks */
 
 .leaflet-container {
+
+	/*
 	background: #ddd;
+	*/
+	background: #bebebe;
+
 	outline: 0;
 	}
 .leaflet-container a {
@@ -635,8 +641,20 @@
 	border-right-color: #fff;
 	}
 
+	
+
+	.leaflet-tooltip.my-labels {
+		background-color: transparent;
+		border: transparent;
+		box-shadow: none;
+		font-weight: bold;
+		font-size: 10px;
+		}
+	  
+
 	#map {
 		width: 100%;
-		height: 518px;
+		height: 510px;
 	}
+
 	

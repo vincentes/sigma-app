@@ -39,7 +39,7 @@ function scanSetup() {
         dbInsertBeacon("SG000001AAAA0002", 1280, 1560, "SS", "Beacon 2");
         dbInsertBeacon("SG000001AAAA0003", 1395, 1740, "SS", "Beacon 3");
         dbInsertBeacon("Bermudez", 1390, 1575, "SS", "Beacon 4");
-        dbInsertBeacon("Wifi-ORT", 1280, 1835, "SS", "Beacon 5");
+        dbInsertBeacon("Otro", 1280, 1835, "SS", "Beacon 5");
         dbInsertBeacon("Ceibal", 1300, 1670, "SS", "Beacon 6");
 
 
@@ -560,9 +560,9 @@ function funcExterna(e) {
 
                 //Modificación para agregar un beacon "falso" para las demos
                 //if (SSID.length == 21) {
-                if (SSID.length == 21 || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido) || (SSID == "Ceibal" && !repetido)) {
+                if (SSID.length == 21 || SSID == "Bermudez" || (SSID == "Otro" && !repetido) || (SSID == "Ceibal" && !repetido)) {
 
-                    if ((SSID.charCodeAt(0) == 83 && SSID.charCodeAt(1) == 71 && SSID.charCodeAt(20) == 0) || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido) || (SSID == "Ceibal" && !repetido)) {
+                    if ((SSID.charCodeAt(0) == 83 && SSID.charCodeAt(1) == 71 && SSID.charCodeAt(20) == 0) || SSID == "Bermudez" || (SSID == "Otro" && !repetido) || (SSID == "Ceibal" && !repetido)) {
                         //Buscamos el beacon en el array local
                         encontrado = buscarBeaconPorIdArray(SSID.substring(0, 16), beaconsEnDBLocal);
 
@@ -580,7 +580,7 @@ function funcExterna(e) {
 
 
                 }
-                if (SSID == "Wifi-ORT" || SSID == "Ceibal") repetido = true;
+                if (SSID == "Otro" || SSID == "Ceibal") repetido = true;
 
             }
             //Ordenamos el array de beacons de acuerdo al radio (De menor a mayor)

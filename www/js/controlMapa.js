@@ -86,7 +86,7 @@ function controlMapaSetup(edicion) {
         mB3 = new mBeacon({ iconUrl: 'img/beacon3.png' }),
         mB4 = new mBeacon({ iconUrl: 'img/beacon4.png' }),
         mB5 = new mBeacon({ iconUrl: 'img/beacon5.png' });
-        mB6 = new mBeacon({ iconUrl: 'img/beacon6.png' });
+    mB6 = new mBeacon({ iconUrl: 'img/beacon6.png' });
 
 
 
@@ -233,7 +233,7 @@ function controlMapaSetup(edicion) {
 
     function getColor(d) {
         return d == "exterior" ? '#cadfc6' :
-            d == "base" ? '#bebebe' :
+            d == "base" ? '#414141' :
                 d == "salon" ? '#ffffff' :
                     d == "gimnasio" ? '#ffffcc' :
                         d == "banio" ? '#cfeef3' :
@@ -266,11 +266,14 @@ function controlMapaSetup(edicion) {
         if (feature.properties && feature.properties.NAME) {
             //layer.bindPopup(feature.properties.NAME + "<br><ons-button onclick='comoLlegar(" + '"ssAds","' + feature.properties.ALIAS + '"' + ")'>Como llegar</ons-button>");
             layer.bindPopup(feature.properties.NAME + "<br><ons-button onclick='rutaMasCorta(" + '"' + feature.properties.ALIAS + '"' + ")'>Como llegar</ons-button>");
+            //console.log(feature.geometry.coordinates[0][0].getBounds().getCenter());
+            //layer.bindTooltip("label", { permanent: true, direction: "center", className: "my-labels" }).openTooltip();
             //.getLatLng().lng
         }
     }
 
     geojson = L.geoJson(plano, { style: style, onEachFeature: popup }).addTo(map);
+
 
 
 
@@ -286,8 +289,19 @@ function controlMapaSetup(edicion) {
     posicionamiento.push(circulo);
 
     var miPos = L.marker([-500, -500], { icon: mRojo }).addTo(map);
-    posicionamiento.push(miPos);
+    var miDestino = L.marker([-500, -500], { icon: mVerde }).addTo(map);
 
+
+    posicionamiento.push(miPos);
+    posicionamiento.push(miDestino);
+
+
+    //Nombre para las features (En desarrollo)
+    /*
+        var miPosXX = L.marker([900, 900], { icon: mVerde }).addTo(map);
+        //miPosXX.bindTooltip("my tooltip text").openTooltip();
+        miPosXX.bindTooltip("label", { permanent: true, direction: "center", className: "my-labels" }).openTooltip();
+    */
 
     ///////////////////////////////////////////////////////////////////////////////////////
     ////////////////// Búsqueda
@@ -354,26 +368,77 @@ function controlMapaSetup(edicion) {
      */
 
 
+    function nombreDeLosFeatures() {
+        var _capaObtenida;
+        var _nombre;
+        for (var i = 0; i < geojson.getLayers().length; i++) {
+            _capaObtenida = geojson.getLayers()[i];
+            if (_capaObtenida.feature.properties.LABEL) {
+
+                _nombre = _capaObtenida.feature.properties.LABEL;
+
+                console.log(_capaObtenida.feature.properties.NAME);
+                console.log(_capaObtenida.getBounds());
+
+                console.log(_capaObtenida.getBounds().getCenter());
+                //L.marker(_capaObtenida.getBounds().getCenter(), { icon: mVerde }).addTo(map);
+                _capaObtenida.bindTooltip(_nombre, { permanent: true, direction: "center", className: "my-labels" }).openTooltip();
+            }
+
+        }
+    }
+
+    nombreDeLosFeatures();
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Llave de fin de función inicial
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
-function viajar(_Array, comienzaEnPosicion) {
+function viajar(_Array, _comienzaEnPosicion, _distancia) {
     var _miPos = posicionamiento[1].getLatLng();
-
+    var _marcadorOrigen = posicionamiento[1];
+    var _marcadorDestino = posicionamiento[2];
+    var _distancia;
+    var _distanciaObt = 0;
+    var _grupo;
 
 
 
     var _Array;
-    if (comienzaEnPosicion) {
-
+    if (_comienzaEnPosicion) {
 
 
         //generamos el punto "nexo" entre la posición y el nodo inicio
         var _lat = _Array[_Array.length - 1][0];
+        var _lng = _Array[_Array.length - 1][1];
+
+
+        //dist2puntos(a.posX, a.posY, b.posX, b.posY);
+        _distanciaObt += dist2puntos(_lng, _lat, _miPos.lng, _miPos.lat);
+        _distanciaObt += dist2puntos(_lng, _lat, _miPos.lng, _lat);
+
+
         _Array.push([_lat, _miPos.lng]);
 
         _Array.push(_miPos);
     }
     travel2 = L.polyline(_Array).addTo(map);
+    _marcadorDestino.bindPopup("Su destino a:<br>" + redondeo((_distancia / escala) + _distanciaObt) + " metros");
+    map.addLayer(_marcadorDestino);
+    _marcadorDestino.openPopup();
+/*
+    _grupo = L.featureGroup([_marcadorOrigen, _marcadorDestino]);
+    var zoom = (map.getBoundsZoom(grupo.getBounds())) - 1;
+
+    map.setView(grupo.getBounds().getCenter(), zoom); 
+    //map.fitBounds(grupo.getBounds().pad(0.5));
+*/
+    alertarOns("Su destino a: ", redondeo((_distancia / escala) + _distanciaObt) + " metros");
 }
 
 function dibujarBeacon2(beacon, numero, editable) {
@@ -386,6 +451,7 @@ function dibujarBeacon2(beacon, numero, editable) {
     }
 
     marcadoresDisponibles[numero].bindPopup(beacon.idBeacon + "<br>Lng/X:" + Math.round(marcadoresDisponibles[numero].getLatLng().lng) + " - Lat/Y:" + Math.round(marcadoresDisponibles[numero].getLatLng().lat));
+
     //marcadoresDisponibles[numero].on('dragend', function (e) {bindPopup(beacon.idBeacon + "<br>Lat/Y:" +Math.round(marcadoresDisponibles[numero].getLatLng().lat) + " - Lng/X:" + Math.round(marcadoresDisponibles[numero].getLatLng().lng)); });
 }
 
@@ -404,7 +470,7 @@ function grabarPosiciones() {
                 dbUpdateBeacon("Bermudez", Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
                 break;
             case 4:
-                dbUpdateBeacon("Wifi-ORT", Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
+                dbUpdateBeacon("Otro", Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
                 break;
             case 5:
                 dbUpdateBeacon("Ceibal", Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
@@ -413,7 +479,7 @@ function grabarPosiciones() {
                 dbUpdateBeacon("SG000001AAAA000" + (i + 1), Math.round(marcadoresDisponibles[i].getLatLng().lng), Math.round(marcadoresDisponibles[i].getLatLng().lat), "SS", "Beacon " + (i + 1));
 
         }
-        //Bermudez Wifi-ORT
+        //Bermudez Otro
 
     }
     actualizarPlano = true;
@@ -666,8 +732,12 @@ const dijkstra = (graph, startNodeName, endNodeName) => {
 
 /// Queda acá para tener los valores
 function comoLlegar(origen, destino, comienzaEnPosicion) {
+    var _marcadorDestino = posicionamiento[2];
+
     try {
         map.removeLayer(travel2);
+
+
         //map.removeLayer(travel1);
 
     }
@@ -675,23 +745,40 @@ function comoLlegar(origen, destino, comienzaEnPosicion) {
         console.log("Atención: Aún no hay rutas trazadas");
         //alertarOns("Atención:", "Aún no hay rutas trazadas")
     }
-
     try {
-
-        var res = dijkstra(nodosMapa, origen, destino);
-        console.log(dijkstra(nodosMapa, origen, destino));
-        console.log("res.nodos");
-
-        console.log(res.nodos);
-        viajar(res.nodos, comienzaEnPosicion);
-        cerrarPopup(destino);
-        //$("#pInfo").text("Su destino a", redondeo(res.distance / escala) + " metros");
-        alertarOns("Su destino a", redondeo(res.distance / escala) + " metros")
+        map.removeLayer(_marcadorDestino);
 
     }
     catch{
-        alertarOns("Atención:", "No se pudo calcular la ruta al destino")
+        console.log("Atención: No se pudo eliminar el marcador destino");
     }
+
+    if (origen !== destino) {
+
+
+        try {
+
+            var res = dijkstra(nodosMapa, origen, destino);
+            console.log(dijkstra(nodosMapa, origen, destino));
+            console.log("res.nodos");
+            cerrarPopup(destino);
+            console.log(res.nodos);
+            viajar(res.nodos, comienzaEnPosicion, res.distance);
+
+
+            _marcadorDestino.setLatLng(res.nodos[0]);
+            //$("#pInfo").text("Su destino a", redondeo(res.distance / escala) + " metros");
+            // alertarOns("Su destino a", redondeo(res.distance / escala) + " metros");
+
+        }
+        catch{
+            alertarOns("Atención:", "No se pudo calcular la ruta al destino")
+        }
+    } else {
+        alertarOns("Atención:", "El origen y el destino deben ser distintos")
+        cerrarPopup(destino);
+    }
+
 }
 
 
@@ -792,7 +879,7 @@ function rutaMasCorta(_destino) {
             //Preguntamos si las coordenadas están dentro de los límites de la capa
             if (_capaObtenida.getBounds().contains(_miPos)) {
 
-                //con el if nos aseguramos que el lugar es un salón, lab, etc pues posee ALIAS
+                //con el if nos aseguramos que el lugar es un salón, lab, etc pues posee ALIAS o es libre (pasillo)
                 if (_capaObtenida.feature.properties.ALIAS || _capaObtenida.feature.properties.TIPO === "libre") {
 
                     if (_capaObtenida.feature.properties.TIPO !== "libre") {
