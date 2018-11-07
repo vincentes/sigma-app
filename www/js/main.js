@@ -557,6 +557,8 @@ AlumnoPage = {
 var periodoScan = null;
 var centrarMapa = false;
 
+
+
 function mapa() {
   document.querySelector('#nav').pushPage('mapa.html')
 }
@@ -604,14 +606,14 @@ function scanOnsen() {
     if (periodoScan === null) {
       periodoScan = setInterval(function () {
         WifiWizard.startScan(scanOK, scanFail);
-      }, 5000);
+      }, 2000);
     } else {
       console.log("Atención - Ya se inició el scan");
     }
 
   }
   catch (err) {
-    alertarOns('Atención!', "Plugin Error - " + err.message);
+    toastOns('Atención!', "Plugin Error - " + err.message);
   }
 }
 
@@ -619,6 +621,7 @@ function detenerScan() {
   if (periodoScan !== null) {
     clearTimeout(periodoScan);
     periodoScan = null;
+    avisadoGPS = 0;
   } else {
     console.log("Atención - Ya se detuvo el scan");
   }
@@ -627,11 +630,11 @@ function detenerScan() {
 function centrarMapaPos() {
   if (centrarMapa) {
     actDesCentrarMapa(false);
-    
+
   } else {
 
     actDesCentrarMapa(true);
-   
+
   }
 }
 
@@ -639,6 +642,7 @@ function actDesCentrarMapa(_activar) {
   var _activar;
   var _msg = "Activado";
   var _color = "black";
+  var _estadoActualCentrado = centrarMapa;
 
   if (_activar) {
     centrarMapa = true;
@@ -650,5 +654,8 @@ function actDesCentrarMapa(_activar) {
   }
 
   document.getElementById('fabCentrarMapa').setAttribute("style", "color: " + _color + ";");
-  alertarOns("Centrar mapa", _msg);
+  if (_estadoActualCentrado != centrarMapa) {
+    toastOns("Centrar mapa", _msg);
+
+  }
 }

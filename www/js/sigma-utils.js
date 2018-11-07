@@ -4,6 +4,59 @@ var Request = {
     }
 };
 
+var Utils = {
+    toGroupName: function(grado, numero) {
+        var gradoTranslation;
+        switch(grado) {
+          case 1:
+            gradoTranslation = 4;
+            break;
+          case 2:
+            gradoTranslation = 5;
+            break;
+          case 3:
+            gradoTranslation = 6;
+            break;
+        }
+        return "{0}º{1}".format(gradoTranslation, numero);
+    },
+    serverDateToLocal: function(serverDate) {
+        var tokens = serverDate.split('-');
+        var year = tokens[0];
+        var month = tokens[1];
+        var day = tokens[2].split('T')[0];
+        return "{0}/{1}/{2}".format(day, month, year);
+    },
+    timeSelectorDateToServer: function(timeSelectorDate) {
+        var tokens = timeSelectorDate.split('-');
+        var year = tokens[0];
+        var month = tokens[1];
+        var day = tokens[2];
+        return "{0}/{1}/{2}".format(month, day, year);
+    },
+    empty: function(val) {
+        if (val === undefined)
+            return true;
+    
+        if (typeof (val) == 'function' || typeof (val) == 'number' || typeof (val) == 'boolean' || Object.prototype.toString.call(val) === '[object Date]')
+            return false;
+    
+        if (val == null || val.length === 0)
+            return true;
+    
+        if (typeof (val) == "object") {
+            var r = true;
+    
+            for (var f in val)
+                r = false;
+    
+            return r;
+        }
+    
+        return false;
+    }
+};
+
 var Network = {
     online: false,
     callback: function() {
@@ -145,6 +198,10 @@ LocalData = {
     getEncuestas: function() {
         return this.encuestas;
     },
+    getAlerta: function() {
+        this.alerta = window.localStorage.getItem("sigma_activities_alerta");
+        return this.alerta;
+    },
     sync: function() {
         if(Utils.empty(this.xhrQueue)) {
             this.doAjaxActivities();
@@ -229,7 +286,7 @@ LocalData = {
     },
     setAlerta: function(alerta) {
         this.alerta = alerta;
-        this.saveAlerta(alerta);
+        this.saveAlerta();
     },
     saveAlerta: function() {
         window.localStorage.setItem("sigma_activities_alerta", JSON.stringify(this.alerta));
@@ -251,6 +308,22 @@ LocalData = {
             var deber = LocalData.deberes[i];
             if(deber.id == deberId) {
                 return deber;
+            }
+        }
+    },
+    getParcial: function(parcialId) {
+        for(var i = 0; i < LocalData.parciales.length; i++) {
+            var parcial  = LocalData.parciales[i];
+            if(parcial.id == parcialId) {
+                return parcial;
+            }
+        }
+    },
+    getEscrito: function(escritoId) {
+        for(var i = 0; i < LocalData.escritos.length; i++) {
+            var escrito  = LocalData.escritos[i];
+            if(escrito.id == escritoId) {
+                return escrito;
             }
         }
     },

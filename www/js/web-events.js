@@ -137,6 +137,7 @@ document.addEventListener('init', function(event) {
         var defs = [];
         $("#thumbnail-list-c").show();
         $("#info-deber-consigna").text(data.contenido);
+        $("#avd-materia").text(data.materiaNombre);
         if(!Utils.empty(data.imageIds)) {
             data.imageIds.forEach(function(imageId) {
                 var def = $.Deferred();

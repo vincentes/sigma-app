@@ -1,4 +1,4 @@
-<ons-page id="alumno-home">
+<ons-page id="alumno-home" class="blue-background">
     <ons-toolbar>
         <div class="right">
             <ons-button modifier="light" onclick="logout()"><ons-icon style="font-size: 22px" icon="ion-android-exit"></ons-icon></ons-button>
@@ -9,11 +9,10 @@
     <ons-card>
         <ons-list class="menu">
             <ons-list-item tappable modifier="long-divider" onclick="AlumnoPage.misDeberes()">Mis deberes</ons-list-item>
-            <ons-list-item tappable modifier="long-divider" onclick="Pages.alumnoParciales()">Mis parciales</ons-list-item>
-            <ons-list-item tappable modifier="long-divider" onclick="Pages.alumnoEscritos()">Mis escritos</ons-list-item>
+            <ons-list-item tappable modifier="long-divider" onclick="Pages.alumnoParciales()">Parciales próximos</ons-list-item>
+            <ons-list-item tappable modifier="long-divider" onclick="Pages.alumnoEscritos()">Escritos próximos</ons-list-item>
             <ons-list-item tappable modifier="long-divider" onclick="Pages.alumnoEncuestas()">Encuestas</ons-list-item>
             <ons-list-item tappable modifier="long-divider" onclick="Pages.alumnoAlertas()">Alerta metereológica</ons-list-item>
-            <ons-list-item tappable modifier="long-divider" onclick="Pages.alumnoCS()">Cambios de salón</ons-list-item>
             <ons-list-item tappable modifier="long-divider" onclick="mapa()">Mapa</ons-list-item>        
             <ons-list-item tappable modifier="long-divider" onclick="logout()">Salir</ons-list-item>        
         </ons-list>

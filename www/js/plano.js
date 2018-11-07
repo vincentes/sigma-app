@@ -89,7 +89,11 @@ var plano = {
                 "NAME": "Salón 33",
                 "TIPO": "salon",
                 "ALIAS": "ssSalon33",
-                "LABEL": "S33"
+                "LABEL": ["S33","Salón 33"]
+                
+                
+                
+
             }
         },
         {
@@ -110,7 +114,8 @@ var plano = {
                 "NAME": "Salón 32",
                 "TIPO": "salon",
                 "ALIAS": "ssSalon32",
-                "LABEL": "S32"
+                "LABEL": ["S32","Salón 32"]
+                
             }
         },
         {
@@ -131,7 +136,8 @@ var plano = {
                 "NAME": "Salón 31",
                 "TIPO": "salon",
                 "ALIAS": "ssSalon31",
-                "LABEL": "S31"
+                "LABEL": ["S31","Salón 31"]
+                
             }
         },
         {
@@ -152,7 +158,8 @@ var plano = {
                 "NAME": "Salón 30",
                 "TIPO": "salon",
                 "ALIAS": "ssSalon30",
-                "LABEL": "S30"
+                "LABEL": ["S30","Salón 30"]
+                
             }
         },
         {
@@ -173,7 +180,8 @@ var plano = {
                 "NAME": "Salón 29",
                 "TIPO": "salon",
                 "ALIAS": "ssSalon29",
-                "LABEL": "S29"
+                "LABEL": ["S29","Salón 29"]
+                
             }
         },
         {
@@ -194,7 +202,8 @@ var plano = {
                 "NAME": "Salón 28",
                 "TIPO": "salon",
                 "ALIAS": "ssSalon28",
-                "LABEL": "S28"
+                "LABEL": ["S28","Salón 28"]
+                
             }
         },
         {
@@ -215,7 +224,8 @@ var plano = {
                 "NAME": "Salón Gremial",
                 "TIPO": "salon",
                 "ALIAS": "ssSalonGremial",
-                "LABEL": "SGr"
+                "LABEL": ["SG","SGR","Salón<br>Gremial","Salón Gremial"]
+               
             }
         },
         {
@@ -240,7 +250,7 @@ var plano = {
                 "NAME": "Gimnasio",
                 "TIPO": "gimnasio",
                 "ALIAS": "ssGimCan",
-                "LABEL": "Gimnasio"
+                "LABEL": ["Gimnasio"]
             }
         },
         {
@@ -268,7 +278,7 @@ var plano = {
                 "NAME": "Baño de Damas",
                 "TIPO": "banio",
                 "ALIAS": "ssBanDam",
-                "LABEL": "Ban.<br>Dam."
+                "LABEL": ["D","BD","Bañ.<br>Dam.","Baño<br>Damas","Baño de Damas"]
             }
         },
         {
@@ -296,7 +306,8 @@ var plano = {
                 "NAME": "Baño de Caballeros",
                 "TIPO": "banio",
                 "ALIAS": "ssBanCab",
-                "LABEL": "Ban.<br>Cab."
+                "LABEL": ["C","BC","Bañ.<br>Cab.","Baño<br>Caballeros","Baño de Caballeros"]
+                
             }
         },
         {
@@ -317,7 +328,7 @@ var plano = {
                 "NAME": "Laboratorio de Física",
                 "TIPO": "lab",
                 "ALIAS": "ssLabFis",
-                "LABEL": "Lab.<br>Fis."
+                "LABEL": ["L<br>F","Lab.<br>Fís.","Laboratorio<br>Física","Laboratorio<br>de Física","Laboratorio de Física"]
             }
         },
         {
@@ -338,7 +349,8 @@ var plano = {
                 "NAME": "Laboratorio de Física 2",
                 "TIPO": "lab",
                 "ALIAS": "ssLabFis2",
-                "LABEL": "Lab.<br>Fis2"
+                "LABEL": ["L<br>F2","Lab.<br>Fís.2","Laboratorio<br>Física 2","Laboratorio<br>de Física 2","Laboratorio de Física 2"]
+                
             }
         },
         {
@@ -366,7 +378,7 @@ var plano = {
                 "NAME": "Adscripción",
                 "TIPO": "admin",
                 "ALIAS": "ssAds",
-                "LABEL": "Ads"
+                "LABEL": ["A","Ads","Adscripción"]
             }
         },
         {
@@ -392,7 +404,7 @@ var plano = {
                 "NAME": "Cantina",
                 "TIPO": "cantina",
                 "ALIAS": "ssCantina",
-                "LABEL": "Cant"
+                "LABEL": ["C<br>a","Cant.","Cantina"]
             }
         },
         {
@@ -413,7 +425,7 @@ var plano = {
                 "NAME": "Comedor",
                 "TIPO": "comedor",
                 "ALIAS": "ssComedor",
-                "LABEL": "Com."
+                "LABEL": ["Co.","Com.","Comedor","Comedor principal"]
             }
         },
         {
@@ -434,7 +446,8 @@ var plano = {
                 "NAME": "Comedor 2",
                 "TIPO": "comedor",
                 "ALIAS": "ssComedor2",
-                "LABEL": "Com2"
+                "LABEL": ["C<br>2","Com<br>2","Comedor<br>2","Comedor<br>secundario"]
+               
             }
         },
         //////////////////////////////////////////////////////////////////////////////////////////

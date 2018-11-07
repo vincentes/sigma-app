@@ -1,18 +1,14 @@
-<ons-page id="mapa">
+<ons-page id="mapa" class="">
 
     <ons-toolbar>
         <div class="left">
-            <ons-button modifier="light" onclick="document.querySelector('#nav').popPage()">Volver</ons-button>
+            <ons-button modifier="light" onclick="document.querySelector('#nav').popPage();detenerScan()">Volver</ons-button>
         </div>
-        <!--
-             <div class="center" style="text-align: right;">
-            <ons-search-input placeholder="Buscar Destino" onchange="buscarLugar(this.value)"></ons-search-input>
-            
-            
-        </div>
-             -->
-
-
+        
+             <div class="right" style="text-align: right;" id="divCancelarRuta">
+               
+              
+        </div>     
 
     </ons-toolbar>
     <!--
@@ -38,12 +34,12 @@
 
                 scanSetup();
                 controlMapaSetup(false);
-                //comoLlegar("ssSalonGremial", "ssSalon33", true);
-                //rutaMasCorta("ssSalonGremial");
-                //Ocultamos el fab de configuración salvo que el rol sea Adscripto
+                avisadoWIFI = false;
+
+                //Ocultamos el fab de configuración salvo que se active el modo desarrollador
 
                 $('#beaconConfigFab').hide();
-//LocalData.devEnabled = true;
+                //LocalData.devEnabled = true;
                 if (LocalData.devEnabled) {
                     $('#beaconConfigFab').show();
                 }
@@ -144,7 +140,7 @@
                     <div class="right">
                         <ons-button onclick="scanOnsen()">Iniciar Escaneo</ons-button>
                     </div>
-                   
+
                 </ons-list-item>
                 <ons-list-item>
                     <div class="center">

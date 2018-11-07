@@ -10,6 +10,12 @@ var beaconsEnDBLocal = [];
 var escala = 17;
 var actualizarPlano = false;
 var scanInterval = false;
+var avisadoGPS = 0;
+var avisadoWIFI = false;
+
+
+
+
 
 
 
@@ -29,6 +35,9 @@ function scanSetup() {
         preCargaSQL();
         pasarBeaconsSQLArray();
         dibujarBeaconsEnDb(false);
+        //android6oSuperior();
+
+
 
 
     }
@@ -39,7 +48,7 @@ function scanSetup() {
         dbInsertBeacon("SG000001AAAA0002", 1280, 1560, "SS", "Beacon 2");
         dbInsertBeacon("SG000001AAAA0003", 1395, 1740, "SS", "Beacon 3");
         dbInsertBeacon("Bermudez", 1390, 1575, "SS", "Beacon 4");
-        dbInsertBeacon("Otro", 1280, 1835, "SS", "Beacon 5");
+        dbInsertBeacon("Wifi-ORT", 1280, 1835, "SS", "Beacon 5");
         dbInsertBeacon("Ceibal", 1300, 1670, "SS", "Beacon 6");
 
 
@@ -104,34 +113,96 @@ function scanSetup() {
     <button onclick="clearTimeout(myVar)">Stop it</button>
     */
 
+    //Chequeamos si el dispositivo es android y si su versión es superior o igual a 6.0
+
+
 
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////                        FIN - Llamados al cargar página                         ////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function android6oSuperior() {
+    if (avisadoGPS == 10) {
+        try {
+
+            // alert("el uuid: " + device.uuid);
+            var platform = device.platform;
+
+            if (platform === "Android") {
+                var version = device.version;
+
+                //recortamos el resultado para evitar encontrar texto al final, Ej: Version can also return update level "2.1-update1"
+                //buscamos el primer punto
+                var posPunto = version.indexOf(".");
+                //recortamos
+                var versionOK = version.substring(0, posPunto + 2);
+                //console.log(version);
+
+                //verificamos
+                if (parseInt(versionOK, 10) >= 6) {
+                    alertarOns("Atención:<br>El posicionamiento está tardando demasiado", "Es posible que esté muy lejos del edificio<br>Otra causa puede estar relacionada a que su dispositivo posee " + platform + " - " + version + ", por tanto no olvide activar el GPS y otorgarle permiso de ubicación a la app para su correcto funcionamiento");
+                    avisadoGPS++;
+
+
+
+                    //return true;
+                }
+
+            }
+
+            //return false;
+        }
+        catch{
+            toastOns("Atención:", "No se pudo determinar la información del Sistema");
+            //return false;
+        }
+
+    } else {
+        avisadoGPS++;
+    }
+
+}
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////                                  Win - Fail                                    ////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function fail(e) {
-    alertarOns("Atención", "Error checking Wifi status");
+    toastOns("Atención", "Error comprobando el estado del Wifi");
 }
 
 function scanFail(e) {
-    alertarOns("Atención", "Error al iniciar el scan, compruebe que el WIFI esté encendido");
+    if (!avisadoWIFI) {
+        avisadoWIFI = true;
+        ons.notification.confirm({
+            title: 'Atención',
+            message: 'El WIFI está desactivado<br>¿Desea activarlo ahora?',
+            callback: function (ret) {
+              if (ret === 1) {
+                WifiWizard.setWifiEnabled(true, winEnable, failEnable);
+              }else{
+                $("#pInfo").text('Active el WIFI para obtener su posición');
+              }
+            },
+            buttonLabels: ["Cancelar", "Activar"]
+          });
+        //alertarOns("Atención", "El WIFI está desactivado, desea activarlo ahora<br><ons-button onclick='WifiWizard.setWifiEnabled(true, winEnable, failEnable)'>Activar WIFI</ons-button>");
+       
+    }
 
 }
 
 function winEnable(e) {
-    alertarOns("Atención", "Wifi enabled successfully");
+    toastOns("Atención", "Wifi activado excitosamente");
+    avisadoWIFI = false;
 
 }
 
 
 function failEnable(e) {
-    alertarOns("Atención", "No se pudo activar el WIFI del dispositivo");
+    toastOns("Atención", "No se pudo activar el WIFI del dispositivo");
 }
 
 function win(e) {
@@ -141,7 +212,7 @@ function win(e) {
 
         }
         catch (err) {
-            alertarOns('Atención!', "Plugin Error - " + err.message);
+            toastOns('Atención!', "Plugin Error - " + err.message);
 
         }
     }
@@ -158,7 +229,7 @@ function scanOK(e) {
     }
 
     else {
-        alertarOns("Atención", "No se inició el scan");
+        toastOns("Atención", "No se inició el scan");
     }
 
 }
@@ -167,18 +238,25 @@ function scanOK(e) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function alertarOns(title, msg) {
     try {
-        ons.notification.toast(title + " - " + msg, { timeout: 1000, animation: 'fade' });
+        ons.notification.alert({
+            title: title,
+            message: msg
+        });
     }
     catch{
         alert("Error de alert");
     }
 
-    /*
-    ons.notification.alert({
-        title: title,
-        message: msg
-    });
-    */
+}
+
+function toastOns(title, msg) {
+    try {
+        ons.notification.toast(title + " - " + msg, { timeout: 1000, animation: 'fade' });
+    }
+    catch{
+        alert("Error de toast");
+    }
+
 }
 
 function redondeo(valor) {
@@ -209,7 +287,7 @@ function crearTabla() {
     //No hacemos nada en este metodo, se usará un array en lugar de la base de datos
 
 
-    
+
     myDB.transaction(function (transaction) {
         transaction.executeSql('CREATE TABLE IF NOT EXISTS beacons (ID INTEGER PRIMARY KEY AUTOINCREMENT, idBeacon text UNIQUE, posX integer, posY integer, piso text, tipo text)', [],
             function (tx, result) {
@@ -219,7 +297,7 @@ function crearTabla() {
                 console.log("Error occurred while creating the table.");
             });
     });
-   
+
 }
 
 
@@ -239,18 +317,18 @@ function dbInsertBeacon(idBeacon, posX, posY, piso, tipo) {
     }
 
 */
-    
-        myDB.transaction(function (transaction) {
-            var executeQuery = "INSERT INTO beacons (idBeacon, posX, posY, piso, tipo) VALUES (?,?,?,?,?)";
-            transaction.executeSql(executeQuery, [idBeacon, posX, posY, piso, tipo]
-                , function (tx, result) {
-                    console.log('dbInsertBeacon: Inserted');
-                },
-                function (error) {
-                    console.log('dbInsertBeacon: Error occurred');
-                });
-        });
-        
+
+    myDB.transaction(function (transaction) {
+        var executeQuery = "INSERT INTO beacons (idBeacon, posX, posY, piso, tipo) VALUES (?,?,?,?,?)";
+        transaction.executeSql(executeQuery, [idBeacon, posX, posY, piso, tipo]
+            , function (tx, result) {
+                console.log('dbInsertBeacon: Inserted');
+            },
+            function (error) {
+                console.log('dbInsertBeacon: Error occurred');
+            });
+    });
+
 }
 
 //Actualizar Beacon
@@ -274,7 +352,7 @@ function dbUpdateBeacon(idBeacon, posX, posY, piso, tipo) {
 
 
             dibujarBeaconsEnDb(false);
-            alertarOns('dbUpdateBeacon: Updated:', idBeacon + " - " + posX + " - " + posY + " - " + piso + " - " + tipo);
+            toastOns('dbUpdateBeacon: Updated:', idBeacon + " - " + posX + " - " + posY + " - " + piso + " - " + tipo);
 
             bandera = true;
         }
@@ -285,19 +363,19 @@ function dbUpdateBeacon(idBeacon, posX, posY, piso, tipo) {
 
 
 
-    
+
     myDB.transaction(function (transaction) {
 
         transaction.executeSql("UPDATE beacons set posX =" + posX + ", posY =" + posY + ", piso = '" + piso + "', tipo = '" + tipo + "' where idBeacon = '" + idBeacon + "'", []
             , function (tx, result) {
                 dibujarBeaconsEnDb(false);
-                alertarOns('dbUpdateBeacon: Updated:', idBeacon + " - " + posX + " - " + posY + " - " + piso + " - " + tipo);
+                console.log('dbUpdateBeacon: Updated:', idBeacon + " - " + posX + " - " + posY + " - " + piso + " - " + tipo);
             },
             function (error) {
-                alertarOns('dbUpdateBeacon:', 'Error occurred');
+                toastOns('dbUpdateBeacon:', 'Error occurred');
             });
     });
-    
+
 }
 
 
@@ -305,46 +383,46 @@ function dbUpdateBeacon(idBeacon, posX, posY, piso, tipo) {
 
 //Buscar Beacon en SQL Local por id
 function buscarBeaconPorIdSQL(idBeacon, radio) {
-/*
-    baseDeDatos.forEach(function (_beacon) {
-        var _beacon;
-
-        try {
-            if (_beacon.idBeacon === idBeacon) {
-                //Añadimos el radio como atributo del objeto
-                _beacon.radio = radio;
-                //Lo agregamos al array
-
-                beaconsEncontrados.push(_beacon);
-            }
-
-        }
-        catch{
-            //nada 
-        }
-    });
-*/
+    /*
+        baseDeDatos.forEach(function (_beacon) {
+            var _beacon;
     
-        myDB.transaction(function (transaction) {
-            transaction.executeSql("SELECT * FROM beacons where idBeacon ='" + idBeacon + "'", [], function (tx, results) {
-    
-                var len = results.rows.length;
-                if (len > 0) {
-                    //El beacon es válido y está contrastado en la báse de datos local, lo llamamos "b"
-                    b = results.rows.item(0);
+            try {
+                if (_beacon.idBeacon === idBeacon) {
                     //Añadimos el radio como atributo del objeto
-                    b.radio = radio;
+                    _beacon.radio = radio;
                     //Lo agregamos al array
     
-                    beaconsEncontrados.push(b);
-    
-    
-    
+                    beaconsEncontrados.push(_beacon);
                 }
     
-            }, null);
+            }
+            catch{
+                //nada 
+            }
         });
-    
+    */
+
+    myDB.transaction(function (transaction) {
+        transaction.executeSql("SELECT * FROM beacons where idBeacon ='" + idBeacon + "'", [], function (tx, results) {
+
+            var len = results.rows.length;
+            if (len > 0) {
+                //El beacon es válido y está contrastado en la báse de datos local, lo llamamos "b"
+                b = results.rows.item(0);
+                //Añadimos el radio como atributo del objeto
+                b.radio = radio;
+                //Lo agregamos al array
+
+                beaconsEncontrados.push(b);
+
+
+
+            }
+
+        }, null);
+    });
+
 }
 
 
@@ -376,49 +454,49 @@ function pasarBeaconsSQLArray() {
     beaconsEnDBLocal.length = 0;
 
     //Evitando SQLite
-/*
-    baseDeDatos.forEach(function (_beacon) {
-        var _beacon;
-
-        try {
-            //Pasamos cada beacon al Array
-
-            beaconsEnDBLocal.push(_beacon);
-
-        }
-        catch{
-            //nada 
-        }
-    });
-*/
-
-
-   
-        myDB.transaction(function (transaction) {
-            transaction.executeSql("SELECT * FROM beacons", [], function (tx, results) {
+    /*
+        baseDeDatos.forEach(function (_beacon) {
+            var _beacon;
     
-                var len = results.rows.length;
-                if (len > 0) {
-                    for (var i = 0; i < len; i++) {
-                        //Pasamos cada beacon al Array
-                        var bE = results.rows.item(i);
-                        beaconsEnDBLocal.push(bE);
+            try {
+                //Pasamos cada beacon al Array
     
-                    }
+                beaconsEnDBLocal.push(_beacon);
     
-    
-                }
-    
-            }, null);
+            }
+            catch{
+                //nada 
+            }
         });
-    
+    */
+
+
+
+    myDB.transaction(function (transaction) {
+        transaction.executeSql("SELECT * FROM beacons", [], function (tx, results) {
+
+            var len = results.rows.length;
+            if (len > 0) {
+                for (var i = 0; i < len; i++) {
+                    //Pasamos cada beacon al Array
+                    var bE = results.rows.item(i);
+                    beaconsEnDBLocal.push(bE);
+
+                }
+
+
+            }
+
+        }, null);
+    });
+
 }
 
 //Dibujamos la posición de cada beacon en la DB
 function dibujarBeaconsEnDb(editable) {
     if (actualizarPlano) {
         pasarBeaconsSQLArray();
-        alertarOns("Atención", "Actualizando la base de datos");
+        toastOns("Atención", "Actualizando la base de datos");
         actualizarPlano = false;
     }
 
@@ -433,56 +511,56 @@ function dibujarBeaconsEnDb(editable) {
 
 //Mostramos los datos
 function mostrarDatosSQL() {
-/*
-    $("#aTableData").text("");
-    baseDeDatos.forEach(function (_beacon) {
-        var _beacon;
-
-        try {
-
-            $("#aTableData").append(_beacon.idBeacon + " - " + _beacon.posX + " - " + _beacon.posY + " - " + _beacon.piso + " - " + _beacon.tipo + "<br>");
-        }
-        catch{
-            //nada 
-        }
-    });
-*/
-   
+    /*
+        $("#aTableData").text("");
+        baseDeDatos.forEach(function (_beacon) {
+            var _beacon;
     
-        myDB.transaction(function (transaction) {
+            try {
     
-    
-            transaction.executeSql('SELECT * FROM beacons', [], function (tx, results) {
-                $("#aTableData").text("");
-                var len = results.rows.length, i;
-                // $("#rowCount").append(len);
-                for (i = 0; i < len; i++) {
-    
-                    var encontrado = results.rows.item(i);
-    
-                    $("#aTableData").append(encontrado.idBeacon + " - " + encontrado.posX + " - " + encontrado.posY + " - " + encontrado.piso + " - " + encontrado.tipo + "<br>");
-                }
-    
-            }, null);
+                $("#aTableData").append(_beacon.idBeacon + " - " + _beacon.posX + " - " + _beacon.posY + " - " + _beacon.piso + " - " + _beacon.tipo + "<br>");
+            }
+            catch{
+                //nada 
+            }
         });
-    
-       
+    */
+
+
+    myDB.transaction(function (transaction) {
+
+
+        transaction.executeSql('SELECT * FROM beacons', [], function (tx, results) {
+            $("#aTableData").text("");
+            var len = results.rows.length, i;
+            // $("#rowCount").append(len);
+            for (i = 0; i < len; i++) {
+
+                var encontrado = results.rows.item(i);
+
+                $("#aTableData").append(encontrado.idBeacon + " - " + encontrado.posX + " - " + encontrado.posY + " - " + encontrado.piso + " - " + encontrado.tipo + "<br>");
+            }
+
+        }, null);
+    });
+
+
 }
 
 function borrarTabla() {
 
     //baseDeDatos.length = 0;
-    
-    
-        myDB.transaction(function (transaction) {
-            var executeQuery = "DROP TABLE  IF EXISTS beacons";
-            transaction.executeSql(executeQuery, [],
-                function (tx, result) { console.log('Table deleted successfully.'); },
-                function (error) { console.log('Error occurred while droping the table.'); }
-            );
-        });
-    
-        
+
+
+    myDB.transaction(function (transaction) {
+        var executeQuery = "DROP TABLE  IF EXISTS beacons";
+        transaction.executeSql(executeQuery, [],
+            function (tx, result) { console.log('Table deleted successfully.'); },
+            function (error) { console.log('Error occurred while droping the table.'); }
+        );
+    });
+
+
 }
 
 
@@ -529,6 +607,7 @@ function funcExterna(e) {
 
         WifiWizard.getScanResults({ numLevels: false }, function (result) {
             var repetido = false;
+            var count = 0;
             //Purgamos el array
             beaconsEncontrados.length = 0;
             //Limpiamos el mapa
@@ -556,13 +635,13 @@ function funcExterna(e) {
                 var UNICODE = '';
                 var idBeacon = "";
                 var encontrado = null;
-                console.log("SSID: " + SSID + " - MAC: " + BSSID + " - Level: " + level + " - Freq: " + frequency);
+                //console.log("SSID: " + SSID + " - MAC: " + BSSID + " - Level: " + level + " - Freq: " + frequency);
 
                 //Modificación para agregar un beacon "falso" para las demos
                 //if (SSID.length == 21) {
-                if (SSID.length == 21 || SSID == "Bermudez" || (SSID == "Otro" && !repetido) || (SSID == "Ceibal" && !repetido)) {
+                if (SSID.length == 21 || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido) || (SSID == "Ceibal" && !repetido)) {
 
-                    if ((SSID.charCodeAt(0) == 83 && SSID.charCodeAt(1) == 71 && SSID.charCodeAt(20) == 0) || SSID == "Bermudez" || (SSID == "Otro" && !repetido) || (SSID == "Ceibal" && !repetido)) {
+                    if ((SSID.charCodeAt(0) == 83 && SSID.charCodeAt(1) == 71 && SSID.charCodeAt(20) == 0) || SSID == "Bermudez" || (SSID == "Wifi-ORT" && !repetido) || (SSID == "Ceibal" && !repetido)) {
                         //Buscamos el beacon en el array local
                         encontrado = buscarBeaconPorIdArray(SSID.substring(0, 16), beaconsEnDBLocal);
 
@@ -580,7 +659,7 @@ function funcExterna(e) {
 
 
                 }
-                if (SSID == "Otro" || SSID == "Ceibal") repetido = true;
+                if (SSID == "Wifi-ORT" || SSID == "Ceibal") repetido = true;
 
             }
             //Ordenamos el array de beacons de acuerdo al radio (De menor a mayor)
@@ -592,21 +671,41 @@ function funcExterna(e) {
             $("#pResultado").append("Beacons encontrados: " + beaconsEncontrados.length + "<br>AP's encontrados: " + result.length + '<br>');
             $("#pInfo").text('Posición obtenida');
 
+            count = beaconsEncontrados.length;
 
-            switch (beaconsEncontrados.length) {
+            switch (count) {
                 case 0:
-                    //alertarOns("Atención", "No se puede determinar la posición");
+                    //toastOns("Atención", "No se puede determinar la posición");
                     $("#pInfo").text('No se pudo determinar la posición');
+                    android6oSuperior();
                 case 1:
                     //console.log("En funcExterna: Case 1: " + beaconsEncontrados[0].posX + " - " + beaconsEncontrados[0].posY + " - " + beaconsEncontrados[0].radio);
-                    dibujarRadioPosicion2(beaconsEncontrados[0].posX, beaconsEncontrados[0].posY, beaconsEncontrados[0].radio * escala, false);
+                    try {
+                        dibujarRadioPosicion2(beaconsEncontrados[0].posX, beaconsEncontrados[0].posY, beaconsEncontrados[0].radio * escala, false);
+                    }
+                    catch{
+                        console.log("Case 1, con error");
+                    }
                     break;
                 case 2:
-                    bilateracion();
+                    try {
+                        bilateracion();
+                    }
+                    catch{
+                        console.log("Case 2, con error");
+                    }
+
                     break;
                 default:
-                    //alertarOns("Trilateración", "3 o más beacons");
-                    trilateracion();
+
+                    //toastOns("Trilateración", "3 o más beacons");
+                    try {
+                        trilateracion();
+                    }
+                    catch{
+                        console.log("Case Default, con error");
+                    }
+
             }
 
         });
@@ -615,7 +714,7 @@ function funcExterna(e) {
 
     }
     catch{
-        alertarOns("Error", "Intentando obtener la posición")
+        toastOns("Error", "Intentando obtener la posición")
     }
 
 
@@ -644,7 +743,7 @@ function bilateracion() {
     var disBeaconsAB = dist2puntos(a.posX, a.posY, b.posX, b.posY);
     try {
         if (a.radio > disBeaconsAB) {
-            alertarOns("Atención", "los dos radios son mayores a la dist");
+            toastOns("Atención", "los dos radios son mayores a la dist");
             refactorizarRadios(a, b, disBeaconsAB, 1);
 
         } else {
@@ -667,7 +766,7 @@ function bilateracion() {
         }
     }
     catch{
-        alertarOns("Error", "Bilateración");
+        toastOns("Error", "Bilateración");
     }
 
 }
@@ -826,7 +925,7 @@ function trilateracion() {
         }
     }
     catch{
-        alertarOns("Error", "Trilateración");
+        toastOns("Error", "Trilateración");
     }
 
 
@@ -856,7 +955,7 @@ function clickCounter() {
             }
             alert(msg);
         } else {
-            alertarOns("Atención", "Aún no hay elementos para mostrar");
+            toastOns("Atención", "Aún no hay elementos para mostrar");
 
         }
 

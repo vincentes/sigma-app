@@ -104,7 +104,7 @@ AdscriptoAlertasCreate = {
         API.postAlerta(alerta).done(function() {
             AdscriptoAlertasCreate.submitGeneric(alerta);
         }).fail(function() {
-            ons.notification.toast("No se puedo modificar la alerta.", {timeout:5000});
+            ons.notification.toast("No se pudo modificar la alerta.", {timeout:5000});
         });
     },
     submitOffline: function(alerta) {
