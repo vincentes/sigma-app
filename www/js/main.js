@@ -659,3 +659,10 @@ function actDesCentrarMapa(_activar) {
 
   }
 }
+
+function acercaDe() {
+  ons.notification.alert({
+    title: "Información",
+    message: "Esta aplicación utiliza la librería Leaflet, por más información visite leafletjs.com"
+  });
+}

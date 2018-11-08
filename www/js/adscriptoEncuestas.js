@@ -296,10 +296,12 @@ AdscriptoEncuestaStats = {
                     texto: this.encuesta.preguntas[a].texto
                 });
 
-                $("#cont").append(e.html);
-                for(var i =0; i < this.encuesta.preguntas[a].respuestas.length; i++) {
-                    var r = this.encuesta.preguntas[a].respuestas[i];
-                    $("#" + e.id).append("<ons-list-item>{0}</ons-list-item>".format(r.texto));
+                if(this.encuesta.preguntas[a].texto !== "Cosa?") {
+                    $("#cont").append(e.html);
+                    for(var i =0; i < this.encuesta.preguntas[a].respuestas.length; i++) {
+                        var r = this.encuesta.preguntas[a].respuestas[i];
+                        $("#" + e.id).append("<ons-list-item>{0}</ons-list-item>".format(r.texto));
+                    }
                 }
             }
  

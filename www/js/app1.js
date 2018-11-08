@@ -677,6 +677,21 @@ function funcExterna(e) {
                 case 0:
                     //toastOns("Atención", "No se puede determinar la posición");
                     $("#pInfo").text('No se pudo determinar la posición');
+                    if(destinoFijado != ""){
+                        try{
+                            if(travel2.options.color === "red"){
+                                alertarOns("No se puede determinar tu posición", "La ruta hacia " + nombreSegunAlias(destinoFijado) + " no se actualizará hasta solucionar este inconveniente");
+                            }
+                            travel2.setStyle({
+                                color: 'grey',
+                                weight: '10',
+                                dashArray: [1, 15]
+                              });
+                        }
+                        catch{
+                            console.log("No se pudo cambiar el color de la polyline");
+                        }
+                    }
                     android6oSuperior();
                 case 1:
                     //console.log("En funcExterna: Case 1: " + beaconsEncontrados[0].posX + " - " + beaconsEncontrados[0].posY + " - " + beaconsEncontrados[0].radio);
@@ -743,7 +758,7 @@ function bilateracion() {
     var disBeaconsAB = dist2puntos(a.posX, a.posY, b.posX, b.posY);
     try {
         if (a.radio > disBeaconsAB) {
-            toastOns("Atención", "los dos radios son mayores a la dist");
+            //toastOns("Atención", "los dos radios son mayores a la dist");
             refactorizarRadios(a, b, disBeaconsAB, 1);
 
         } else {
@@ -766,7 +781,9 @@ function bilateracion() {
         }
     }
     catch{
-        toastOns("Error", "Bilateración");
+      //  toastOns("Error", "Bilateración");
+      console.log("Error - Bilateración");
+
     }
 
 }
@@ -925,7 +942,9 @@ function trilateracion() {
         }
     }
     catch{
-        toastOns("Error", "Trilateración");
+       // toastOns("Error", "Trilateración");
+      console.log("Error - Trilateración");
+
     }
 
 

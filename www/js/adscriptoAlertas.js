@@ -39,10 +39,12 @@ API.postAlerta = function(args) {
 
 Pages.adscriptoAlertas = function() {
     Page.pushPage("adscripto-alertas.html");
+    AdscriptoAlertas.init();
 }
 
 Pages.alumnoAlertas = function() {
     Page.pushPage("alumno-alertas.html");
+    AlumnoAlertas.init();
 }
 
 Pages.adscriptoAlertasCreate = function(modify) {
@@ -115,12 +117,14 @@ AdscriptoAlertasCreate = {
 AlumnoAlertas = {
     init: function() {
         $("#alumno-alertas-spinner").show();
-        var online = Network.isOnline();
-        if(online) {
-            this.getOnline();
-        } else {
-            this.getOffline();
-        }
+        Network.updateConnection(function() {
+            var online = Network.isOnline();
+            if(online) {
+                AlumnoAlertas.getOnline();
+            } else {
+                AlumnoAlertas.getOffline();
+            }
+        });
     },
     display: function(alerta) {
         if(!Utils.empty(alerta)) {
@@ -184,12 +188,14 @@ AdscriptoAlertas = {
     },
     alerta: {},
     init: function() {
-        var online = Network.isOnline();
-        if(online) {
-            this.displayOnline();
-        } else {
-            this.displayOffline();
-        }
+        Network.updateConnection(function() {
+            var online = Network.isOnline();
+            if(online) {
+                AdscriptoAlertas.displayOnline();
+            } else {
+                AdscriptoAlertas.displayOffline();
+            }
+        });
     },
     displayOffline: function() {
         this.display(LocalData.getAlerta());

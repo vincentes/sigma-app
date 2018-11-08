@@ -933,6 +933,10 @@ DocenteParcialesCreate = {
         }).get();
         
         Network.updateConnection(function() {
+            var now = new Date();
+            var dateDeadline = new Date(date);
+            dateDeadline.setHours(0,0,0,0);
+            now.setHours(0,0,0,0);
             if(Utils.empty(date)) {
                 ons.notification.toast("No has introducido una fecha para el parcial.", {timeout: 5000});
                 return; 
@@ -942,8 +946,8 @@ DocenteParcialesCreate = {
             } else if(Utils.empty(grupos)) {
                 ons.notification.toast("No has introducido un grupo asignar al parcial.", {timeout: 5000});
                 return; 
-            } else if(new Date(date) < new Date()) {
-                ons.notification.toast("La fecha debe ser posterior a la actual.", {timeout: 5000});
+            } else if(dateDeadline < now) {
+                ons.notification.toast("La fecha debe ser posterior o igual a la actual.", {timeout: 5000});
                 return; 
             }
 
@@ -1022,6 +1026,10 @@ DocenteEscritosCreate = {
                 gruposAsignados: grupos
             };
 
+            var now = new Date();
+            var dateDeadline = new Date(escrito.fecha);
+            dateDeadline.setHours(0,0,0,0);
+            now.setHours(0,0,0,0);
             if(Utils.empty(date)) {
                 ons.notification.toast("No has introducido una fecha para el escrito.", {timeout: 5000});
                 return; 
@@ -1031,8 +1039,8 @@ DocenteEscritosCreate = {
             } else if(Utils.empty(grupos)) {
                 ons.notification.toast("No has introducido un grupo asignar al escrito.", {timeout: 5000});
                 return; 
-            } else if(new Date(date) < new Date()) {
-                ons.notification.toast("La fecha debe ser posterior a la actual.", {timeout: 5000});
+            } else if(dateDeadline < now) {
+                ons.notification.toast("La fecha debe ser posterior o igual a la actual.", {timeout: 5000});
                 return; 
             }
             
@@ -1934,13 +1942,17 @@ DocenteDeberesAssign = {
             }
         });
         
+        var now = new Date();
+        var dateDeadline = new Date(deadline);
+        dateDeadline.setHours(0,0,0,0);
+        now.setHours(0,0,0,0);
         if(Utils.empty(groups)) {
             ons.notification.toast("No has elegido ningun grupo para asignar al deber.", {timeout: 5000});
             return;
         } else if(Utils.empty(deadline)) {
             ons.notification.toast("No has elegido ninguna fecha de entrega.", {timeout: 5000});
             return;
-        } else if(new Date(deadline) <= new Date()) {
+        } else if(dateDeadline < now) {
             ons.notification.toast("La fecha debe ser posterior o igual a la actual.", {timeout: 5000});
             return;
         }

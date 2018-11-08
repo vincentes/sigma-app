@@ -5,6 +5,9 @@ var map;
 var verBeacons = false;
 var geojson;
 var destinoFijado = "";
+var origenFijado = false;
+var dupArray = [];
+
 var centrarEnRuta = false;
 
 function controlMapaSetup(edicion) {
@@ -336,7 +339,7 @@ function controlMapaSetup(edicion) {
 
         //Insertamos el circulo de posicionamiento
         var circulo = L.circle(
-            [-500, -500],
+            [-2500, -2500],
             20,
             { interactive: false }
         ).addTo(map);
@@ -345,12 +348,16 @@ function controlMapaSetup(edicion) {
         posicionamiento.length = 0;
         posicionamiento.push(circulo);
 
-        var miPos = L.marker([-500, -500], { icon: mRojo }).addTo(map);
-        var miDestino = L.marker([-500, -500], { icon: mVerde }).addTo(map);
+        var miPos = L.marker([-2500, -2500], { icon: mRojo }).addTo(map);
+        var miDestino = L.marker([-2500, -2500], { icon: mVerde }).addTo(map);
+        var miOrigen = L.marker([-2500, -2500], { icon: mAzul }).addTo(map);
+
 
 
         posicionamiento.push(miPos);
         posicionamiento.push(miDestino);
+        posicionamiento.push(miOrigen);
+
 
 
         //Nombre para las features (En desarrollo)
@@ -488,10 +495,10 @@ function controlMapaSetup(edicion) {
                     }
 
 
-                   // console.log(_capaObtenida.feature.properties.NAME);
-                   // console.log(_capaObtenida.getBounds());
+                    // console.log(_capaObtenida.feature.properties.NAME);
+                    // console.log(_capaObtenida.getBounds());
 
-                   // console.log(_capaObtenida.getBounds().getCenter());
+                    // console.log(_capaObtenida.getBounds().getCenter());
                     //L.marker(_capaObtenida.getBounds().getCenter(), { icon: mVerde }).addTo(map);
                     //_capaObtenida.unbindTooltip();
                 }
@@ -518,12 +525,13 @@ function controlMapaSetup(edicion) {
 
 function viajar(_Array, _comienzaEnPosicion, _distancia) {
     var _miPos = posicionamiento[1].getLatLng();
-    var _marcadorOrigen = posicionamiento[1];
+    var _marcadorOrigen = posicionamiento[3];
     var _marcadorDestino = posicionamiento[2];
     var _distancia;
     var _distanciaObt = 0;
     var _grupo;
     var _Array;
+    
 
 
 
@@ -544,9 +552,42 @@ function viajar(_Array, _comienzaEnPosicion, _distancia) {
 
         _Array.push(_miPos);
     }
+
+
+    if (!origenFijado) {
+        dupArray.length = 0;
+        dupArray = _Array.slice();
+        /*
+       for(var i = 0; i < _Array.length; i++){
+           dupArray[i] = _Array[i];
+       }
+*/
+        map.addLayer(_marcadorOrigen);
+
+        _marcadorOrigen.setLatLng(posicionamiento[0].getLatLng());
+        _marcadorOrigen.bindPopup("Punto de partida");
+        origenFijado = true;
+    }
+
+    travel1 = L.polyline(dupArray).addTo(map);
+
+    travel1.setStyle({
+        color: 'grey',
+        weight: '10',
+        dashArray: [1, 15]
+    });
+
     travel2 = L.polyline(_Array).addTo(map);
+    travel2.setStyle({
+        color: 'red',
+        weight: '10',
+        dashArray: [1, 15]
+    });
     _marcadorDestino.bindPopup("Tu destino a:<br>" + redondeo((_distancia / escala) + _distanciaObt) + " metros");
     map.addLayer(_marcadorDestino);
+    map.addLayer(_marcadorOrigen);
+
+
 
 
     if (centrarEnRuta) {
@@ -662,7 +703,8 @@ function dibujarRadioPosicion2(posX, posY, radio2, esUnBeacon) {
 
         }
         catch{
-            toastOns("Atención", "Error al fijar posición");
+            // toastOns("Atención", "Error al fijar posición");
+            console.log("En dibujarRadioPosicion2 Error al fijar posición")
         }
 
 
@@ -693,14 +735,14 @@ function verOcultarBeacons(_ver) {
                 $('#modPos').show();
 
             }
-            catch{ toastOns("atención", "Error al agregar el marcador"); }
+            catch{ console.log("atención Error al agregar el marcador"); }
 
         } else {
             try {
                 map.removeLayer(_marcador);
                 $('#modPos').hide();
             }
-            catch{ toastOns("atención", "Error al quitar el marcador"); }
+            catch{ console.log("atención Error al quitar el marcador"); }
 
 
 
@@ -721,14 +763,15 @@ function moverBloquearBeacons(_permitir) {
             try {
                 marker.dragging.enable();
             }
-            catch{ toastOns("atención", "Error al aplicar la propiedad"); }
+            catch{ console.log("En moverBloquearBeacons Error al activar dragging"); }
 
 
         } else {
             try {
                 marker.dragging.disable();
             }
-            catch{ toastOns("atención", "Error al aplicar la propiedad"); }
+            catch{ console.log("En moverBloquearBeacons Error al desactivar dragging"); }
+
 
 
         }
@@ -766,7 +809,29 @@ function buscarLugar(_lugar) {
  
  }
 */
+//Buscar el nombre de un lugar según su Alias
+function nombreSegunAlias(_alias) {
+    var _name;
+    var _alias;
+    var _aliasObt;
 
+    for (var i = 0; i < geojson.getLayers().length; i++) {
+
+        if (geojson.getLayers()[i].feature.properties.NAME) {
+
+            _aliasObt = geojson.getLayers()[i].feature.properties.ALIAS;
+
+            if (_aliasObt.toLowerCase() === _alias.toLowerCase()) {
+                _name = geojson.getLayers()[i].feature.properties.NAME;
+
+            }
+        }
+
+
+    }
+    return _name;
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DIJKSTRA - JS
@@ -856,7 +921,7 @@ function comoLlegar(origen, destino, comienzaEnPosicion) {
         map.removeLayer(travel2);
 
 
-        //map.removeLayer(travel1);
+        map.removeLayer(travel1);
 
     }
     catch{
@@ -912,8 +977,14 @@ function comoLlegar(origen, destino, comienzaEnPosicion) {
 
         }
     } else {
-        toastOns("Atención:", "El origen y el destino deben ser distintos");
-        cerrarPopup(destino);
+        alertarOns("Atención:", "El origen y el destino deben ser distintos");
+        try {
+            cerrarPopup(destino);
+        }
+        catch{
+            console.log("En else de como llegar TRY, no se pudo cerrar el popup");
+        }
+
     }
 
 }
@@ -936,7 +1007,7 @@ function nodoMasCercano(_lat, _lng) {
 
             _menorDistancia = _temp;
             _nodoMasCercano = _prefijo + _counter;
-           // console.log("M dist:" + _menorDistancia + " Nodo: " + _nodoMasCercano);
+            // console.log("M dist:" + _menorDistancia + " Nodo: " + _nodoMasCercano);
         }
         /*
         else {
@@ -1086,8 +1157,14 @@ function cancelarRuta(_avisar) {
     }
 
     destinoFijado = "";
+    origenFijado = false;
+
+
     try {
+
         map.removeLayer(travel2);
+        map.removeLayer(travel1);
+
 
     }
     catch{
@@ -1095,6 +1172,7 @@ function cancelarRuta(_avisar) {
     }
     try {
         map.removeLayer(posicionamiento[2]);
+        map.removeLayer(posicionamiento[3]);
 
     }
     catch{

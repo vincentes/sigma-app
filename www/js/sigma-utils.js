@@ -142,9 +142,11 @@ LocalData = {
     productionServerEnabled: false,
     resetQueue: function() {
         this.queue = [];
+        this.saveQueue();        
     },
     resetXhrQueue: function() {
         this.xhrQueue = [];
+        this.saveQueue();
     },
     doAjaxActivities: function() {
         for(var i = 0; i < this.queue.length; i++) {
@@ -349,6 +351,10 @@ LocalData = {
         window.localStorage.setItem("sigma_activities_parciales", JSON.stringify(this.parciales));
     },
     isAssigned: function(deber, grupoId) {
+        if(Utils.empty(deber.assignments)) {
+            return false;
+        }
+
         for(var j= 0; j < deber.assignments.length; j++) {
             var a = deber.assignments[j];
             if(a == null) {
@@ -442,8 +448,6 @@ LocalData = {
         return null;
     },
     pushDeber: function(deber) {
-        this.deberes.push(deber);
-        window.localStorage.setItem("sigma_user_deberes", JSON.stringify(this.deberes));
         if(!Network.isOnline()) {
             deber.id = this.deberes.length;
             if(Utils.empty(deber.imagesUrl)) {
@@ -452,14 +456,19 @@ LocalData = {
             } else {
                 this.addToQueue("xhrSaveDeberAfterImages", deber);
             }
+            this.deberes.push(deber);
+            window.localStorage.setItem("sigma_user_deberes", JSON.stringify(this.deberes));
             return deber.id;
         }
+        this.deberes.push(deber);
+        window.localStorage.setItem("sigma_user_deberes", JSON.stringify(this.deberes));
     },
     pushParcial: function(parcial) {
         this.parciales.push(parcial);
         window.localStorage.setItem("sigma_user_parciales", JSON.stringify(this.parciales));
         if(!Network.isOnline()) {
-            parcial.id = this.parciales.length;
+            parcial.id = this.parciales.length + 99999;
+            parcial.offline = true; 
             this.addToQueue("createParcial", parcial);
             return parcial.id;
         }
@@ -538,6 +547,11 @@ LocalData = {
         var lsEscritos = JSON.parse(window.localStorage.getItem("sigma_activities_escritos"));
         if(lsEscritos != undefined) {
             LocalData.escritos = lsEscritos; 
+        }
+
+        var lsDeberes = JSON.parse(window.localStorage.getItem("sigma_user_deberes"));
+        if(lsParciales != undefined) {
+            LocalData.deberes = lsDeberes; 
         }
 
         var lsParciales = JSON.parse(window.localStorage.getItem("sigma_activities_parciales"));
